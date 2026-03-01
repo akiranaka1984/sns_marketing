@@ -1649,3 +1649,89 @@ export type SelectHashtagPerformance = typeof hashtagPerformance.$inferSelect;
 // funnelEvents
 export type InsertFunnelEvent = typeof funnelEvents.$inferInsert;
 export type SelectFunnelEvent = typeof funnelEvents.$inferSelect;
+
+// ─── Growth Dashboard tables ─────────────────────────────────────
+
+export const growthLoopState = mysqlTable("growth_loop_state", {
+	id: int().autoincrement().notNull().primaryKey(),
+	projectId: int().notNull(),
+	isRunning: tinyint().default(0).notNull(),
+	currentStrategyScore: int().default(0),
+	consecutiveDeclines: int().default(0),
+	escalationNeeded: tinyint().default(0).notNull(),
+	escalationReason: text(),
+	lastKpiCheckAt: timestamp({ mode: 'string' }),
+	lastStrategyEvaluationAt: timestamp({ mode: 'string' }),
+	lastFullReviewAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("idx_growth_loop_state_projectId").on(table.projectId),
+]);
+
+export const growthLoopActions = mysqlTable("growth_loop_actions", {
+	id: int().autoincrement().notNull().primaryKey(),
+	projectId: int().notNull(),
+	actionType: varchar({ length: 100 }).notNull(),
+	description: text(),
+	status: mysqlEnum(['pending','approved','rejected','executed']).default('pending').notNull(),
+	executionMode: varchar({ length: 50 }),
+	approvedAt: timestamp({ mode: 'string' }),
+	executedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("idx_growth_loop_actions_projectId").on(table.projectId),
+	index("idx_growth_loop_actions_status").on(table.status),
+]);
+
+export const campaigns = mysqlTable("campaigns", {
+	id: int().autoincrement().notNull().primaryKey(),
+	projectId: int().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	goal: text(),
+	status: mysqlEnum(['draft','active','paused','completed']).default('draft').notNull(),
+	budget: decimal({ precision: 12, scale: 2 }).default('0'),
+	revenue: decimal({ precision: 12, scale: 2 }).default('0'),
+	roi: decimal({ precision: 8, scale: 2 }).default('0'),
+	startDate: timestamp({ mode: 'string' }),
+	endDate: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("idx_campaigns_projectId").on(table.projectId),
+]);
+
+export const trackedTrends = mysqlTable("tracked_trends", {
+	id: int().autoincrement().notNull().primaryKey(),
+	trendName: varchar({ length: 255 }).notNull(),
+	trendType: varchar({ length: 100 }),
+	platform: varchar({ length: 50 }),
+	relevanceScore: int().default(0),
+	trendingScore: int().default(0),
+	status: mysqlEnum(['active','expired','used']).default('active').notNull(),
+	detectedAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+},
+(table) => [
+	index("idx_tracked_trends_detectedAt").on(table.detectedAt),
+]);
+
+export const contentCalendar = mysqlTable("content_calendar", {
+	id: int().autoincrement().notNull().primaryKey(),
+	projectId: int().notNull(),
+	scheduledDate: timestamp({ mode: 'string' }).notNull(),
+	timeSlot: varchar({ length: 50 }),
+	contentType: varchar({ length: 100 }),
+	topic: text(),
+	status: mysqlEnum(['planned','drafted','scheduled','published']).default('planned').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("idx_content_calendar_projectId").on(table.projectId),
+	index("idx_content_calendar_scheduledDate").on(table.scheduledDate),
+]);
