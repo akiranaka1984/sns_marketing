@@ -181,12 +181,13 @@ export const appRouter = router({
         return { id: insertId };
       }),
 
-    // Update account (including xHandle and planType)
+    // Update account (including xHandle, planType, postingMethod)
     update: protectedProcedure
       .input(z.object({
         accountId: z.number(),
         xHandle: z.string().optional(),
         planType: z.enum(['free', 'premium', 'premium_plus']).optional(),
+        postingMethod: z.enum(['playwright', 'api_v2', 'duoplus']).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const account = await db.getAccountById(input.accountId);
@@ -200,6 +201,9 @@ export const appRouter = router({
         }
         if (input.planType !== undefined) {
           updateData.planType = input.planType;
+        }
+        if (input.postingMethod !== undefined) {
+          updateData.postingMethod = input.postingMethod;
         }
 
         await db.updateAccount(input.accountId, updateData);

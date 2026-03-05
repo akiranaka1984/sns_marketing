@@ -17,4 +17,7 @@ export const ENV = {
   get llmProvider() {
     return (process.env.LLM_PROVIDER || "openai") as "openai" | "anthropic";
   },
+  get adminPassword() {
+    return process.env.ADMIN_PASSWORD || "";
+  },
 };

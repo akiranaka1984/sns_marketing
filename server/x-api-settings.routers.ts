@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "./db";
 import { xApiSettings } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { testApiV2Connection } from "./x-api-v2-poster";
 
 import { createLogger } from "./utils/logger";
 
@@ -29,6 +30,10 @@ export const xApiSettingsRouter = router({
         apiKey: "",
         apiSecret: "",
         bearerToken: "",
+        accessToken: "",
+        accessTokenSecret: "",
+        apiTier: "free" as const,
+        oauthConfigured: false,
         lastTestedAt: null,
         testResult: null,
       };
@@ -39,6 +44,10 @@ export const xApiSettingsRouter = router({
       apiKey: settings.apiKey || "",
       apiSecret: settings.apiSecret || "",
       bearerToken: settings.bearerToken || "",
+      accessToken: settings.accessToken || "",
+      accessTokenSecret: settings.accessTokenSecret || "",
+      apiTier: settings.apiTier || "free",
+      oauthConfigured: !!(settings.apiKey && settings.apiSecret && settings.accessToken && settings.accessTokenSecret),
       lastTestedAt: settings.lastTestedAt,
       testResult: settings.testResult,
     };
@@ -52,6 +61,9 @@ export const xApiSettingsRouter = router({
       apiKey: z.string().optional(),
       apiSecret: z.string().optional(),
       bearerToken: z.string().optional(),
+      accessToken: z.string().optional(),
+      accessTokenSecret: z.string().optional(),
+      apiTier: z.enum(['free', 'basic', 'pro', 'enterprise']).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.user?.id || 1;
@@ -65,9 +77,12 @@ export const xApiSettingsRouter = router({
         // Update existing
         await db.update(xApiSettings)
           .set({
-            apiKey: input.apiKey || existing.apiKey,
-            apiSecret: input.apiSecret || existing.apiSecret,
-            bearerToken: input.bearerToken || existing.bearerToken,
+            apiKey: input.apiKey ?? existing.apiKey,
+            apiSecret: input.apiSecret ?? existing.apiSecret,
+            bearerToken: input.bearerToken ?? existing.bearerToken,
+            accessToken: input.accessToken ?? existing.accessToken,
+            accessTokenSecret: input.accessTokenSecret ?? existing.accessTokenSecret,
+            apiTier: input.apiTier ?? existing.apiTier,
             updatedAt: new Date().toISOString(),
           })
           .where(eq(xApiSettings.userId, userId));
@@ -78,6 +93,9 @@ export const xApiSettingsRouter = router({
           apiKey: input.apiKey || null,
           apiSecret: input.apiSecret || null,
           bearerToken: input.bearerToken || null,
+          accessToken: input.accessToken || null,
+          accessTokenSecret: input.accessTokenSecret || null,
+          apiTier: input.apiTier || 'free',
         });
       }
 
@@ -161,6 +179,43 @@ export const xApiSettingsRouter = router({
         return {
           success: false,
           message: `接続失敗: ${error.message}`,
+        };
+      }
+    }),
+
+  /**
+   * Test X API v2 OAuth 1.0a connection (for posting)
+   * Uses the saved credentials to call GET /2/users/me
+   */
+  testOAuthConnection: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      try {
+        const result = await testApiV2Connection();
+
+        if (result.success) {
+          const userId = ctx.user?.id || 1;
+          const now = new Date().toISOString();
+
+          await db.update(xApiSettings)
+            .set({ lastTestedAt: now, testResult: 'oauth_success' })
+            .where(eq(xApiSettings.userId, userId));
+
+          return {
+            success: true,
+            message: `OAuth接続成功: @${result.username} として認証されました`,
+            username: result.username,
+          };
+        }
+
+        return {
+          success: false,
+          message: `OAuth接続失敗: ${result.error}`,
+        };
+      } catch (error: any) {
+        logger.error("[X API] OAuth connection test failed:", error);
+        return {
+          success: false,
+          message: `OAuth接続失敗: ${error.message}`,
         };
       }
     }),

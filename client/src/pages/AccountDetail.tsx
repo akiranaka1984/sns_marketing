@@ -6,7 +6,7 @@ import { trpc } from "@/lib/trpc";
 import {
   ArrowLeft, Calendar, Activity, Loader2, Info,
   Edit2, Save, X, RefreshCw, User, BookOpen, Users2, LayoutDashboard, Sparkles, Bot,
-  Monitor, Shield, ShieldCheck, ShieldAlert, ShieldX, LogIn, Trash2, Eye
+  Monitor, Shield, ShieldCheck, ShieldAlert, ShieldX, LogIn, Trash2, Eye, Zap
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import BrowserPreviewDialog from "@/components/BrowserPreviewDialog";
@@ -125,6 +125,16 @@ export default function AccountDetail() {
     },
   });
 
+  const updatePostingMethodMutation = trpc.accounts.update.useMutation({
+    onSuccess: () => {
+      toast.success("投稿方式を変更しました");
+      utils.accounts.byId.invalidate({ id: accountId });
+    },
+    onError: (error) => {
+      toast.error(`変更失敗: ${error.message}`);
+    },
+  });
+
   const syncGrowthMutation = trpc.accounts.syncGrowth.useMutation({
     onSuccess: (result) => {
       toast.success(`成長データを同期しました: ${result.learningsCount}件の学習、${result.totalXP} XP`);
@@ -202,9 +212,14 @@ export default function AccountDetail() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#DDA0DD] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]">
-              <Monitor className="w-3.5 h-3.5" />
-              Playwright
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] ${
+              (account as any).postingMethod === 'api_v2' ? 'bg-[#4ECDC4]' : 'bg-[#DDA0DD]'
+            }`}>
+              {(account as any).postingMethod === 'api_v2' ? (
+                <><Zap className="w-3.5 h-3.5" />API v2</>
+              ) : (
+                <><Monitor className="w-3.5 h-3.5" />Playwright</>
+              )}
             </span>
             {/* Status badge */}
             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] ${
@@ -272,11 +287,34 @@ export default function AccountDetail() {
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-[#1A1A1A]">投稿方式</p>
                     <div className="p-1.5 rounded-lg bg-[#FFFDF7] border-2 border-[#1A1A1A]">
-                      <Monitor className="h-3.5 w-3.5 text-[#1A1A1A]" />
+                      {(account as any).postingMethod === 'api_v2' ? (
+                        <Zap className="h-3.5 w-3.5 text-[#1A1A1A]" />
+                      ) : (
+                        <Monitor className="h-3.5 w-3.5 text-[#1A1A1A]" />
+                      )}
                     </div>
                   </div>
-                  <p className="text-sm font-bold text-[#1A1A1A]">Playwright</p>
-                  <p className="text-[10px] font-bold text-[#1A1A1A] mt-0.5">ブラウザ自動化</p>
+                  <div className="flex gap-1.5">
+                    {([
+                      { value: 'playwright', label: 'Playwright', sub: 'ブラウザ' },
+                      { value: 'api_v2', label: 'API v2', sub: '公式API' },
+                    ] as const).map((method) => (
+                      <button
+                        key={method.value}
+                        type="button"
+                        onClick={() => updatePostingMethodMutation.mutate({ accountId, postingMethod: method.value })}
+                        disabled={updatePostingMethodMutation.isPending}
+                        className={`flex-1 px-2 py-1.5 rounded-lg border-2 border-[#1A1A1A] text-left transition-all ${
+                          ((account as any).postingMethod || 'playwright') === method.value
+                            ? 'bg-[#1A1A1A] text-white shadow-none'
+                            : 'bg-[#FFFDF7] text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]'
+                        }`}
+                      >
+                        <p className="text-[11px] font-bold">{method.label}</p>
+                        <p className={`text-[9px] font-bold ${((account as any).postingMethod || 'playwright') === method.value ? 'text-gray-300' : 'text-[#6B6B6B]'}`}>{method.sub}</p>
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="bg-[#FFD700] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">

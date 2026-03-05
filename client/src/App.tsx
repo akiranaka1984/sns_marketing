@@ -39,10 +39,11 @@ import TeamManagement from "./pages/TeamManagement";
 import { useAuth } from "./_core/hooks/useAuth";
 import DashboardLayout from "./components/DashboardLayout";
 import { CommandPalette } from "./components/CommandPalette";
+import Login from "./pages/Login";
 import { Loader2 } from "lucide-react";
 
 function Router() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, refresh } = useAuth();
 
   if (loading) {
     return (
@@ -58,30 +59,7 @@ function Router() {
   }
 
   if (!isAuthenticated) {
-    // Only auto-redirect to dev-login in development mode
-    const isDev = import.meta.env.DEV;
-    if (isDev) {
-      window.location.href = "/api/dev-login";
-    } else {
-      // In production, redirect to OAuth login
-      const portalUrl = import.meta.env.VITE_OAUTH_PORTAL_URL;
-      const appId = import.meta.env.VITE_APP_ID;
-      if (portalUrl && appId) {
-        const callbackUrl = `${window.location.origin}/api/oauth/callback`;
-        const state = btoa(callbackUrl);
-        window.location.href = `${portalUrl}/oauth/authorize?client_id=${appId}&redirect_uri=${encodeURIComponent(callbackUrl)}&state=${state}&response_type=code`;
-      }
-    }
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA] dark:bg-[#1A1A1A]">
-        <div className="text-center">
-          <div className="w-10 h-10 mx-auto mb-4 rounded-lg bg-[#1A1A1A] dark:bg-white flex items-center justify-center">
-            <span className="text-white dark:text-[#1A1A1A] font-bold text-xs">M</span>
-          </div>
-          <p className="text-sm text-[#A3A3A3]">ログイン中...</p>
-        </div>
-      </div>
-    );
+    return <Login onSuccess={() => refresh()} />;
   }
 
   return (

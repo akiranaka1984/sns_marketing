@@ -22,6 +22,14 @@ export default function Settings() {
   const [xBearerToken, setXBearerToken] = useState("");
   const [showXBearerToken, setShowXBearerToken] = useState(false);
 
+  // X API OAuth 1.0a state (for posting via API v2)
+  const [xApiKey, setXApiKey] = useState("");
+  const [xApiSecret, setXApiSecret] = useState("");
+  const [xAccessToken, setXAccessToken] = useState("");
+  const [xAccessTokenSecret, setXAccessTokenSecret] = useState("");
+  const [xApiTier, setXApiTier] = useState<"free" | "basic" | "pro" | "enterprise">("free");
+  const [showXOAuthFields, setShowXOAuthFields] = useState(false);
+
   // Get API status
   const { data: apiStatus, isLoading: statusLoading, refetch: refetchStatus } = trpc.settings.getApiStatus.useQuery();
 
@@ -52,6 +60,11 @@ export default function Settings() {
       if (xApiSettings.bearerToken && !xBearerToken) {
         setXBearerToken(xApiSettings.bearerToken);
       }
+      if (xApiSettings.apiKey && !xApiKey) setXApiKey(xApiSettings.apiKey);
+      if (xApiSettings.apiSecret && !xApiSecret) setXApiSecret(xApiSettings.apiSecret);
+      if (xApiSettings.accessToken && !xAccessToken) setXAccessToken(xApiSettings.accessToken);
+      if (xApiSettings.accessTokenSecret && !xAccessTokenSecret) setXAccessTokenSecret(xApiSettings.accessTokenSecret);
+      if (xApiSettings.apiTier) setXApiTier(xApiSettings.apiTier as typeof xApiTier);
     }
   }, [xApiSettings]);
 
@@ -122,12 +135,45 @@ export default function Settings() {
     saveApiKeys.mutate({ llmProvider: provider });
   };
 
+  // Test X API OAuth connection
+  const testOAuthConnection = trpc.xApiSettings.testOAuthConnection.useMutation({
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+      refetchXApi();
+    },
+    onError: (error) => {
+      toast.error("\u30A8\u30E9\u30FC: " + error.message);
+    },
+  });
+
   const handleSaveXApi = () => {
     if (!xBearerToken) {
       toast.warning("Bearer Token\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044");
       return;
     }
     saveXApiSettings.mutate({ bearerToken: xBearerToken });
+  };
+
+  const handleSaveXOAuth = () => {
+    if (!xApiKey || !xApiSecret || !xAccessToken || !xAccessTokenSecret) {
+      toast.warning("\u5168\u3066\u306EOAuth\u30D5\u30A3\u30FC\u30EB\u30C9\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044");
+      return;
+    }
+    saveXApiSettings.mutate({
+      apiKey: xApiKey,
+      apiSecret: xApiSecret,
+      accessToken: xAccessToken,
+      accessTokenSecret: xAccessTokenSecret,
+      apiTier: xApiTier,
+    });
+  };
+
+  const handleTestOAuth = () => {
+    testOAuthConnection.mutate();
   };
 
   const handleTestOpenAI = () => {
@@ -530,6 +576,152 @@ export default function Settings() {
           </div>
         </div>
 
+        {/* X API OAuth 1.0a Settings (for posting via API v2) */}
+        <div className="bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg overflow-hidden shadow-[4px_4px_0_#1A1A1A]">
+          <div className="bg-[#4ECDC4] px-5 py-4 border-b-2 border-[#1A1A1A]">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[14px] font-bold text-[#1A1A1A]">X API v2 OAuth 1.0a</h3>
+              <div className="flex items-center gap-2">
+                {xApiSettings?.oauthConfigured ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#A8E6CF] text-[#1A1A1A] border-2 border-[#1A1A1A]">
+                    <span className="w-[5px] h-[5px] rounded-lg bg-[#1A1A1A]" />
+                    {"\u8A2D\u5B9A\u6E08\u307F"}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#FF6B6B] text-[#1A1A1A] border-2 border-[#1A1A1A]">
+                    <span className="w-[5px] h-[5px] rounded-lg bg-[#1A1A1A]" />
+                    {"\u672A\u8A2D\u5B9A"}
+                  </span>
+                )}
+              </div>
+            </div>
+            <p className="text-[12px] text-[#6B6B6B] font-bold mt-1">{"API\u7D4C\u7531\u3067\u306E\u6295\u7A3F\u306B\u4F7F\u7528\uFF08Playwright\u4EE3\u66FF\uFF09"}</p>
+          </div>
+
+          <div className="p-5 space-y-4">
+            <div className="p-3 rounded-lg bg-[#FFF8DC] border-2 border-[#1A1A1A] text-[12px] text-[#1A1A1A] font-bold">
+              {"X Developer Portal\u306E\u300CKeys and tokens\u300D\u304B\u3089\u4EE5\u4E0B4\u3064\u306E\u30AD\u30FC\u3092\u53D6\u5F97\u3057\u3066\u304F\u3060\u3055\u3044\u3002\u3053\u308C\u3089\u306F\u30C4\u30A4\u30FC\u30C8\u6295\u7A3F\u306B\u5FC5\u8981\u3067\u3059\u3002"}
+            </div>
+
+            {/* API Key */}
+            <div className="space-y-2">
+              <Label htmlFor="x-api-key" className="text-[13px] font-bold text-[#1A1A1A]">API Key (Consumer Key)</Label>
+              <div className="relative">
+                <Input
+                  id="x-api-key"
+                  type={showXOAuthFields ? "text" : "password"}
+                  placeholder="API Key..."
+                  value={xApiKey}
+                  onChange={(e) => setXApiKey(e.target.value)}
+                  className="border-2 border-[#1A1A1A] text-[13px] rounded-lg font-bold bg-[#FFFDF7] focus:ring-2 focus:ring-[#1A1A1A]"
+                />
+              </div>
+            </div>
+
+            {/* API Secret */}
+            <div className="space-y-2">
+              <Label htmlFor="x-api-secret" className="text-[13px] font-bold text-[#1A1A1A]">API Secret (Consumer Secret)</Label>
+              <div className="relative">
+                <Input
+                  id="x-api-secret"
+                  type={showXOAuthFields ? "text" : "password"}
+                  placeholder="API Secret..."
+                  value={xApiSecret}
+                  onChange={(e) => setXApiSecret(e.target.value)}
+                  className="border-2 border-[#1A1A1A] text-[13px] rounded-lg font-bold bg-[#FFFDF7] focus:ring-2 focus:ring-[#1A1A1A]"
+                />
+              </div>
+            </div>
+
+            {/* Access Token */}
+            <div className="space-y-2">
+              <Label htmlFor="x-access-token" className="text-[13px] font-bold text-[#1A1A1A]">Access Token</Label>
+              <div className="relative">
+                <Input
+                  id="x-access-token"
+                  type={showXOAuthFields ? "text" : "password"}
+                  placeholder="Access Token..."
+                  value={xAccessToken}
+                  onChange={(e) => setXAccessToken(e.target.value)}
+                  className="border-2 border-[#1A1A1A] text-[13px] rounded-lg font-bold bg-[#FFFDF7] focus:ring-2 focus:ring-[#1A1A1A]"
+                />
+              </div>
+            </div>
+
+            {/* Access Token Secret */}
+            <div className="space-y-2">
+              <Label htmlFor="x-access-token-secret" className="text-[13px] font-bold text-[#1A1A1A]">Access Token Secret</Label>
+              <div className="relative">
+                <Input
+                  id="x-access-token-secret"
+                  type={showXOAuthFields ? "text" : "password"}
+                  placeholder="Access Token Secret..."
+                  value={xAccessTokenSecret}
+                  onChange={(e) => setXAccessTokenSecret(e.target.value)}
+                  className="border-2 border-[#1A1A1A] text-[13px] rounded-lg font-bold bg-[#FFFDF7] focus:ring-2 focus:ring-[#1A1A1A]"
+                />
+              </div>
+            </div>
+
+            {/* Show/Hide toggle */}
+            <button
+              type="button"
+              onClick={() => setShowXOAuthFields(!showXOAuthFields)}
+              className="text-[12px] font-bold text-[#6B6B6B] hover:text-[#1A1A1A] flex items-center gap-1.5 transition-colors"
+            >
+              {showXOAuthFields ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+              {showXOAuthFields ? "\u30AD\u30FC\u3092\u96A0\u3059" : "\u30AD\u30FC\u3092\u8868\u793A"}
+            </button>
+
+            {/* API Tier */}
+            <div className="space-y-2">
+              <Label className="text-[13px] font-bold text-[#1A1A1A]">API{"\u30D7\u30E9\u30F3"}</Label>
+              <div className="flex gap-2">
+                {(["free", "basic", "pro", "enterprise"] as const).map((tier) => (
+                  <button
+                    key={tier}
+                    type="button"
+                    onClick={() => setXApiTier(tier)}
+                    className={`px-3 py-1.5 rounded-lg border-2 border-[#1A1A1A] text-[12px] font-bold transition-all shadow-[2px_2px_0_#1A1A1A] ${
+                      xApiTier === tier
+                        ? "bg-[#4ECDC4] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                        : "bg-[#FFFDF7] hover:bg-[#FFF8DC] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                    }`}
+                  >
+                    {tier.charAt(0).toUpperCase() + tier.slice(1)}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[11px] text-[#6B6B6B] font-bold">
+                Free: {"17\u6295\u7A3F/24h"} | Basic: {"100\u6295\u7A3F/24h"} | Pro: {"300K/\u6708"} | Enterprise: {"\u7121\u5236\u9650"}
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                onClick={handleTestOAuth}
+                disabled={!xApiSettings?.oauthConfigured || testOAuthConnection.isPending}
+                variant="outline"
+                size="sm"
+                className="text-[13px] font-bold border-2 border-[#1A1A1A] bg-[#FFFDF7] hover:bg-[#FFF8DC] rounded-lg transition-all shadow-[4px_4px_0_#1A1A1A] hover:shadow-[2px_2px_0_#1A1A1A] hover:translate-x-[2px] hover:translate-y-[2px]"
+              >
+                {testOAuthConnection.isPending && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+                {"OAuth\u63A5\u7D9A\u30C6\u30B9\u30C8"}
+              </Button>
+              <Button
+                onClick={handleSaveXOAuth}
+                disabled={!xApiKey || !xApiSecret || !xAccessToken || !xAccessTokenSecret || saveXApiSettings.isPending}
+                size="sm"
+                className="text-[13px] font-bold bg-[#FFD700] hover:bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] rounded-lg shadow-[4px_4px_0_#1A1A1A] hover:shadow-[2px_2px_0_#1A1A1A] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              >
+                {saveXApiSettings.isPending && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
+                <Save className="mr-2 h-3.5 w-3.5" />
+                {"\u4FDD\u5B58"}
+              </Button>
+            </div>
+          </div>
+        </div>
+
         {/* API Setup Guide */}
         <div className="bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg overflow-hidden shadow-[4px_4px_0_#1A1A1A]">
           <div className="bg-[#FFDAB9] px-5 py-4 border-b-2 border-[#1A1A1A]">
@@ -561,13 +753,25 @@ export default function Settings() {
             <div className="border-t-2 border-[#1A1A1A] pt-5">
               <h4 className="font-bold text-[#1A1A1A] mb-2 flex items-center gap-2">
                 <span className="w-5 h-5 rounded-lg bg-[#87CEEB] border-2 border-[#1A1A1A] flex items-center justify-center text-[10px] font-bold text-[#1A1A1A]">3</span>
-                X (Twitter) API
+                X (Twitter) API Bearer Token
               </h4>
               <ol className="list-decimal list-inside text-[#6B6B6B] font-bold space-y-1.5 ml-7">
                 <li><a href="https://developer.twitter.com/en/portal/dashboard" target="_blank" rel="noopener noreferrer" className="text-[#1A1A1A] hover:underline font-bold">X Developer Portal</a>{"\u3067\u30A2\u30D7\u30EA\u3092\u4F5C\u6210"}</li>
                 <li>{"\u300CKeys and tokens\u300D\u304B\u3089Bearer Token\u3092\u53D6\u5F97"}</li>
                 <li>{"\u4E0A\u306E\u30D5\u30A9\u30FC\u30E0\u306B\u5165\u529B\u3057\u3066\u300C\u63A5\u7D9A\u30C6\u30B9\u30C8\u300D\u3067\u78BA\u8A8D"}</li>
-                <li>{"\u300C\u4FDD\u5B58\u300D\u30DC\u30BF\u30F3\u3067\u8A2D\u5B9A\u3092\u4FDD\u5B58"}</li>
+              </ol>
+            </div>
+            <div className="border-t-2 border-[#1A1A1A] pt-5">
+              <h4 className="font-bold text-[#1A1A1A] mb-2 flex items-center gap-2">
+                <span className="w-5 h-5 rounded-lg bg-[#4ECDC4] border-2 border-[#1A1A1A] flex items-center justify-center text-[10px] font-bold text-[#1A1A1A]">4</span>
+                X API v2 OAuth 1.0a{"\uFF08\u6295\u7A3F\u7528\uFF09"}
+              </h4>
+              <ol className="list-decimal list-inside text-[#6B6B6B] font-bold space-y-1.5 ml-7">
+                <li>{"X Developer Portal\u3067\u300CUser authentication settings\u300D\u3092\u6709\u52B9\u5316"}</li>
+                <li>{"Read and write\u6A29\u9650\u3092\u8A2D\u5B9A"}</li>
+                <li>{"\u300CKeys and tokens\u300D\u304B\u3089API Key, API Secret, Access Token, Access Token Secret\u3092\u53D6\u5F97"}</li>
+                <li>{"\u4E0A\u306E\u30D5\u30A9\u30FC\u30E0\u306B\u5165\u529B\u3057\u3066\u300COAuth\u63A5\u7D9A\u30C6\u30B9\u30C8\u300D\u3067\u78BA\u8A8D"}</li>
+                <li>{"\u30A2\u30AB\u30A6\u30F3\u30C8\u8A73\u7D30\u753B\u9762\u3067\u6295\u7A3F\u65B9\u5F0F\u3092\u300CAPI v2\u300D\u306B\u5207\u66FF"}</li>
               </ol>
             </div>
           </div>

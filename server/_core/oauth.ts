@@ -2,6 +2,7 @@ import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import type { Express, Request, Response } from "express";
 import * as db from "../db";
 import { getSessionCookieOptions } from "./cookies";
+import { ENV } from "./env";
 import { sdk } from "./sdk";
 import { createLogger } from "../utils/logger";
 
@@ -50,6 +51,56 @@ export function registerOAuthRoutes(app: Express) {
 
     console.log("[Dev] Development login enabled at /api/dev-login");
   }
+  // Admin password login endpoint
+  app.post("/api/admin-login", async (req: Request, res: Response) => {
+    try {
+      const { password } = req.body || {};
+
+      if (!password || typeof password !== "string") {
+        res.status(400).json({ success: false, message: "パスワードを入力してください" });
+        return;
+      }
+
+      const adminPassword = ENV.adminPassword;
+      if (!adminPassword) {
+        logger.error("[Admin Login] ADMIN_PASSWORD environment variable is not set");
+        res.status(500).json({ success: false, message: "管理者パスワードが設定されていません" });
+        return;
+      }
+
+      if (password !== adminPassword) {
+        logger.warn("[Admin Login] Invalid password attempt");
+        res.status(401).json({ success: false, message: "パスワードが正しくありません" });
+        return;
+      }
+
+      const adminOpenId = ENV.ownerOpenId || "admin-user";
+      const adminName = ENV.ownerName || "Admin";
+
+      await db.upsertUser({
+        openId: adminOpenId,
+        name: adminName,
+        email: null,
+        loginMethod: "admin",
+        lastSignedIn: new Date().toISOString().slice(0, 19).replace("T", " "),
+      });
+
+      const sessionToken = await sdk.createSessionToken(adminOpenId, {
+        name: adminName,
+        expiresInMs: ONE_YEAR_MS,
+      });
+
+      const cookieOptions = getSessionCookieOptions(req);
+      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+      logger.info("[Admin Login] Admin logged in successfully");
+      res.json({ success: true, message: "ログインしました" });
+    } catch (error) {
+      logger.error("[Admin Login] Failed:", error);
+      res.status(500).json({ success: false, message: "ログインに失敗しました" });
+    }
+  });
+
   app.get("/api/oauth/callback", async (req: Request, res: Response) => {
     const code = getQueryParam(req, "code");
     const state = getQueryParam(req, "state");

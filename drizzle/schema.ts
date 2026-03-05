@@ -93,8 +93,8 @@ export const accounts = mysqlTable("accounts", {
 	// X (Twitter) plan type - determines character limit
 	// free: 280 chars, premium: 280 chars (articles separate), premium_plus: 25000 chars
 	planType: mysqlEnum(['free', 'premium', 'premium_plus']).default('free').notNull(),
-	// Posting method: playwright (browser automation)
-	postingMethod: mysqlEnum(['duoplus', 'playwright']).default('playwright').notNull(),
+	// Posting method: playwright (browser automation), api_v2 (official X API)
+	postingMethod: mysqlEnum(['duoplus', 'playwright', 'api_v2']).default('playwright').notNull(),
 	// Playwright session status
 	sessionStatus: mysqlEnum(['active', 'expired', 'needs_login']).default('needs_login').notNull(),
 	// Growth system fields - account leveling and experience points
@@ -981,6 +981,11 @@ export const xApiSettings = mysqlTable("x_api_settings", {
 	apiKey: varchar({ length: 255 }),
 	apiSecret: varchar({ length: 500 }),
 	bearerToken: text(),
+	// OAuth 1.0a User Authentication (required for posting via API v2)
+	accessToken: varchar({ length: 500 }),
+	accessTokenSecret: varchar({ length: 500 }),
+	// API plan tier
+	apiTier: mysqlEnum(['free', 'basic', 'pro', 'enterprise']).default('free'),
 	isActive: tinyint().default(1),
 	lastTestedAt: timestamp({ mode: 'string' }),
 	testResult: varchar({ length: 50 }),
