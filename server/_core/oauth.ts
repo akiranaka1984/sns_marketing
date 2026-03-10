@@ -2,7 +2,7 @@ import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import type { Express, Request, Response } from "express";
 import * as db from "../db";
 import { db as drizzleDb } from "../db";
-import { accounts, xApiSettings } from "../../drizzle/schema";
+import { accounts, xApiSettings, adminSettings } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { getSessionCookieOptions } from "./cookies";
 import { ENV } from "./env";
@@ -12,6 +12,7 @@ import {
   pendingOAuthRequests,
   exchangeForAccessToken,
 } from "../account-oauth.routers";
+import bcrypt from "bcryptjs";
 
 const logger = createLogger("oauth");
 
@@ -68,14 +69,26 @@ export function registerOAuthRoutes(app: Express) {
         return;
       }
 
-      const adminPassword = ENV.adminPassword;
-      if (!adminPassword) {
-        logger.error("[Admin Login] ADMIN_PASSWORD environment variable is not set");
-        res.status(500).json({ success: false, message: "管理者パスワードが設定されていません" });
-        return;
+      // Fetch hashed password from DB (0 or 1 row)
+      const dbSetting = await drizzleDb.query.adminSettings.findFirst();
+
+      let isValid = false;
+
+      if (dbSetting) {
+        // DB password exists: verify with bcrypt
+        isValid = await bcrypt.compare(password, dbSetting.passwordHash);
+      } else {
+        // Fallback: compare against ENV.adminPassword for backward compatibility
+        const adminPassword = ENV.adminPassword;
+        if (!adminPassword) {
+          logger.error("[Admin Login] No password configured in DB or environment");
+          res.status(500).json({ success: false, message: "管理者パスワードが設定されていません" });
+          return;
+        }
+        isValid = password === adminPassword;
       }
 
-      if (password !== adminPassword) {
+      if (!isValid) {
         logger.warn("[Admin Login] Invalid password attempt");
         res.status(401).json({ success: false, message: "パスワードが正しくありません" });
         return;
@@ -105,6 +118,69 @@ export function registerOAuthRoutes(app: Express) {
     } catch (error) {
       logger.error("[Admin Login] Failed:", error);
       res.status(500).json({ success: false, message: "ログインに失敗しました" });
+    }
+  });
+
+  // GET /api/admin/password-status - Check if DB password is configured
+  app.get("/api/admin/password-status", async (_req: Request, res: Response) => {
+    try {
+      const dbSetting = await drizzleDb.query.adminSettings.findFirst();
+      res.json({ isSet: !!dbSetting });
+    } catch (error) {
+      logger.error("[Admin Password Status] Failed:", error);
+      res.status(500).json({ error: "ステータスの取得に失敗しました" });
+    }
+  });
+
+  // POST /api/admin/set-password - Set or change the admin password stored in DB
+  app.post("/api/admin/set-password", async (req: Request, res: Response) => {
+    try {
+      const { currentPassword, newPassword } = req.body || {};
+
+      if (!newPassword || typeof newPassword !== "string") {
+        res.status(400).json({ success: false, message: "新しいパスワードを入力してください" });
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        res.status(400).json({ success: false, message: "パスワードは6文字以上で入力してください" });
+        return;
+      }
+
+      const dbSetting = await drizzleDb.query.adminSettings.findFirst();
+
+      if (dbSetting) {
+        // Changing existing password: currentPassword is required
+        if (!currentPassword || typeof currentPassword !== "string") {
+          res.status(400).json({ success: false, message: "現在のパスワードを入力してください" });
+          return;
+        }
+        const isValid = await bcrypt.compare(currentPassword, dbSetting.passwordHash);
+        if (!isValid) {
+          res.status(401).json({ success: false, message: "現在のパスワードが正しくありません" });
+          return;
+        }
+
+        // Update existing record
+        const newHash = await bcrypt.hash(newPassword, 10);
+        await drizzleDb
+          .update(adminSettings)
+          .set({ passwordHash: newHash })
+          .where(eq(adminSettings.id, dbSetting.id));
+
+        logger.info("[Admin Set Password] Password updated successfully");
+        res.json({ success: true, message: "パスワードを変更しました" });
+      } else {
+        // Initial setup: no currentPassword required
+        const newHash = await bcrypt.hash(newPassword, 10);
+        await drizzleDb.insert(adminSettings).values({ passwordHash: newHash });
+
+        logger.info("[Admin Set Password] Initial password set successfully");
+        res.json({ success: true, message: "管理者パスワードを設定しました" });
+      }
+    } catch (error) {
+      logger.error("[Admin Set Password] Failed:", error);
+      res.status(500).json({ success: false, message: "パスワードの設定に失敗しました" });
     }
   });
 

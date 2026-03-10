@@ -1759,3 +1759,14 @@ export const contentCalendar = mysqlTable("content_calendar", {
 	index("idx_content_calendar_projectId").on(table.projectId),
 	index("idx_content_calendar_scheduledDate").on(table.scheduledDate),
 ]);
+
+// Admin settings table: stores hashed admin password (0 or 1 row)
+export const adminSettings = mysqlTable("admin_settings", {
+	id: int("id").primaryKey().autoincrement(),
+	passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+	createdAt: timestamp("created_at").defaultNow(),
+	updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type AdminSettings = typeof adminSettings.$inferSelect;
+export type NewAdminSettings = typeof adminSettings.$inferInsert;

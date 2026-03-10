@@ -186,8 +186,12 @@ jobs:
           VITE_OAUTH_PORTAL_URL=${{ secrets.VITE_OAUTH_PORTAL_URL }}
           OAUTH_SERVER_URL=${{ secrets.OAUTH_SERVER_URL }}
           PRODUCTION_URL=${{ secrets.PRODUCTION_URL }}
+          ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
           GITHUB_REPOSITORY=${{ github.repository }}
           IMAGE_TAG=${IMAGE_TAG}
+          NODE_ENV=production
+          ENABLE_DEV_LOGIN=false
+          TZ=Asia/Tokyo
           EOF
 
             # Pull new images
