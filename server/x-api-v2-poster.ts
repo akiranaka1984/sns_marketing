@@ -14,8 +14,8 @@
 
 import crypto from 'crypto';
 import { db } from './db';
-import { xApiSettings, accounts } from '../drizzle/schema';
-import { eq } from 'drizzle-orm';
+import { xApiSettings, accounts, apiUsageTracking } from '../drizzle/schema';
+import { eq, sql } from 'drizzle-orm';
 import { createLogger } from './utils/logger';
 
 const logger = createLogger('x-api-v2-poster');
@@ -106,22 +106,93 @@ function generateOAuthHeader(
 
 // ─── Credential Loading ──────────────────────────────────────────────
 
-async function getOAuthCredentials(): Promise<OAuthCredentials | null> {
+/**
+ * Load OAuth credentials for a specific account.
+ *
+ * Resolution order:
+ * 1. Per-account tokens (oauthAccessToken + oauthAccessTokenSecret from accounts table)
+ *    combined with the global API Key + API Secret from xApiSettings.
+ * 2. Fully global credentials from xApiSettings (backward-compatible fallback).
+ *
+ * The API Key / API Secret (consumer key/secret) always come from the Developer App
+ * and are stored globally. The Access Token / Access Token Secret are per-user and
+ * may be stored on each account after a 3-legged OAuth flow.
+ */
+async function getOAuthCredentials(accountId: number): Promise<OAuthCredentials | null> {
+  // Always load the global developer app credentials
   const settings = await db.query.xApiSettings.findFirst({
     where: eq(xApiSettings.userId, 1),
   });
 
-  if (!settings?.apiKey || !settings?.apiSecret || !settings?.accessToken || !settings?.accessTokenSecret) {
-    logger.error('Missing OAuth 1.0a credentials in x_api_settings. All four fields are required: apiKey, apiSecret, accessToken, accessTokenSecret');
+  if (!settings?.apiKey || !settings?.apiSecret) {
+    logger.error('Missing global API Key / API Secret in x_api_settings');
     return null;
   }
 
+  // Try to load per-account OAuth tokens
+  const account = await db.query.accounts.findFirst({
+    where: eq(accounts.id, accountId),
+  });
+
+  if (account?.oauthAccessToken && account?.oauthAccessTokenSecret) {
+    logger.info({ accountId, oauthUsername: account.oauthUsername }, 'Using per-account OAuth tokens');
+    return {
+      apiKey: settings.apiKey,
+      apiSecret: settings.apiSecret,
+      accessToken: account.oauthAccessToken,
+      accessTokenSecret: account.oauthAccessTokenSecret,
+    };
+  }
+
+  // Fall back to global access token / secret
+  if (!settings.accessToken || !settings.accessTokenSecret) {
+    logger.error(
+      { accountId },
+      'No per-account OAuth tokens and no global Access Token / Access Token Secret in x_api_settings',
+    );
+    return null;
+  }
+
+  logger.info({ accountId }, 'Falling back to global OAuth tokens for account');
   return {
     apiKey: settings.apiKey,
     apiSecret: settings.apiSecret,
     accessToken: settings.accessToken,
     accessTokenSecret: settings.accessTokenSecret,
   };
+}
+
+// ─── API Usage Tracking ──────────────────────────────────────────────
+
+/**
+ * Increment the tweet count for an account in the current month.
+ * Uses INSERT ... ON DUPLICATE KEY UPDATE for an atomic upsert.
+ */
+async function recordApiUsage(accountId: number): Promise<void> {
+  const month = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
+  const now = new Date().toISOString().slice(0, 19).replace('T', ' '); // MySQL datetime string
+
+  try {
+    await db
+      .insert(apiUsageTracking)
+      .values({
+        accountId,
+        month,
+        tweetCount: 1,
+        lastPostedAt: now,
+      })
+      .onDuplicateKeyUpdate({
+        set: {
+          tweetCount: sql`${apiUsageTracking.tweetCount} + 1`,
+          lastPostedAt: now,
+        },
+      });
+
+    logger.info({ accountId, month }, 'API usage recorded');
+  } catch (error: any) {
+    // Non-fatal: log and continue so the caller is not affected
+    logger.error({ accountId, month, err: error.message }, 'Failed to record API usage');
+  }
 }
 
 // ─── Rate Limit Handling ─────────────────────────────────────────────
@@ -346,7 +417,7 @@ export async function postToXViaApiV2(
   mediaUrls?: string[],
 ): Promise<ApiV2PostResult> {
   try {
-    const credentials = await getOAuthCredentials();
+    const credentials = await getOAuthCredentials(accountId);
     if (!credentials) {
       return {
         success: false,
@@ -463,6 +534,9 @@ export async function postToXViaApiV2(
 
     logger.info({ accountId, tweetId, postUrl }, 'Tweet posted successfully via API v2');
 
+    // Record API usage (non-blocking, errors are swallowed inside recordApiUsage)
+    await recordApiUsage(accountId);
+
     return {
       success: true,
       message: 'Tweet posted successfully via X API v2',
@@ -482,8 +556,31 @@ export async function postToXViaApiV2(
 // ─── Connection Test ─────────────────────────────────────────────────
 
 /**
+ * Load global OAuth credentials (API Key + Secret + Access Token + Secret from xApiSettings).
+ * Used exclusively by testApiV2Connection to verify the Developer App credentials.
+ */
+async function getGlobalOAuthCredentials(): Promise<OAuthCredentials | null> {
+  const settings = await db.query.xApiSettings.findFirst({
+    where: eq(xApiSettings.userId, 1),
+  });
+
+  if (!settings?.apiKey || !settings?.apiSecret || !settings?.accessToken || !settings?.accessTokenSecret) {
+    logger.error('Missing OAuth 1.0a credentials in x_api_settings. All four fields are required: apiKey, apiSecret, accessToken, accessTokenSecret');
+    return null;
+  }
+
+  return {
+    apiKey: settings.apiKey,
+    apiSecret: settings.apiSecret,
+    accessToken: settings.accessToken,
+    accessTokenSecret: settings.accessTokenSecret,
+  };
+}
+
+/**
  * Test the X API v2 connection by verifying credentials.
  * Uses GET /2/users/me to check if the OAuth tokens are valid.
+ * Always uses global credentials (tests the Developer App OAuth, not per-account).
  */
 export async function testApiV2Connection(): Promise<{
   success: boolean;
@@ -491,7 +588,7 @@ export async function testApiV2Connection(): Promise<{
   error?: string;
 }> {
   try {
-    const credentials = await getOAuthCredentials();
+    const credentials = await getGlobalOAuthCredentials();
     if (!credentials) {
       return { success: false, error: 'Missing OAuth credentials' };
     }

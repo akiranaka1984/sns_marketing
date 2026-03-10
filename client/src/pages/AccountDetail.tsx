@@ -6,7 +6,8 @@ import { trpc } from "@/lib/trpc";
 import {
   ArrowLeft, Calendar, Activity, Loader2, Info,
   Edit2, Save, X, RefreshCw, User, BookOpen, Users2, LayoutDashboard, Sparkles, Bot,
-  Monitor, Shield, ShieldCheck, ShieldAlert, ShieldX, LogIn, Trash2, Eye, Zap
+  Monitor, Shield, ShieldCheck, ShieldAlert, ShieldX, LogIn, Trash2, Eye, Zap,
+  Link2, Unlink, AlertTriangle
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import BrowserPreviewDialog from "@/components/BrowserPreviewDialog";
@@ -142,6 +143,31 @@ export default function AccountDetail() {
     },
     onError: (error) => {
       toast.error(`同期失敗: ${error.message}`);
+    },
+  });
+
+  // OAuth hooks
+  const { data: oauthStatus } = trpc.accountOAuth.getOAuthStatus.useQuery(
+    { accountId },
+    { enabled: !!accountId }
+  );
+
+  const startOAuthMutation = trpc.accountOAuth.startOAuthFlow.useMutation({
+    onSuccess: (result) => {
+      window.open(result.authUrl, '_blank', 'width=600,height=700');
+    },
+    onError: (error) => {
+      toast.error(`OAuth開始失敗: ${error.message}`);
+    },
+  });
+
+  const disconnectMutation = trpc.accountOAuth.disconnectAccount.useMutation({
+    onSuccess: () => {
+      toast.success("連携を解除しました");
+      utils.accountOAuth.getOAuthStatus.invalidate({ accountId });
+    },
+    onError: (error) => {
+      toast.error(`連携解除失敗: ${error.message}`);
     },
   });
 
@@ -357,6 +383,127 @@ export default function AccountDetail() {
                     同期
                   </Button>
                 </div>
+              </div>
+
+              {/* X API OAuth Connection */}
+              <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B]">X API 連携</p>
+                  {oauthStatus?.oauthTokenStatus === 'active' && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#A8E6CF] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                      <span className="w-[5px] h-[5px] rounded-full bg-[#1A1A1A]" />
+                      連携済み
+                    </span>
+                  )}
+                  {oauthStatus?.oauthTokenStatus === 'expired' && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#FFDAB9] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      期限切れ
+                    </span>
+                  )}
+                  {(oauthStatus?.oauthTokenStatus === 'not_connected' || oauthStatus?.oauthTokenStatus === 'revoked' || !oauthStatus) && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#FF6B6B] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                      <span className="w-[5px] h-[5px] rounded-full bg-[#1A1A1A]" />
+                      未連携
+                    </span>
+                  )}
+                </div>
+
+                {/* Connected state */}
+                {oauthStatus?.oauthTokenStatus === 'active' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-[#A8E6CF] border-2 border-[#1A1A1A]">
+                      <div className="p-2 rounded-lg bg-[#FFFDF7] border-2 border-[#1A1A1A]">
+                        <Link2 className="w-4 h-4 text-[#1A1A1A]" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-[#1A1A1A]">
+                          @{oauthStatus.oauthUsername || account.username}
+                        </p>
+                        {oauthStatus.oauthConnectedAt && (
+                          <p className="text-[10px] font-bold text-[#6B6B6B] mt-0.5">
+                            連携日: {new Date(oauthStatus.oauthConnectedAt).toLocaleDateString('ja-JP')}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          if (confirm("X APIの連携を解除しますか？")) {
+                            disconnectMutation.mutate({ accountId });
+                          }
+                        }}
+                        disabled={disconnectMutation.isPending}
+                        className="h-8 text-xs font-bold border-2 border-[#1A1A1A] bg-[#FF6B6B] text-[#1A1A1A] hover:bg-[#FF6B6B] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+                      >
+                        {disconnectMutation.isPending ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                        ) : (
+                          <Unlink className="h-3.5 w-3.5 mr-1.5" />
+                        )}
+                        連携解除
+                      </Button>
+                    </div>
+                    <p className="text-[11px] font-bold text-[#6B6B6B]">
+                      X API v2を使用して直接投稿が可能です。投稿方式を「API v2」に設定してください。
+                    </p>
+                  </div>
+                )}
+
+                {/* Expired / Revoked state */}
+                {(oauthStatus?.oauthTokenStatus === 'expired' || oauthStatus?.oauthTokenStatus === 'revoked') && (
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-[#FFDAB9] border-2 border-[#1A1A1A]">
+                      <div className="p-2 rounded-lg bg-[#FFFDF7] border-2 border-[#1A1A1A]">
+                        <AlertTriangle className="w-4 h-4 text-[#1A1A1A]" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-[#1A1A1A]">アクセストークンが無効です</p>
+                        <p className="text-[10px] font-bold text-[#6B6B6B] mt-0.5">
+                          {oauthStatus.oauthTokenStatus === 'expired'
+                            ? 'トークンの有効期限が切れました。再連携してください。'
+                            : 'アクセスが取り消されました。再連携してください。'}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => startOAuthMutation.mutate({ accountId })}
+                      disabled={startOAuthMutation.isPending}
+                      className="h-8 text-xs font-bold bg-[#FFD700] hover:bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[2px_2px_0_#1A1A1A] hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
+                    >
+                      {startOAuthMutation.isPending ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                      ) : (
+                        <Link2 className="h-3.5 w-3.5 mr-1.5" />
+                      )}
+                      再連携する
+                    </Button>
+                  </div>
+                )}
+
+                {/* Not connected state */}
+                {(oauthStatus?.oauthTokenStatus === 'not_connected' || !oauthStatus) && (
+                  <div className="space-y-3">
+                    <p className="text-[11px] font-bold text-[#6B6B6B] leading-relaxed">
+                      3-legged OAuthでXアカウントを連携し、API v2で投稿できるようにします
+                    </p>
+                    <Button
+                      size="sm"
+                      onClick={() => startOAuthMutation.mutate({ accountId })}
+                      disabled={startOAuthMutation.isPending}
+                      className="h-9 text-xs font-bold bg-[#FFD700] hover:bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[2px_2px_0_#1A1A1A] hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
+                    >
+                      {startOAuthMutation.isPending ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                      ) : (
+                        <Link2 className="h-3.5 w-3.5 mr-1.5" />
+                      )}
+                      Xと連携する
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {/* Account Details */}

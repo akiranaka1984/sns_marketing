@@ -1,10 +1,17 @@
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import type { Express, Request, Response } from "express";
 import * as db from "../db";
+import { db as drizzleDb } from "../db";
+import { accounts, xApiSettings } from "../../drizzle/schema";
+import { eq } from "drizzle-orm";
 import { getSessionCookieOptions } from "./cookies";
 import { ENV } from "./env";
 import { sdk } from "./sdk";
 import { createLogger } from "../utils/logger";
+import {
+  pendingOAuthRequests,
+  exchangeForAccessToken,
+} from "../account-oauth.routers";
 
 const logger = createLogger("oauth");
 
@@ -98,6 +105,90 @@ export function registerOAuthRoutes(app: Express) {
     } catch (error) {
       logger.error("[Admin Login] Failed:", error);
       res.status(500).json({ success: false, message: "ログインに失敗しました" });
+    }
+  });
+
+  // ─── X OAuth 1.0a callback for individual account linking ───────────
+  app.get("/api/x-oauth/callback", async (req: Request, res: Response) => {
+    const oauthToken = typeof req.query["oauth_token"] === "string" ? req.query["oauth_token"] : undefined;
+    const oauthVerifier = typeof req.query["oauth_verifier"] === "string" ? req.query["oauth_verifier"] : undefined;
+
+    if (!oauthToken || !oauthVerifier) {
+      logger.error("[X OAuth] Callback missing oauth_token or oauth_verifier");
+      res.redirect(302, "/accounts?oauth_error=missing_params");
+      return;
+    }
+
+    // Retrieve the pending request entry stored during startOAuthFlow
+    const pending = pendingOAuthRequests.get(oauthToken);
+
+    if (!pending) {
+      logger.error({ oauthToken }, "[X OAuth] No pending request found for oauth_token — may have expired");
+      res.redirect(302, "/accounts?oauth_error=expired_or_unknown_token");
+      return;
+    }
+
+    const { oauthTokenSecret, accountId } = pending;
+
+    // Remove the pending entry immediately — one-time use
+    pendingOAuthRequests.delete(oauthToken);
+
+    try {
+      // Load consumer credentials (apiKey / apiSecret) from xApiSettings.
+      // We do a best-effort lookup using userId=1 since at this point we do
+      // not have a session cookie in this redirect context.
+      const settingsRow = await drizzleDb.query.xApiSettings.findFirst({
+        where: eq(xApiSettings.userId, 1),
+      });
+
+      if (!settingsRow?.apiKey || !settingsRow?.apiSecret) {
+        logger.error("[X OAuth] Consumer credentials not configured in x_api_settings");
+        res.redirect(302, `/accounts?oauth_error=missing_consumer_credentials`);
+        return;
+      }
+
+      logger.info({ accountId }, "[X OAuth] Exchanging request token for access token");
+
+      const tokenParams = await exchangeForAccessToken(
+        settingsRow.apiKey,
+        settingsRow.apiSecret,
+        oauthToken,
+        oauthTokenSecret,
+        oauthVerifier,
+      );
+
+      const accessToken = tokenParams.get("oauth_token");
+      const accessTokenSecret = tokenParams.get("oauth_token_secret");
+      const screenName = tokenParams.get("screen_name");
+
+      if (!accessToken || !accessTokenSecret) {
+        logger.error({ tokenParams: tokenParams.toString() }, "[X OAuth] Missing access token in X response");
+        res.redirect(302, `/accounts?oauth_error=token_exchange_failed`);
+        return;
+      }
+
+      const now = new Date().toISOString();
+
+      await drizzleDb
+        .update(accounts)
+        .set({
+          oauthAccessToken: accessToken,
+          oauthAccessTokenSecret: accessTokenSecret,
+          oauthTokenStatus: "active",
+          oauthUsername: screenName ?? null,
+          oauthConnectedAt: now,
+        } as any)
+        .where(eq(accounts.id, accountId));
+
+      logger.info(
+        { accountId, screenName },
+        "[X OAuth] Account linked successfully",
+      );
+
+      res.redirect(302, `/accounts?oauth_success=1&accountId=${accountId}`);
+    } catch (error: any) {
+      logger.error({ accountId, err: error.message }, "[X OAuth] Callback failed");
+      res.redirect(302, `/accounts?oauth_error=${encodeURIComponent(error.message)}`);
     }
   });
 

@@ -101,6 +101,12 @@ export const accounts = mysqlTable("accounts", {
 	experiencePoints: int().default(0).notNull(),
 	level: int().default(1).notNull(),
 	totalLearningsCount: int().default(0).notNull(),
+	// Per-account OAuth tokens (3-legged OAuth flow for X API v2 posting)
+	oauthAccessToken: varchar({ length: 500 }),
+	oauthAccessTokenSecret: varchar({ length: 500 }),
+	oauthTokenStatus: mysqlEnum(['not_connected', 'active', 'expired', 'revoked']).default('not_connected').notNull(),
+	oauthConnectedAt: timestamp({ mode: 'string' }),
+	oauthUsername: varchar({ length: 100 }),
 },
 (table) => [
 	index("username_platform_idx").on(table.username, table.platform),
@@ -994,6 +1000,19 @@ export const xApiSettings = mysqlTable("x_api_settings", {
 },
 (table) => [
 	index("idx_x_api_settings_userId").on(table.userId),
+]);
+
+// Per-account API usage tracking (tweet counts per month)
+export const apiUsageTracking = mysqlTable("api_usage_tracking", {
+	id: int().autoincrement().notNull().primaryKey(),
+	accountId: int().notNull(),
+	month: varchar({ length: 7 }).notNull(), // format: '2026-03'
+	tweetCount: int().default(0).notNull(),
+	lastPostedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+},
+(table) => [
+	index("idx_api_usage_tracking_accountId_month_unique").on(table.accountId, table.month),
 ]);
 
 // Account-specific learning data for consistent persona across posts and comments

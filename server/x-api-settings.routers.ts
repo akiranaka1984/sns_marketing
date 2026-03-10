@@ -1,7 +1,7 @@
 import { router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { db } from "./db";
-import { xApiSettings } from "../drizzle/schema";
+import { xApiSettings, apiUsageTracking } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { testApiV2Connection } from "./x-api-v2-poster";
 
@@ -219,4 +219,60 @@ export const xApiSettingsRouter = router({
         };
       }
     }),
+
+  /**
+   * Get API usage statistics for the current month.
+   * Returns total tweet count across all accounts and a per-account breakdown.
+   */
+  getApiUsage: protectedProcedure.query(async () => {
+    const currentMonth = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
+
+    // Per-account breakdown for the current month
+    const rows = await db
+      .select({
+        accountId: apiUsageTracking.accountId,
+        tweetCount: apiUsageTracking.tweetCount,
+        lastPostedAt: apiUsageTracking.lastPostedAt,
+      })
+      .from(apiUsageTracking)
+      .where(eq(apiUsageTracking.month, currentMonth));
+
+    const totalTweets = rows.reduce((acc, row) => acc + (row.tweetCount ?? 0), 0);
+
+    return {
+      month: currentMonth,
+      totalTweets,
+      perAccount: rows,
+    };
+  }),
+
+  /**
+   * Get the monthly tweet limit based on the API tier configured in xApiSettings.
+   * Tier limits (tweets per month):
+   *   free:       500
+   *   basic:    3,000
+   *   pro:    300,000
+   *   enterprise: unlimited (represented as null)
+   */
+  getMonthlyLimit: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.user?.id || 1;
+
+    const settings = await db.query.xApiSettings.findFirst({
+      where: eq(xApiSettings.userId, userId),
+    });
+
+    const tier = settings?.apiTier ?? 'free';
+
+    const limits: Record<string, number | null> = {
+      free: 500,
+      basic: 3000,
+      pro: 300000,
+      enterprise: null,
+    };
+
+    return {
+      tier,
+      monthlyLimit: limits[tier] ?? 500,
+    };
+  }),
 });

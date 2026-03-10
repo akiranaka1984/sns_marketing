@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle2, XCircle, Loader2, ExternalLink, Save, Eye, EyeOff } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, ExternalLink, Save, Eye, EyeOff, BarChart3 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -149,6 +149,10 @@ export default function Settings() {
       toast.error("\u30A8\u30E9\u30FC: " + error.message);
     },
   });
+
+  // API usage queries
+  const { data: apiUsage } = trpc.xApiSettings.getApiUsage.useQuery();
+  const { data: monthlyLimit } = trpc.xApiSettings.getMonthlyLimit.useQuery();
 
   const handleSaveXApi = () => {
     if (!xBearerToken) {
@@ -719,6 +723,111 @@ export default function Settings() {
                 {"\u4FDD\u5B58"}
               </Button>
             </div>
+          </div>
+        </div>
+
+        {/* API Usage Dashboard */}
+        <div className="bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg overflow-hidden shadow-[4px_4px_0_#1A1A1A]">
+          <div className="bg-[#4ECDC4] px-5 py-4 border-b-2 border-[#1A1A1A]">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-[#1A1A1A]" />
+              <h3 className="text-[14px] font-bold text-[#1A1A1A]">{"API使用量"}</h3>
+            </div>
+            <p className="text-[12px] text-[#6B6B6B] font-bold mt-1">{"今月のX API v2投稿使用量"}</p>
+          </div>
+          <div className="p-5 space-y-5">
+            {/* Monthly total progress bar */}
+            {(() => {
+              const used = apiUsage?.totalTweets ?? 0;
+              const limit = monthlyLimit?.monthlyLimit ?? (xApiTier === 'free' ? 500 : xApiTier === 'basic' ? 3000 : xApiTier === 'pro' ? 300000 : 1000000);
+              const percent = limit > 0 ? Math.min(Math.round((used / limit) * 100), 100) : 0;
+              const barColor = percent > 85 ? 'bg-[#FF6B6B]' : percent > 60 ? 'bg-[#FFDAB9]' : 'bg-[#A8E6CF]';
+              const labelColor = percent > 85 ? 'text-[#FF6B6B]' : percent > 60 ? 'text-[#6B6B6B]' : 'text-[#1A1A1A]';
+              return (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#6B6B6B]">{"月間API使用量"}</p>
+                    <span className={`text-[12px] font-bold ${labelColor}`}>{percent}%</span>
+                  </div>
+                  <div className="h-4 w-full rounded-lg bg-[#E5E7EB] border-2 border-[#1A1A1A] overflow-hidden">
+                    <div
+                      className={`h-full rounded-lg transition-all ${barColor}`}
+                      style={{ width: `${percent}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className="text-[12px] font-bold text-[#1A1A1A]">
+                      {used.toLocaleString()} / {limit.toLocaleString()} ツイート
+                    </p>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold border-2 border-[#1A1A1A] ${
+                      percent > 85 ? 'bg-[#FF6B6B]' : percent > 60 ? 'bg-[#FFDAB9]' : 'bg-[#A8E6CF]'
+                    } text-[#1A1A1A]`}>
+                      {percent > 85 ? "警告" : percent > 60 ? "注意" : "正常"}
+                    </span>
+                  </div>
+                  {apiUsage?.month && (
+                    <p className="text-[11px] font-bold text-[#6B6B6B]">
+                      {"対象月: "}{apiUsage.month}
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* Per-account breakdown table */}
+            {apiUsage?.perAccount && apiUsage.perAccount.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#6B6B6B]">{"アカウント別使用量"}</p>
+                <div className="rounded-lg border-2 border-[#1A1A1A] overflow-hidden">
+                  <table className="w-full text-[12px] font-bold">
+                    <thead>
+                      <tr className="bg-[#FFF8DC] border-b-2 border-[#1A1A1A]">
+                        <th className="text-left px-3 py-2 text-[10px] uppercase tracking-wider text-[#6B6B6B]">{"アカウント"}</th>
+                        <th className="text-right px-3 py-2 text-[10px] uppercase tracking-wider text-[#6B6B6B]">{"今月の投稿数"}</th>
+                        <th className="text-right px-3 py-2 text-[10px] uppercase tracking-wider text-[#6B6B6B]">{"割合"}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {apiUsage.perAccount.map((row: { accountId: number; tweetCount: number | null; lastPostedAt: string | null }, idx: number) => {
+                        const total = apiUsage?.totalTweets ?? 1;
+                        const count = row.tweetCount ?? 0;
+                        const rowPercent = total > 0 ? Math.round((count / total) * 100) : 0;
+                        return (
+                          <tr
+                            key={row.accountId}
+                            className={`border-b border-[#1A1A1A] last:border-b-0 ${idx % 2 === 0 ? 'bg-[#FFFDF7]' : 'bg-[#FFF8DC]'}`}
+                          >
+                            <td className="px-3 py-2 text-[#1A1A1A]">
+                              <span className="font-bold">ID: {row.accountId}</span>
+                            </td>
+                            <td className="px-3 py-2 text-right text-[#1A1A1A]">
+                              {count.toLocaleString()}
+                            </td>
+                            <td className="px-3 py-2 text-right">
+                              <span className={`inline-flex items-center px-1.5 py-0.5 rounded-lg border-2 border-[#1A1A1A] text-[10px] font-bold ${
+                                rowPercent > 50 ? 'bg-[#FFDAB9]' : 'bg-[#A8E6CF]'
+                              } text-[#1A1A1A]`}>
+                                {rowPercent}%
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Empty state */}
+            {(!apiUsage || (apiUsage.perAccount && apiUsage.perAccount.length === 0)) && (
+              <div className="flex items-center justify-center py-6 rounded-lg bg-[#FFF8DC] border-2 border-[#1A1A1A]">
+                <div className="text-center">
+                  <BarChart3 className="w-8 h-8 text-[#6B6B6B] mx-auto mb-2" />
+                  <p className="text-[12px] font-bold text-[#6B6B6B]">{"今月のAPI投稿データがありません"}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

@@ -39,6 +39,7 @@ import { projectModelAccountsRouter } from './project-model-accounts.routers';
 import { kpiTrackingRouter } from './kpi-tracking.routers';
 import { playwrightSessionRouter } from './playwright-session.routers';
 import { xApiSettingsRouter } from './x-api-settings.routers';
+import { accountOAuthRouter } from './account-oauth.routers';
 import { learningInsightsRouter } from './learning-insights.routers';
 import { growthDashboardRouter } from './growth-dashboard.routers';
 import { startScheduler, stopScheduler, isSchedulerRunning, getAllScheduledExecutions, checkAndRunScheduledAgents } from "./agent-scheduler";
@@ -86,6 +87,7 @@ export const appRouter = router({
   kpiTracking: kpiTrackingRouter,
   playwrightSession: playwrightSessionRouter,
   xApiSettings: xApiSettingsRouter,
+  accountOAuth: accountOAuthRouter,
   learningInsights: learningInsightsRouter,
   growthDashboard: growthDashboardRouter,
 
