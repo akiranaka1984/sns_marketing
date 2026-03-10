@@ -1,9 +1,41 @@
 services:
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO /dev/null http://localhost:80/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+    networks:
+      - default
+
   app:
     image: ghcr.io/${GITHUB_REPOSITORY:-akiranaka1984/sns_marketing_super}:${IMAGE_TAG:-latest}
     restart: unless-stopped
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     environment:
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
@@ -101,7 +133,7 @@ services:
   redis:
     image: redis:alpine
     restart: unless-stopped
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru --bind 0.0.0.0
     volumes:
       - redis_data:/data
     environment:
