@@ -29,9 +29,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Type check (non-blocking)
-        run: pnpm check || echo "Type check failed but continuing..."
-        continue-on-error: true
+      - name: Type check
+        run: pnpm check
 
       - name: Format check
         run: pnpm format --check || echo "Format check failed but continuing..."
@@ -87,15 +86,16 @@ jobs:
           for i in {1..30}; do
             if mysqladmin ping -h 127.0.0.1 -u root -proot --silent 2>/dev/null; then
               echo "MySQL is ready!"
-              break
+              exit 0
             fi
             echo "Waiting for MySQL... ($i/30)"
             sleep 2
           done
+          echo "MySQL did not become ready in time"
+          exit 1
 
-      - name: Run tests (non-blocking)
-        run: pnpm test || echo "Tests failed but continuing..."
-        continue-on-error: true
+      - name: Run tests
+        run: pnpm test
         env:
           DATABASE_URL: mysql://user:password@127.0.0.1:3306/sns_automation_test
           REDIS_URL: redis://127.0.0.1:6379
