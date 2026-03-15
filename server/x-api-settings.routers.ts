@@ -4,6 +4,7 @@ import { db } from "./db";
 import { xApiSettings, apiUsageTracking } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { testApiV2Connection } from "./x-api-v2-poster";
+import { ensureEncrypted, decrypt } from "./utils/encryption";
 
 import { createLogger } from "./utils/logger";
 
@@ -39,15 +40,22 @@ export const xApiSettingsRouter = router({
       };
     }
 
+    // Decrypt sensitive credential fields before returning to client
+    const decryptedApiKey = settings.apiKey ? decrypt(settings.apiKey) : "";
+    const decryptedApiSecret = settings.apiSecret ? decrypt(settings.apiSecret) : "";
+    const decryptedBearerToken = settings.bearerToken ? decrypt(settings.bearerToken) : "";
+    const decryptedAccessToken = settings.accessToken ? decrypt(settings.accessToken) : "";
+    const decryptedAccessTokenSecret = settings.accessTokenSecret ? decrypt(settings.accessTokenSecret) : "";
+
     return {
       configured: !!settings.bearerToken,
-      apiKey: settings.apiKey || "",
-      apiSecret: settings.apiSecret || "",
-      bearerToken: settings.bearerToken || "",
-      accessToken: settings.accessToken || "",
-      accessTokenSecret: settings.accessTokenSecret || "",
+      apiKey: decryptedApiKey,
+      apiSecret: decryptedApiSecret,
+      bearerToken: decryptedBearerToken,
+      accessToken: decryptedAccessToken,
+      accessTokenSecret: decryptedAccessTokenSecret,
       apiTier: settings.apiTier || "free",
-      oauthConfigured: !!(settings.apiKey && settings.apiSecret && settings.accessToken && settings.accessTokenSecret),
+      oauthConfigured: !!(decryptedApiKey && decryptedApiSecret && decryptedAccessToken && decryptedAccessTokenSecret),
       lastTestedAt: settings.lastTestedAt,
       testResult: settings.testResult,
     };
@@ -73,15 +81,22 @@ export const xApiSettingsRouter = router({
         where: eq(xApiSettings.userId, userId),
       });
 
+      // Encrypt sensitive credentials before storing in database
+      const encApiKey = input.apiKey ? ensureEncrypted(input.apiKey) : undefined;
+      const encApiSecret = input.apiSecret ? ensureEncrypted(input.apiSecret) : undefined;
+      const encBearerToken = input.bearerToken ? ensureEncrypted(input.bearerToken) : undefined;
+      const encAccessToken = input.accessToken ? ensureEncrypted(input.accessToken) : undefined;
+      const encAccessTokenSecret = input.accessTokenSecret ? ensureEncrypted(input.accessTokenSecret) : undefined;
+
       if (existing) {
         // Update existing
         await db.update(xApiSettings)
           .set({
-            apiKey: input.apiKey ?? existing.apiKey,
-            apiSecret: input.apiSecret ?? existing.apiSecret,
-            bearerToken: input.bearerToken ?? existing.bearerToken,
-            accessToken: input.accessToken ?? existing.accessToken,
-            accessTokenSecret: input.accessTokenSecret ?? existing.accessTokenSecret,
+            apiKey: encApiKey ?? existing.apiKey,
+            apiSecret: encApiSecret ?? existing.apiSecret,
+            bearerToken: encBearerToken ?? existing.bearerToken,
+            accessToken: encAccessToken ?? existing.accessToken,
+            accessTokenSecret: encAccessTokenSecret ?? existing.accessTokenSecret,
             apiTier: input.apiTier ?? existing.apiTier,
             updatedAt: new Date().toISOString(),
           })
@@ -90,11 +105,11 @@ export const xApiSettingsRouter = router({
         // Insert new
         await db.insert(xApiSettings).values({
           userId,
-          apiKey: input.apiKey || null,
-          apiSecret: input.apiSecret || null,
-          bearerToken: input.bearerToken || null,
-          accessToken: input.accessToken || null,
-          accessTokenSecret: input.accessTokenSecret || null,
+          apiKey: encApiKey || null,
+          apiSecret: encApiSecret || null,
+          bearerToken: encBearerToken || null,
+          accessToken: encAccessToken || null,
+          accessTokenSecret: encAccessTokenSecret || null,
           apiTier: input.apiTier || 'free',
         });
       }

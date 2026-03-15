@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, publicProcedure } from "./_core/trpc";
+import { router, protectedProcedure } from "./_core/trpc";
 import { db } from "./db";
 import { interactions, postUrls } from "../drizzle/schema";
 import { eq, and, sql, desc, gte } from "drizzle-orm";
@@ -16,24 +16,24 @@ function toMySQLTimestamp(date: Date): string {
 
 export const schedulerRouter = router({
   // スケジューラー状態を取得
-  getStatus: publicProcedure.query(async () => {
+  getStatus: protectedProcedure.query(async () => {
     return getSchedulerStatus();
   }),
 
   // スケジューラーを開始
-  start: publicProcedure.mutation(async () => {
+  start: protectedProcedure.mutation(async () => {
     startInteractionScheduler();
     return { success: true };
   }),
 
   // スケジューラーを停止
-  stop: publicProcedure.mutation(async () => {
+  stop: protectedProcedure.mutation(async () => {
     stopInteractionScheduler();
     return { success: true };
   }),
 
   // ダッシュボード用統計を取得
-  getStats: publicProcedure
+  getStats: protectedProcedure
     .input(z.object({ projectId: z.number().optional() }))
     .query(async ({ input }) => {
       const now = new Date();

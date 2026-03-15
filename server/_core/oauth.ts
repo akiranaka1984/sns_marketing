@@ -13,6 +13,7 @@ import {
   exchangeForAccessToken,
 } from "../account-oauth.routers";
 import bcrypt from "bcryptjs";
+import { ensureEncrypted, decrypt } from "../utils/encryption";
 
 const logger = createLogger("oauth");
 
@@ -156,7 +157,13 @@ export function registerOAuthRoutes(app: Express) {
       const dbSetting = await drizzleDb.query.adminSettings.findFirst();
 
       if (dbSetting) {
-        // Changing existing password: currentPassword is required
+        // Changing existing password: require both session auth AND current password
+        const sessionUser = await sdk.authenticateRequest(req).catch(() => null);
+        if (!sessionUser) {
+          res.status(401).json({ success: false, message: "ログインが必要です" });
+          return;
+        }
+
         if (!currentPassword || typeof currentPassword !== "string") {
           res.status(400).json({ success: false, message: "現在のパスワードを入力してください" });
           return;
@@ -168,7 +175,7 @@ export function registerOAuthRoutes(app: Express) {
         }
 
         // Update existing record
-        const newHash = await bcrypt.hash(newPassword, 10);
+        const newHash = await bcrypt.hash(newPassword, 12);
         await drizzleDb
           .update(adminSettings)
           .set({ passwordHash: newHash })
@@ -178,7 +185,7 @@ export function registerOAuthRoutes(app: Express) {
         res.json({ success: true, message: "パスワードを変更しました" });
       } else {
         // Initial setup: no currentPassword required
-        const newHash = await bcrypt.hash(newPassword, 10);
+        const newHash = await bcrypt.hash(newPassword, 12);
         await drizzleDb.insert(adminSettings).values({ passwordHash: newHash });
 
         logger.info("[Admin Set Password] Initial password set successfully");
@@ -232,8 +239,8 @@ export function registerOAuthRoutes(app: Express) {
       logger.info({ accountId }, "[X OAuth] Exchanging request token for access token");
 
       const tokenParams = await exchangeForAccessToken(
-        settingsRow.apiKey,
-        settingsRow.apiSecret,
+        decrypt(settingsRow.apiKey),
+        decrypt(settingsRow.apiSecret),
         oauthToken,
         oauthTokenSecret,
         oauthVerifier,
@@ -254,8 +261,8 @@ export function registerOAuthRoutes(app: Express) {
       await drizzleDb
         .update(accounts)
         .set({
-          oauthAccessToken: accessToken,
-          oauthAccessTokenSecret: accessTokenSecret,
+          oauthAccessToken: ensureEncrypted(accessToken),
+          oauthAccessTokenSecret: ensureEncrypted(accessTokenSecret),
           oauthTokenStatus: "active",
           oauthUsername: screenName ?? null,
           oauthConnectedAt: now,

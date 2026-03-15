@@ -18,8 +18,11 @@ function getEncryptionKey(): Buffer {
   if (!secret) {
     throw new Error('ENCRYPTION_KEY or JWT_SECRET must be set for credential encryption');
   }
-  // Derive a stable 256-bit key from the secret
-  return scryptSync(secret, 'sns-marketing-salt', KEY_LENGTH);
+  // Use ENCRYPTION_SALT env var if set; otherwise fall back to the legacy fixed salt
+  // for backward compatibility with existing encrypted data.
+  // RECOMMENDATION: Set ENCRYPTION_SALT to a unique random value in production.
+  const salt = process.env.ENCRYPTION_SALT || 'sns-marketing-salt';
+  return scryptSync(secret, salt, KEY_LENGTH);
 }
 
 /**

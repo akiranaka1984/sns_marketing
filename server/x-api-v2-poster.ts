@@ -17,6 +17,7 @@ import { db } from './db';
 import { xApiSettings, accounts, apiUsageTracking } from '../drizzle/schema';
 import { eq, sql } from 'drizzle-orm';
 import { createLogger } from './utils/logger';
+import { decrypt } from './utils/encryption';
 
 const logger = createLogger('x-api-v2-poster');
 
@@ -137,10 +138,10 @@ async function getOAuthCredentials(accountId: number): Promise<OAuthCredentials 
   if (account?.oauthAccessToken && account?.oauthAccessTokenSecret) {
     logger.info({ accountId, oauthUsername: account.oauthUsername }, 'Using per-account OAuth tokens');
     return {
-      apiKey: settings.apiKey,
-      apiSecret: settings.apiSecret,
-      accessToken: account.oauthAccessToken,
-      accessTokenSecret: account.oauthAccessTokenSecret,
+      apiKey: decrypt(settings.apiKey),
+      apiSecret: decrypt(settings.apiSecret),
+      accessToken: decrypt(account.oauthAccessToken),
+      accessTokenSecret: decrypt(account.oauthAccessTokenSecret),
     };
   }
 
@@ -155,10 +156,10 @@ async function getOAuthCredentials(accountId: number): Promise<OAuthCredentials 
 
   logger.info({ accountId }, 'Falling back to global OAuth tokens for account');
   return {
-    apiKey: settings.apiKey,
-    apiSecret: settings.apiSecret,
-    accessToken: settings.accessToken,
-    accessTokenSecret: settings.accessTokenSecret,
+    apiKey: decrypt(settings.apiKey),
+    apiSecret: decrypt(settings.apiSecret),
+    accessToken: decrypt(settings.accessToken),
+    accessTokenSecret: decrypt(settings.accessTokenSecret),
   };
 }
 
@@ -570,10 +571,10 @@ async function getGlobalOAuthCredentials(): Promise<OAuthCredentials | null> {
   }
 
   return {
-    apiKey: settings.apiKey,
-    apiSecret: settings.apiSecret,
-    accessToken: settings.accessToken,
-    accessTokenSecret: settings.accessTokenSecret,
+    apiKey: decrypt(settings.apiKey),
+    apiSecret: decrypt(settings.apiSecret),
+    accessToken: decrypt(settings.accessToken),
+    accessTokenSecret: decrypt(settings.accessTokenSecret),
   };
 }
 
