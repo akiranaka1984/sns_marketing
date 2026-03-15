@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { KeyRound, Loader2, LogIn, Shield } from "lucide-react";
+import { KeyRound, Loader2, LogIn, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type Mode = "loading" | "setup" | "login";
@@ -28,7 +28,6 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
         const data = await res.json();
         setMode(data.isSet ? "login" : "setup");
       } catch {
-        // Fallback to login mode if endpoint is unreachable
         setMode("login");
       }
     };
@@ -97,7 +96,6 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
         setSetupSuccess("パスワードを設定しました。ログインしてください。");
         setNewPassword("");
         setConfirmPassword("");
-        // Switch to login mode after a short delay
         setTimeout(() => {
           setMode("login");
           setSetupSuccess("");
@@ -112,22 +110,15 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
     }
   };
 
-  const backgroundDecoration = (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl" />
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl" />
-    </div>
-  );
+  const inputClass =
+    "h-12 bg-transparent border-0 border-b border-white/10 rounded-none text-white placeholder:text-neutral-600 text-[15px] focus:ring-0 focus:border-white/30 transition-colors px-0";
 
   // Loading state
   if (mode === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-        {backgroundDecoration}
-        <div className="relative z-10 flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 text-slate-400 animate-spin" />
-          <p className="text-[13px] text-slate-500">読み込み中...</p>
+      <div className="min-h-screen flex items-center justify-center bg-neutral-950">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-5 h-5 text-neutral-600 animate-spin" />
         </div>
       </div>
     );
@@ -136,154 +127,161 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
   // Password setup mode
   if (mode === "setup") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-        {backgroundDecoration}
+      <div className="min-h-screen flex items-center justify-center bg-neutral-950 relative">
+        {/* Subtle grid pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
+            backgroundSize: "60px 60px",
+          }}
+        />
 
-        <div className="w-full max-w-sm relative z-10 px-4">
-          <form
-            onSubmit={handleSetupSubmit}
-            className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-8 shadow-2xl shadow-black/20"
-          >
-            {/* Logo / Icon */}
-            <div className="flex flex-col items-center mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center mb-5 shadow-lg shadow-blue-500/25">
-                <KeyRound className="w-8 h-8 text-white" />
+        <div className="w-full max-w-[360px] relative z-10 px-6">
+          <form onSubmit={handleSetupSubmit}>
+            {/* Header */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center">
+                  <KeyRound className="w-4.5 h-4.5 text-neutral-950" />
+                </div>
+                <span className="text-[13px] font-medium text-neutral-500 tracking-wide uppercase">
+                  Initial Setup
+                </span>
               </div>
-              <h1 className="text-[22px] font-semibold text-white tracking-tight">
-                パスワード設定
+              <h1 className="text-[32px] font-light text-white tracking-tight leading-tight">
+                パスワードを
+                <br />
+                設定してください
               </h1>
-              <p className="text-[13px] text-slate-400 mt-1.5">
-                管理パネルのパスワードを設定してください
+              <p className="text-[14px] text-neutral-500 mt-3 leading-relaxed">
+                管理パネルへのアクセスに使用します
               </p>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <Input
-                  type="password"
-                  placeholder="新しいパスワード"
-                  value={newPassword}
-                  onChange={(e) => {
-                    setNewPassword(e.target.value);
-                    setSetupError("");
-                  }}
-                  className="h-12 bg-white/[0.06] border-white/[0.08] text-white placeholder:text-slate-500 rounded-xl text-[14px] focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
-                  autoFocus
-                />
-              </div>
+            <div className="space-y-6">
+              <Input
+                type="password"
+                placeholder="新しいパスワード"
+                value={newPassword}
+                onChange={(e) => {
+                  setNewPassword(e.target.value);
+                  setSetupError("");
+                }}
+                className={inputClass}
+                autoFocus
+              />
 
-              <div>
-                <Input
-                  type="password"
-                  placeholder="パスワードを確認"
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setConfirmPassword(e.target.value);
-                    setSetupError("");
-                  }}
-                  className="h-12 bg-white/[0.06] border-white/[0.08] text-white placeholder:text-slate-500 rounded-xl text-[14px] focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
-                />
-              </div>
+              <Input
+                type="password"
+                placeholder="パスワードを確認"
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  setSetupError("");
+                }}
+                className={inputClass}
+              />
 
               {setupError && (
-                <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-[13px] text-red-300 flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
-                  {setupError}
-                </div>
+                <p className="text-[13px] text-red-400">{setupError}</p>
               )}
 
               {setupSuccess && (
-                <div className="px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[13px] text-emerald-300 flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-                  {setupSuccess}
-                </div>
+                <p className="text-[13px] text-emerald-400">{setupSuccess}</p>
               )}
 
               <Button
                 type="submit"
                 disabled={setupLoading || !newPassword || !confirmPassword}
-                className="w-full h-12 text-[14px] font-medium bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-600 hover:to-violet-700 text-white rounded-xl border-0 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-200 disabled:opacity-40"
+                className="w-full h-12 text-[14px] font-medium bg-white hover:bg-neutral-200 text-neutral-950 rounded-lg border-0 transition-colors duration-150 disabled:opacity-30 disabled:bg-white mt-2"
               >
                 {setupLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <KeyRound className="h-4 w-4 mr-2" />
+                  <>
+                    設定する
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </>
                 )}
-                パスワードを設定
               </Button>
             </div>
-
-            <p className="text-center text-[11px] text-slate-600 mt-6">
-              初回設定のみ表示されます
-            </p>
           </form>
         </div>
       </div>
     );
   }
 
-  // Login mode (default)
+  // Login mode
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-      {backgroundDecoration}
+    <div className="min-h-screen flex items-center justify-center bg-neutral-950 relative">
+      {/* Subtle grid pattern */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+        }}
+      />
 
-      <div className="w-full max-w-sm relative z-10 px-4">
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-8 shadow-2xl shadow-black/20"
-        >
-          {/* Logo / Icon */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center mb-5 shadow-lg shadow-blue-500/25">
-              <Shield className="w-8 h-8 text-white" />
+      <div className="w-full max-w-[360px] relative z-10 px-6">
+        <form onSubmit={handleSubmit}>
+          {/* Header */}
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center">
+                <LogIn className="w-4.5 h-4.5 text-neutral-950" />
+              </div>
+              <span className="text-[13px] font-medium text-neutral-500 tracking-wide uppercase">
+                SNS Marketing
+              </span>
             </div>
-            <h1 className="text-[22px] font-semibold text-white tracking-tight">
-              SNS Marketing
+            <h1 className="text-[32px] font-light text-white tracking-tight">
+              ログイン
             </h1>
-            <p className="text-[13px] text-slate-400 mt-1.5">
-              管理パネルにログイン
+            <p className="text-[14px] text-neutral-500 mt-3">
+              管理パネルにアクセス
             </p>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <Input
-                type="password"
-                placeholder="パスワード"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setError("");
-                }}
-                className="h-12 bg-white/[0.06] border-white/[0.08] text-white placeholder:text-slate-500 rounded-xl text-[14px] focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
-                autoFocus
-              />
-            </div>
+          <div className="space-y-6">
+            <Input
+              type="password"
+              placeholder="パスワード"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError("");
+              }}
+              className={inputClass}
+              autoFocus
+            />
 
-            {error && (
-              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-[13px] text-red-300 flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
-                {error}
-              </div>
-            )}
+            {error && <p className="text-[13px] text-red-400">{error}</p>}
 
             <Button
               type="submit"
               disabled={loading || !password}
-              className="w-full h-12 text-[14px] font-medium bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-600 hover:to-violet-700 text-white rounded-xl border-0 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-200 disabled:opacity-40"
+              className="w-full h-12 text-[14px] font-medium bg-white hover:bg-neutral-200 text-neutral-950 rounded-lg border-0 transition-colors duration-150 disabled:opacity-30 disabled:bg-white mt-2"
             >
               {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <LogIn className="h-4 w-4 mr-2" />
+                <>
+                  ログイン
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </>
               )}
-              ログイン
             </Button>
           </div>
 
-          <p className="text-center text-[11px] text-slate-600 mt-6">
-            Authorized personnel only
-          </p>
+          <div className="mt-12 pt-6 border-t border-white/[0.04]">
+            <p className="text-[11px] text-neutral-700 text-center">
+              Authorized personnel only
+            </p>
+          </div>
         </form>
       </div>
     </div>
