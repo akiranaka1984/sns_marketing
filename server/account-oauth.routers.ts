@@ -19,6 +19,7 @@ import { db } from "./db";
 import { xApiSettings, accounts } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { createLogger } from "./utils/logger";
+import { decrypt } from "./utils/encryption";
 
 const logger = createLogger("account-oauth.routers");
 
@@ -145,7 +146,7 @@ async function getConsumerCredentials(
     return null;
   }
 
-  return { apiKey: settings.apiKey, apiSecret: settings.apiSecret };
+  return { apiKey: decrypt(settings.apiKey), apiSecret: decrypt(settings.apiSecret) };
 }
 
 // ─── X OAuth Endpoints ────────────────────────────────────────────────

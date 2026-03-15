@@ -8,7 +8,7 @@
  * - Get history
  */
 
-import { router, publicProcedure } from "./_core/trpc";
+import { router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { db } from "./db";
@@ -52,7 +52,7 @@ export const kpiTrackingRouter = router({
   /**
    * Set KPI targets for a project
    */
-  setTargets: publicProcedure
+  setTargets: protectedProcedure
     .input(
       z.object({
         projectId: z.number(),
@@ -115,7 +115,7 @@ export const kpiTrackingRouter = router({
   /**
    * Update KPI progress for a project (typically called by scheduler)
    */
-  updateProgress: publicProcedure
+  updateProgress: protectedProcedure
     .input(
       z.object({
         projectId: z.number(),
@@ -297,7 +297,7 @@ export const kpiTrackingRouter = router({
   /**
    * Get KPI dashboard data for a project
    */
-  getDashboard: publicProcedure
+  getDashboard: protectedProcedure
     .input(
       z.object({
         projectId: z.number(),
@@ -395,7 +395,7 @@ export const kpiTrackingRouter = router({
   /**
    * Get KPI history for a specific metric
    */
-  getHistory: publicProcedure
+  getHistory: protectedProcedure
     .input(
       z.object({
         projectId: z.number(),
@@ -444,7 +444,7 @@ export const kpiTrackingRouter = router({
   /**
    * Delete a KPI target
    */
-  deleteTarget: publicProcedure
+  deleteTarget: protectedProcedure
     .input(
       z.object({
         projectId: z.number(),

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, publicProcedure } from "./_core/trpc";
+import { router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { db } from "./db";
 import { interactionSettings, projects, strategies } from "../drizzle/schema";
@@ -96,7 +96,7 @@ async function parseEngagementStrategyWithAI(strategyText: string): Promise<{
 
 export const interactionSettingsRouter = router({
   // 設定を取得
-  get: publicProcedure
+  get: protectedProcedure
     .input(z.object({ projectId: z.number() }))
     .query(async ({ input }) => {
       let settings = await db.query.interactionSettings.findFirst({
@@ -131,7 +131,7 @@ export const interactionSettingsRouter = router({
     }),
 
   // 設定を保存
-  save: publicProcedure
+  save: protectedProcedure
     .input(z.object({
       projectId: z.number(),
       isEnabled: z.boolean(),
@@ -184,7 +184,7 @@ export const interactionSettingsRouter = router({
     }),
 
   // AI戦略から設定を読み込む
-  loadFromStrategy: publicProcedure
+  loadFromStrategy: protectedProcedure
     .input(z.object({ projectId: z.number() }))
     .mutation(async ({ input }) => {
       // プロジェクトの戦略を取得
