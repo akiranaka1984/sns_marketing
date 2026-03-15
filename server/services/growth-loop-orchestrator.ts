@@ -412,7 +412,6 @@ async function runKpiCheck(
         .update(growthLoopState)
         .set({
           lastKpiCheckAt: toMySQLTimestamp(new Date()),
-          currentKpiSummary: JSON.stringify(kpiSummary),
           consecutiveDeclines: newConsecutiveDeclines,
           escalationNeeded: needsEscalation ? 1 : 0,
           escalationReason: needsEscalation
@@ -490,7 +489,7 @@ async function runPerformanceUpdate(
     const projectAgents = await db.query.agents.findMany({
       where: and(
         eq(agents.projectId, projectId),
-        eq(agents.isActive, true)
+        eq(agents.isActive, 1)
       ),
     });
 
@@ -531,7 +530,6 @@ async function runPerformanceUpdate(
       await db
         .update(growthLoopState)
         .set({
-          lastPerformanceUpdateAt: toMySQLTimestamp(new Date()),
           updatedAt: toMySQLTimestamp(new Date()),
         })
         .where(eq(growthLoopState.id, loopState.id));
@@ -679,7 +677,7 @@ async function runStrategyEvaluation(
       const projectAgents = await db.query.agents.findMany({
         where: and(
           eq(agents.projectId, projectId),
-          eq(agents.isActive, true)
+          eq(agents.isActive, 1)
         ),
       });
 
@@ -838,7 +836,7 @@ async function runStrategyRegeneration(
     const projectAgents = await db.query.agents.findMany({
       where: and(
         eq(agents.projectId, projectId),
-        eq(agents.isActive, true)
+        eq(agents.isActive, 1)
       ),
     });
 
@@ -1016,7 +1014,7 @@ JSON形式で回答してください:
       await db
         .update(growthLoopState)
         .set({
-          lastStrategyRegenerationAt: toMySQLTimestamp(new Date()),
+          lastStrategyEvaluationAt: toMySQLTimestamp(new Date()),
           currentStrategyScore: 50,
           consecutiveDeclines: 0,
           escalationNeeded: 0,
@@ -1118,7 +1116,7 @@ async function runFullReview(
     const projectAgents = await db.query.agents.findMany({
       where: and(
         eq(agents.projectId, projectId),
-        eq(agents.isActive, true)
+        eq(agents.isActive, 1)
       ),
     });
 

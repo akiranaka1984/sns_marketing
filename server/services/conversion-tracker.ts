@@ -68,7 +68,7 @@ interface ROIReport {
   byCampaign: Array<{
     campaignId: number;
     campaignName: string;
-    goal: string;
+    goal: string | null;
     spend: number;
     revenue: number;
     roi: number;
@@ -209,7 +209,7 @@ export async function updateCampaignROI(campaignId: number) {
     .set({
       revenue: String(revenue),
       roi: String(roi),
-      updatedAt: new Date(),
+      updatedAt: new Date().toISOString().slice(0, 19).replace("T", " "),
     })
     .where(eq(campaigns.id, campaignId));
 
