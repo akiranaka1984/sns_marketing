@@ -213,15 +213,15 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
         className={`
           group w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-normal transition-all duration-150
           ${active
-            ? "bg-white/[0.08] text-white"
-            : "text-neutral-400 hover:bg-white/[0.04] hover:text-neutral-200"
+            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+            : "text-neutral-400 hover:bg-white/[0.04] hover:text-neutral-200 border border-transparent"
           }
         `}
       >
         <Icon
           className={`w-4 h-4 flex-shrink-0 transition-colors duration-150 ${
             active
-              ? "text-white"
+              ? "text-emerald-400"
               : "text-neutral-500 group-hover:text-neutral-300"
           }`}
         />
@@ -275,8 +275,8 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2.5 hover:bg-white/[0.04] rounded-lg px-2 py-1.5 transition-all duration-150 flex-1 min-w-0 group">
-                <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-[12px] font-medium">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center flex-shrink-0 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
+                  <span className="text-white text-[12px] font-semibold">
                     {user?.name?.charAt(0).toUpperCase() || "S"}
                   </span>
                 </div>
