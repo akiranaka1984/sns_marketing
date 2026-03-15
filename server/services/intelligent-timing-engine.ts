@@ -472,7 +472,7 @@ export async function optimizeAgentTimingSlots(
       .update(agents)
       .set({
         postingTimeSlots: JSON.stringify(newTimeSlots),
-        updatedAt: new Date(),
+        updatedAt: new Date().toISOString().slice(0, 19).replace("T", " "),
       })
       .where(eq(agents.id, agentId));
 
