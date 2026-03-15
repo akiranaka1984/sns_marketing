@@ -492,7 +492,8 @@ export async function ensureDiversity(
   // Count current distribution
   const distribution: Record<string, number> = {};
   for (const slot of weekSlots) {
-    distribution[slot.contentType] = (distribution[slot.contentType] || 0) + 1;
+    const ct = slot.contentType ?? "unknown";
+    distribution[ct] = (distribution[ct] || 0) + 1;
   }
 
   const total = weekSlots.length;
@@ -605,7 +606,7 @@ export async function fillCalendarSlot(
 
   // Generate content matching the slot's content type
   // We add content type guidance as additional context
-  const contentTypeGuidance = getContentTypeGuidance(calendarEntry.contentType);
+  const contentTypeGuidance = getContentTypeGuidance(calendarEntry.contentType ?? "general");
   const topicGuidance = calendarEntry.topic ? `\nTopic: ${calendarEntry.topic}` : "";
 
   // Temporarily augment agent context with content type direction
@@ -796,7 +797,8 @@ export async function analyzeContentGaps(
   for (const entry of calendarEntries) {
     const dateStr = new Date(entry.scheduledDate).toISOString().split("T")[0];
     datesWithContent.add(dateStr);
-    typeDistribution[entry.contentType] = (typeDistribution[entry.contentType] || 0) + 1;
+    const ct = entry.contentType ?? "unknown";
+    typeDistribution[ct] = (typeDistribution[ct] || 0) + 1;
   }
 
   // Find empty dates
