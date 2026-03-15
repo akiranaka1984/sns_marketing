@@ -55,6 +55,7 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
   const [mode, setMode] = useState<Mode>("loading");
 
   // Login mode state
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -83,6 +84,10 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username) {
+      setError("ユーザーIDを入力してください");
+      return;
+    }
     if (!password) {
       setError("パスワードを入力してください");
       return;
@@ -95,7 +100,7 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
       const res = await fetch("/api/admin-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await res.json();
@@ -260,6 +265,19 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
 
           <div className="space-y-3">
             <input
+              type="text"
+              placeholder="ユーザーID"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                setError("");
+              }}
+              className={inputClass}
+              autoComplete="username"
+              autoFocus
+            />
+
+            <input
               type="password"
               placeholder="パスワード"
               value={password}
@@ -268,7 +286,7 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
                 setError("");
               }}
               className={inputClass}
-              autoFocus
+              autoComplete="current-password"
             />
 
             {error && (
@@ -277,7 +295,7 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
 
             <button
               type="submit"
-              disabled={loading || !password}
+              disabled={loading || !username || !password}
               className={`${buttonBase} mt-2`}
             >
               {loading ? (

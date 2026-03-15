@@ -62,7 +62,13 @@ export function registerOAuthRoutes(app: Express) {
   // Admin password login endpoint
   app.post("/api/admin-login", async (req: Request, res: Response) => {
     try {
-      const { password } = req.body || {};
+      const { username, password } = req.body || {};
+
+      // Validate username (must be "admin")
+      if (!username || typeof username !== "string" || username !== "admin") {
+        res.status(401).json({ success: false, message: "ユーザーIDが正しくありません" });
+        return;
+      }
 
       if (!password || typeof password !== "string") {
         res.status(400).json({ success: false, message: "パスワードを入力してください" });
