@@ -13,7 +13,9 @@ export default function NotFound() {
     <div className="flex items-center justify-center py-20">
       <div className="w-full max-w-md mx-4 text-center">
         <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-8">
-          <AlertCircle className="h-12 w-12 text-neutral-500 mx-auto mb-4" />
+          <div className="w-14 h-14 rounded-xl bg-neutral-900 border border-white/[0.06] flex items-center justify-center mx-auto mb-5">
+            <AlertCircle className="h-6 w-6 text-emerald-500" />
+          </div>
 
           <h1 className="text-3xl font-bold text-white mb-1">404</h1>
 
