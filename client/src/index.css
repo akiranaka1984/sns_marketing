@@ -729,8 +729,10 @@
   border: 1px solid rgba(255, 255, 255, 0.06) !important;
 }
 
-/* Input focus enhancement */
-input:focus, textarea:focus, select:focus {
+/* Input focus enhancement — scoped to avoid overriding custom components */
+[role="dialog"] input:not([data-custom-focus]):focus,
+[role="dialog"] textarea:not([data-custom-focus]):focus,
+[role="dialog"] select:not([data-custom-focus]):focus {
   border-color: var(--primary) !important;
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12) !important;
   outline: none !important;
