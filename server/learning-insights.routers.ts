@@ -9,6 +9,11 @@ import {
 } from "../drizzle/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, gte } from "drizzle-orm";
+import {
+  getUnifiedLearnings,
+  getTopPerformingPatterns,
+  generateContentSuggestions,
+} from "./services/unified-learning-service";
 
 /** Convert Date to MySQL-compatible timestamp string */
 function toMySQLTimestamp(date: Date): string {
@@ -135,6 +140,69 @@ export const learningInsightsRouter = router({
         avgConfidence: Math.round(Number(row.avgConfidence || 0)),
         learningCount: Number(row.learningCount),
       }));
+    }),
+
+  /**
+   * Unified learnings: merge data from agentKnowledge, accountLearnings, buzzLearnings
+   * for a given accountId and return a normalised, source-tagged result set.
+   */
+  getUnifiedLearnings: protectedProcedure
+    .input(
+      z.object({
+        accountId: z.number(),
+        projectId: z.number().optional(),
+        minConfidence: z.number().min(0).max(100).optional().default(0),
+        activeOnly: z.boolean().optional().default(true),
+        limit: z.number().min(1).max(200).optional().default(50),
+      })
+    )
+    .query(async ({ input }) => {
+      return getUnifiedLearnings(input.accountId, {
+        projectId: input.projectId,
+        minConfidence: input.minConfidence,
+        activeOnly: input.activeOnly,
+        limit: input.limit,
+      });
+    }),
+
+  /**
+   * Top performing patterns: return the highest-scored patterns across all
+   * 3 learning tables, ordered by composite score (confidence + success rate + usage).
+   */
+  getTopPerformingPatterns: protectedProcedure
+    .input(
+      z.object({
+        accountId: z.number(),
+        projectId: z.number().optional(),
+        topN: z.number().min(1).max(50).optional().default(10),
+        minConfidence: z.number().min(0).max(100).optional().default(40),
+      })
+    )
+    .query(async ({ input }) => {
+      return getTopPerformingPatterns(input.accountId, {
+        topN: input.topN,
+        minConfidence: input.minConfidence,
+        projectId: input.projectId,
+      });
+    }),
+
+  /**
+   * Content suggestions: analyse unified learning data and produce actionable
+   * suggestions grouped by category (hook / structure / hashtag / timing / tone / cta / topic).
+   */
+  generateContentSuggestions: protectedProcedure
+    .input(
+      z.object({
+        accountId: z.number(),
+        projectId: z.number().optional(),
+        maxPerCategory: z.number().min(1).max(5).optional().default(2),
+      })
+    )
+    .query(async ({ input }) => {
+      return generateContentSuggestions(input.accountId, {
+        projectId: input.projectId,
+        maxPerCategory: input.maxPerCategory,
+      });
     }),
 
   /**
