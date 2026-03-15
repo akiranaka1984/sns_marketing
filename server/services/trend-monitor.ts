@@ -21,6 +21,9 @@ import {
 import { eq, and, gte, desc, sql, count, inArray } from "drizzle-orm";
 import { invokeLLM } from "../_core/llm";
 import { generateContent, buildAgentContext } from "../agent-engine";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger("trend-monitor");
 
 // ============================================
 // Constants
@@ -52,7 +55,7 @@ let isRunning = false;
  */
 export async function detectTrendsFromBuzzPosts(userId: number): Promise<number> {
   try {
-    console.log(`${LOG_PREFIX} Detecting trends from buzz posts for user ${userId}`);
+    logger.info(`Detecting trends from buzz posts for user ${userId}`);
 
     const twentyFourHoursAgo = new Date();
     twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
@@ -76,7 +79,7 @@ export async function detectTrendsFromBuzzPosts(userId: number): Promise<number>
       .orderBy(desc(buzzPosts.createdAt));
 
     if (recentBuzz.length === 0) {
-      console.log(`${LOG_PREFIX} No recent buzz posts found`);
+      logger.info(`No recent buzz posts found`);
       return 0;
     }
 
@@ -161,16 +164,16 @@ export async function detectTrendsFromBuzzPosts(userId: number): Promise<number>
         });
 
         newTrendsCount++;
-        console.log(`${LOG_PREFIX} New trend detected: #${hashtag} (${data.count} occurrences)`);
+        logger.info(`New trend detected: #${hashtag} (${data.count} occurrences)`);
       } catch (error) {
-        console.error(`${LOG_PREFIX} Error saving trend #${hashtag}:`, error);
+        logger.error(`Error saving trend #${hashtag}:`, error);
       }
     }
 
-    console.log(`${LOG_PREFIX} Detected ${newTrendsCount} new trends from buzz posts`);
+    logger.info(`Detected ${newTrendsCount} new trends from buzz posts`);
     return newTrendsCount;
   } catch (error) {
-    console.error(`${LOG_PREFIX} Error detecting trends from buzz posts:`, error);
+    logger.error(`Error detecting trends from buzz posts:`, error);
     return 0;
   }
 }
@@ -181,7 +184,7 @@ export async function detectTrendsFromBuzzPosts(userId: number): Promise<number>
  */
 export async function detectTrendsFromModelAccounts(userId: number): Promise<number> {
   try {
-    console.log(`${LOG_PREFIX} Detecting trends from model accounts for user ${userId}`);
+    logger.info(`Detecting trends from model accounts for user ${userId}`);
 
     // Get active model accounts for this user
     const activeModels = await db
@@ -195,7 +198,7 @@ export async function detectTrendsFromModelAccounts(userId: number): Promise<num
       );
 
     if (activeModels.length === 0) {
-      console.log(`${LOG_PREFIX} No active model accounts found`);
+      logger.info(`No active model accounts found`);
       return 0;
     }
 
@@ -224,7 +227,7 @@ export async function detectTrendsFromModelAccounts(userId: number): Promise<num
       );
 
     if (modelBuzzPosts.length === 0) {
-      console.log(`${LOG_PREFIX} No recent model account posts found`);
+      logger.info(`No recent model account posts found`);
       return 0;
     }
 
@@ -307,18 +310,16 @@ export async function detectTrendsFromModelAccounts(userId: number): Promise<num
         });
 
         newTrendsCount++;
-        console.log(
-          `${LOG_PREFIX} New model-account trend detected: #${hashtag} (${modelSet.size} model accounts)`
-        );
+        logger.info(`New model-account trend detected: #${hashtag} (${modelSet.size} model accounts)`);
       } catch (error) {
-        console.error(`${LOG_PREFIX} Error saving model trend #${hashtag}:`, error);
+        logger.error(`Error saving model trend #${hashtag}:`, error);
       }
     }
 
-    console.log(`${LOG_PREFIX} Detected ${newTrendsCount} new trends from model accounts`);
+    logger.info(`Detected ${newTrendsCount} new trends from model accounts`);
     return newTrendsCount;
   } catch (error) {
-    console.error(`${LOG_PREFIX} Error detecting trends from model accounts:`, error);
+    logger.error(`Error detecting trends from model accounts:`, error);
     return 0;
   }
 }
@@ -337,7 +338,7 @@ export async function scoreTrendRelevance(
   projectId: number
 ): Promise<number> {
   try {
-    console.log(`${LOG_PREFIX} Scoring relevance for trend ${trendId}, project ${projectId}`);
+    logger.info(`Scoring relevance for trend ${trendId}, project ${projectId}`);
 
     // Get the trend
     const trend = await db.query.trackedTrends.findFirst({
@@ -345,7 +346,7 @@ export async function scoreTrendRelevance(
     });
 
     if (!trend) {
-      console.error(`${LOG_PREFIX} Trend ${trendId} not found`);
+      logger.error(`Trend ${trendId} not found`);
       return 0;
     }
 
@@ -355,7 +356,7 @@ export async function scoreTrendRelevance(
     });
 
     if (!project) {
-      console.error(`${LOG_PREFIX} Project ${projectId} not found`);
+      logger.error(`Project ${projectId} not found`);
       return 0;
     }
 
@@ -454,13 +455,11 @@ Respond in JSON:
       })
       .where(eq(trackedTrends.id, trendId));
 
-    console.log(
-      `${LOG_PREFIX} Trend "${trend.trendName}" scored ${score}/100 for project ${projectId}: ${result.reasoning}`
-    );
+    logger.info(`Trend "${trend.trendName}" scored ${score}/100 for project ${projectId}: ${result.reasoning}`);
 
     return score;
   } catch (error) {
-    console.error(`${LOG_PREFIX} Error scoring trend relevance:`, error);
+    logger.error(`Error scoring trend relevance:`, error);
 
     // Reset status on error
     try {
@@ -491,7 +490,7 @@ export async function respondToTrend(
   projectId: number
 ): Promise<{ success: boolean; scheduledPostId?: number; error?: string }> {
   try {
-    console.log(`${LOG_PREFIX} Responding to trend ${trendId} for project ${projectId}`);
+    logger.info(`Responding to trend ${trendId} for project ${projectId}`);
 
     // Get the trend
     const trend = await db.query.trackedTrends.findFirst({
@@ -503,13 +502,12 @@ export async function respondToTrend(
     }
 
     // Check relevance threshold
-    if (trend.relevanceScore < RELEVANCE_THRESHOLD) {
-      console.log(
-        `${LOG_PREFIX} Trend "${trend.trendName}" relevance ${trend.relevanceScore} below threshold ${RELEVANCE_THRESHOLD}, skipping`
-      );
+    const relevanceScore = trend.relevanceScore ?? 0;
+    if (relevanceScore < RELEVANCE_THRESHOLD) {
+      logger.info(`Trend "${trend.trendName}" relevance ${relevanceScore} below threshold ${RELEVANCE_THRESHOLD}, skipping`);
       return {
         success: false,
-        error: `Relevance score ${trend.relevanceScore} below threshold ${RELEVANCE_THRESHOLD}`,
+        error: `Relevance score ${relevanceScore} below threshold ${RELEVANCE_THRESHOLD}`,
       };
     }
 
@@ -620,13 +618,11 @@ export async function respondToTrend(
       })
       .where(eq(trackedTrends.id, trendId));
 
-    console.log(
-      `${LOG_PREFIX} Trend response created: trend="${trend.trendName}", scheduledPostId=${scheduledPostId}, scheduledTime=${scheduledTime.toISOString()}`
-    );
+    logger.info(`Trend response created: trend="${trend.trendName}", scheduledPostId=${scheduledPostId}, scheduledTime=${scheduledTime.toISOString()}`);
 
     return { success: true, scheduledPostId };
   } catch (error) {
-    console.error(`${LOG_PREFIX} Error responding to trend:`, error);
+    logger.error(`Error responding to trend:`, error);
 
     // Reset status on error
     try {
@@ -657,12 +653,12 @@ export async function respondToTrend(
  */
 async function runTrendMonitorCycle(): Promise<void> {
   if (isRunning) {
-    console.log(`${LOG_PREFIX} Monitor cycle already running, skipping`);
+    logger.info(`Monitor cycle already running, skipping`);
     return;
   }
 
   isRunning = true;
-  console.log(`${LOG_PREFIX} Starting trend monitor cycle`);
+  logger.info(`Starting trend monitor cycle`);
 
   try {
     // Get all active projects and their user IDs
@@ -672,7 +668,7 @@ async function runTrendMonitorCycle(): Promise<void> {
       .where(eq(projects.status, "active"));
 
     if (activeProjects.length === 0) {
-      console.log(`${LOG_PREFIX} No active projects found`);
+      logger.info(`No active projects found`);
       return;
     }
 
@@ -685,7 +681,7 @@ async function runTrendMonitorCycle(): Promise<void> {
         await detectTrendsFromBuzzPosts(userId);
         await detectTrendsFromModelAccounts(userId);
       } catch (error) {
-        console.error(`${LOG_PREFIX} Error detecting trends for user ${userId}:`, error);
+        logger.error(`Error detecting trends for user ${userId}:`, error);
       }
     }
 
@@ -713,10 +709,7 @@ async function runTrendMonitorCycle(): Promise<void> {
         try {
           await scoreTrendRelevance(trend.id, project.id);
         } catch (error) {
-          console.error(
-            `${LOG_PREFIX} Error scoring trend ${trend.id} for project ${project.id}:`,
-            error
-          );
+          logger.error(`Error scoring trend ${trend.id} for project ${project.id}:`, error);
         }
       }
     }
@@ -745,19 +738,13 @@ async function runTrendMonitorCycle(): Promise<void> {
         try {
           await respondToTrend(trend.id, userProject.id);
         } catch (error) {
-          console.error(
-            `${LOG_PREFIX} Error responding to trend ${trend.id}:`,
-            error
-          );
+          logger.error(`Error responding to trend ${trend.id}:`, error);
         }
       } else {
         try {
           await respondToTrend(trend.id, targetProjectId);
         } catch (error) {
-          console.error(
-            `${LOG_PREFIX} Error responding to trend ${trend.id}:`,
-            error
-          );
+          logger.error(`Error responding to trend ${trend.id}:`, error);
         }
       }
     }
@@ -774,9 +761,9 @@ async function runTrendMonitorCycle(): Promise<void> {
         )
       );
 
-    console.log(`${LOG_PREFIX} Trend monitor cycle complete`);
+    logger.info(`Trend monitor cycle complete`);
   } catch (error) {
-    console.error(`${LOG_PREFIX} Error in trend monitor cycle:`, error);
+    logger.error(`Error in trend monitor cycle:`, error);
   } finally {
     isRunning = false;
   }
@@ -787,13 +774,11 @@ async function runTrendMonitorCycle(): Promise<void> {
  */
 export function startTrendMonitor(): void {
   if (monitorInterval) {
-    console.log(`${LOG_PREFIX} Trend monitor already running`);
+    logger.info(`Trend monitor already running`);
     return;
   }
 
-  console.log(
-    `${LOG_PREFIX} Starting trend monitor (interval: ${MONITOR_INTERVAL_MS / 1000 / 60} minutes)`
-  );
+  logger.info(`Starting trend monitor (interval: ${MONITOR_INTERVAL_MS / 1000 / 60} minutes)`);
 
   // Run immediately
   runTrendMonitorCycle();
@@ -811,7 +796,7 @@ export function stopTrendMonitor(): void {
   if (monitorInterval) {
     clearInterval(monitorInterval);
     monitorInterval = null;
-    console.log(`${LOG_PREFIX} Trend monitor stopped`);
+    logger.info(`Trend monitor stopped`);
   }
 }
 
@@ -842,7 +827,7 @@ export async function getActiveTrends(projectId?: number): Promise<
 
     return activeTrends;
   } catch (error) {
-    console.error(`${LOG_PREFIX} Error getting active trends:`, error);
+    logger.error(`Error getting active trends:`, error);
     return [];
   }
 }
@@ -864,7 +849,7 @@ export async function getTrendPerformanceReport(projectId: number): Promise<{
   }>;
 }> {
   try {
-    console.log(`${LOG_PREFIX} Generating trend performance report for project ${projectId}`);
+    logger.info(`Generating trend performance report for project ${projectId}`);
 
     // Get all trend response posts for this project
     const trendPosts = await db
@@ -973,10 +958,7 @@ export async function getTrendPerformanceReport(projectId: number): Promise<{
           respondedAt: trend.respondedAt,
         });
       } catch (error) {
-        console.error(
-          `${LOG_PREFIX} Error fetching trend detail for ${trendIdVal}:`,
-          error
-        );
+        logger.error(`Error fetching trend detail for ${trendIdVal}:`, error);
       }
     }
 
@@ -989,13 +971,11 @@ export async function getTrendPerformanceReport(projectId: number): Promise<{
       trendDetails,
     };
 
-    console.log(
-      `${LOG_PREFIX} Performance report: ${totalTrendPosts} trend posts, ${performanceLift}% lift`
-    );
+    logger.info(`Performance report: ${totalTrendPosts} trend posts, ${performanceLift}% lift`);
 
     return report;
   } catch (error) {
-    console.error(`${LOG_PREFIX} Error generating trend performance report:`, error);
+    logger.error(`Error generating trend performance report:`, error);
     return {
       totalTrendPosts: 0,
       totalNormalPosts: 0,

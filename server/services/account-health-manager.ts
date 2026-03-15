@@ -18,6 +18,9 @@ import {
   agentExecutionLogs,
 } from "../../drizzle/schema";
 import { eq, and, gte, desc, sql, count } from "drizzle-orm";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger("account-health-manager");
 
 /** Convert Date to MySQL-compatible timestamp string */
 function toMySQLTimestamp(date: Date): string {
@@ -95,7 +98,7 @@ let isMonitorRunning = false;
  * Sets the account into the 'warming' phase with conservative limits.
  */
 export async function initAccountHealth(accountId: number): Promise<number> {
-  console.log(`[AccountHealth] Initializing health record for account ${accountId}`);
+  logger.info(`Initializing health record for account ${accountId}`);
 
   // Check if health record already exists
   const [existing] = await db
@@ -104,7 +107,7 @@ export async function initAccountHealth(accountId: number): Promise<number> {
     .where(eq(accountHealth.accountId, accountId));
 
   if (existing) {
-    console.log(`[AccountHealth] Health record already exists for account ${accountId} (id: ${existing.id})`);
+    logger.info(`Health record already exists for account ${accountId} (id: ${existing.id})`);
     return existing.id;
   }
 
@@ -116,7 +119,7 @@ export async function initAccountHealth(accountId: number): Promise<number> {
     engagementNaturalnessScore: 100,
     freezeRiskScore: 0,
     accountPhase: "warming",
-    warmingStartedAt: new Date(),
+    warmingStartedAt: toMySQLTimestamp(new Date()),
     maxDailyPosts: 1,
     maxDailyActions: 10,
     postsToday: 0,
@@ -130,7 +133,7 @@ export async function initAccountHealth(accountId: number): Promise<number> {
     consecutiveFailures: 0,
   });
 
-  console.log(`[AccountHealth] Created health record for account ${accountId}`);
+  logger.info(`Created health record for account ${accountId}`);
   return result.insertId;
 }
 
@@ -175,12 +178,12 @@ export async function advanceWarmingPhase(accountId: number): Promise<{
         accountPhase: "mature",
         maxDailyPosts: 10,
         maxDailyActions: 100,
-        warmingCompletedAt: new Date(),
-        updatedAt: new Date(),
+        warmingCompletedAt: toMySQLTimestamp(new Date()),
+        updatedAt: toMySQLTimestamp(new Date()),
       })
       .where(eq(accountHealth.accountId, accountId));
 
-    console.log(`[AccountHealth] Account ${accountId} advanced to 'mature' phase (${Math.floor(daysSinceWarming)} days)`);
+    logger.info(`Account ${accountId} advanced to 'mature' phase (${Math.floor(daysSinceWarming)} days)`);
     return { advanced: true, currentPhase: "mature", message: "Advanced to mature phase (10 posts/day, 100 actions)" };
   }
 
@@ -192,11 +195,11 @@ export async function advanceWarmingPhase(accountId: number): Promise<{
         accountPhase: "growing",
         maxDailyPosts: 3,
         maxDailyActions: 30,
-        updatedAt: new Date(),
+        updatedAt: toMySQLTimestamp(new Date()),
       })
       .where(eq(accountHealth.accountId, accountId));
 
-    console.log(`[AccountHealth] Account ${accountId} advanced to 'growing' phase (${Math.floor(daysSinceWarming)} days)`);
+    logger.info(`Account ${accountId} advanced to 'growing' phase (${Math.floor(daysSinceWarming)} days)`);
     return { advanced: true, currentPhase: "growing", message: "Advanced to growing phase (3 posts/day, 30 actions)" };
   }
 
@@ -321,7 +324,7 @@ export async function recordAction(
 ): Promise<void> {
   const health = await getAccountHealth(accountId);
   if (!health) {
-    console.warn(`[AccountHealth] Cannot record action: no health record for account ${accountId}`);
+    logger.warn(`Cannot record action: no health record for account ${accountId}`);
     return;
   }
 
@@ -352,8 +355,8 @@ export async function recordAction(
     .set(updateData)
     .where(eq(accountHealth.accountId, accountId));
 
-  console.log(
-    `[AccountHealth] Recorded ${actionType} (${success ? "success" : "failure"}) for account ${accountId}` +
+  logger.info(
+    `Recorded ${actionType} (${success ? "success" : "failure"}) for account ${accountId}` +
     ` [posts: ${actionType === "post" ? (health.postsToday + 1) : health.postsToday}/${health.maxDailyPosts},` +
     ` actions: ${health.actionsToday + 1}/${health.maxDailyActions}]`
   );
@@ -364,7 +367,7 @@ export async function recordAction(
  * Should be called at midnight (00:00).
  */
 export async function resetDailyCounters(): Promise<number> {
-  console.log("[AccountHealth] Resetting daily counters for all accounts");
+  logger.info("Resetting daily counters for all accounts");
 
   const result = await db
     .update(accountHealth)
@@ -373,11 +376,11 @@ export async function resetDailyCounters(): Promise<number> {
       actionsToday: 0,
       postsThisHour: 0,
       actionsThisHour: 0,
-      updatedAt: new Date(),
+      updatedAt: toMySQLTimestamp(new Date()),
     });
 
   const affectedRows = (result as any)[0]?.affectedRows ?? 0;
-  console.log(`[AccountHealth] Reset daily counters for ${affectedRows} accounts`);
+  logger.info(`Reset daily counters for ${affectedRows} accounts`);
   return affectedRows;
 }
 
@@ -440,12 +443,12 @@ export async function calculateHealthScore(accountId: number): Promise<HealthSco
       postSuccessRate,
       engagementNaturalnessScore,
       freezeRiskScore,
-      updatedAt: new Date(),
+      updatedAt: toMySQLTimestamp(new Date()),
     })
     .where(eq(accountHealth.accountId, accountId));
 
-  console.log(
-    `[AccountHealth] Score for account ${accountId}: ${clampedScore}` +
+  logger.info(
+    `Score for account ${accountId}: ${clampedScore}` +
     ` (login: ${loginSuccessRate}, post: ${postSuccessRate},` +
     ` naturalness: ${engagementNaturalnessScore}, freezeRisk: ${freezeRiskScore})`
   );
@@ -640,7 +643,7 @@ export async function checkAndThrottle(accountId: number): Promise<{
         throttleReason: `Auto-suspended: health score ${healthScore} < 20`,
         maxDailyPosts: 0,
         maxDailyActions: 0,
-        updatedAt: new Date(),
+        updatedAt: toMySQLTimestamp(new Date()),
       })
       .where(eq(accountHealth.accountId, accountId));
 
@@ -662,7 +665,7 @@ export async function checkAndThrottle(accountId: number): Promise<{
       errorMessage: `[ESCALATION] Account ${accountId} health critically low (${healthScore}/100). Manual review required.`,
     });
 
-    console.log(`[AccountHealth] ESCALATION: Account ${accountId} fully suspended (score: ${healthScore})`);
+    logger.info(`ESCALATION: Account ${accountId} fully suspended (score: ${healthScore})`);
     return {
       action: "escalate",
       healthScore,
@@ -681,11 +684,11 @@ export async function checkAndThrottle(accountId: number): Promise<{
         throttleReason: `Auto-suspended: health score ${healthScore} < 40`,
         maxDailyPosts: 0,
         maxDailyActions: 0,
-        updatedAt: new Date(),
+        updatedAt: toMySQLTimestamp(new Date()),
       })
       .where(eq(accountHealth.accountId, accountId));
 
-    console.log(`[AccountHealth] Account ${accountId} suspended (score: ${healthScore})`);
+    logger.info(`Account ${accountId} suspended (score: ${healthScore})`);
     return {
       action: "suspend",
       healthScore,
@@ -708,11 +711,11 @@ export async function checkAndThrottle(accountId: number): Promise<{
         maxDailyActions: throttledActions,
         isSuspended: 0,
         suspendedReason: null,
-        updatedAt: new Date(),
+        updatedAt: toMySQLTimestamp(new Date()),
       })
       .where(eq(accountHealth.accountId, accountId));
 
-    console.log(`[AccountHealth] Account ${accountId} throttled 50% (score: ${healthScore}, posts: ${throttledPosts}, actions: ${throttledActions})`);
+    logger.info(`Account ${accountId} throttled 50% (score: ${healthScore}, posts: ${throttledPosts}, actions: ${throttledActions})`);
     return {
       action: "throttle",
       healthScore,
@@ -761,11 +764,11 @@ export async function unthrottle(accountId: number): Promise<{
       suspendedReason: null,
       maxDailyPosts: baseLimits.maxDailyPosts,
       maxDailyActions: baseLimits.maxDailyActions,
-      updatedAt: new Date(),
+      updatedAt: toMySQLTimestamp(new Date()),
     })
     .where(eq(accountHealth.accountId, accountId));
 
-  console.log(`[AccountHealth] Account ${accountId} unthrottled (score: ${scoreBreakdown.healthScore})`);
+  logger.info(`Account ${accountId} unthrottled (score: ${scoreBreakdown.healthScore})`);
   return {
     success: true,
     message: `Unthrottled successfully (score: ${scoreBreakdown.healthScore}, posts: ${baseLimits.maxDailyPosts}/day, actions: ${baseLimits.maxDailyActions}/day)`,
@@ -806,11 +809,11 @@ function getBaseLimitsForPhase(phase: AccountPhase): {
  */
 export function startAccountHealthMonitor(): void {
   if (monitorInterval) {
-    console.log("[AccountHealth] Health monitor already running");
+    logger.info("Health monitor already running");
     return;
   }
 
-  console.log(`[AccountHealth] Starting health monitor (interval: ${HEALTH_CHECK_INTERVAL_MS / 1000 / 60} minutes)`);
+  logger.info(`Starting health monitor (interval: ${HEALTH_CHECK_INTERVAL_MS / 1000 / 60} minutes)`);
 
   // Run immediately
   runHealthCheckCycle();
@@ -828,7 +831,7 @@ export function stopAccountHealthMonitor(): void {
   if (monitorInterval) {
     clearInterval(monitorInterval);
     monitorInterval = null;
-    console.log("[AccountHealth] Health monitor stopped");
+    logger.info("Health monitor stopped");
   }
 }
 
@@ -837,7 +840,7 @@ export function stopAccountHealthMonitor(): void {
  */
 async function runHealthCheckCycle(): Promise<void> {
   if (isMonitorRunning) {
-    console.log("[AccountHealth] Health check cycle already running, skipping");
+    logger.info("Health check cycle already running, skipping");
     return;
   }
 
@@ -854,7 +857,7 @@ async function runHealthCheckCycle(): Promise<void> {
       })
       .from(accountHealth);
 
-    console.log(`[AccountHealth] Running health check for ${healthRecords.length} accounts`);
+    logger.info(`Running health check for ${healthRecords.length} accounts`);
 
     for (const record of healthRecords) {
       try {
@@ -873,13 +876,13 @@ async function runHealthCheckCycle(): Promise<void> {
           await unthrottle(record.accountId);
         }
       } catch (error) {
-        console.error(`[AccountHealth] Error checking account ${record.accountId}:`, error);
+        logger.error(`Error checking account ${record.accountId}:`, error);
       }
     }
 
-    console.log("[AccountHealth] Health check cycle completed");
+    logger.info("Health check cycle completed");
   } catch (error) {
-    console.error("[AccountHealth] Error in health check cycle:", error);
+    logger.error("Error in health check cycle:", error);
   } finally {
     isMonitorRunning = false;
   }

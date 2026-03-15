@@ -19,6 +19,9 @@ import {
   accountRelationships,
 } from "../../drizzle/schema";
 import { invokeLLM } from "../_core/llm";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger("network-orchestrator");
 
 // ---------------------------------------------------------------------------
 // Types
@@ -50,6 +53,11 @@ export interface ConversationTurn {
 
 const LOG_PREFIX = "[NetworkOrchestrator]";
 
+/** Convert Date to MySQL-compatible timestamp string */
+function toMySQLTimestamp(date: Date): string {
+  return date.toISOString().slice(0, 19).replace("T", " ");
+}
+
 /** Return a random integer between `min` and `max` (inclusive). */
 function randomBetween(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -67,8 +75,8 @@ export async function assignAccountRoles(
   projectId: number,
   assignments: RoleAssignment[],
 ): Promise<void> {
-  console.log(
-    `${LOG_PREFIX} Assigning ${assignments.length} roles for project ${projectId}`,
+  logger.info(
+    `Assigning ${assignments.length} roles for project ${projectId}`,
   );
 
   for (const { accountId, role } of assignments) {
@@ -86,7 +94,7 @@ export async function assignAccountRoles(
     if (existing) {
       await db
         .update(accountRoles)
-        .set({ role, isActive: 1, updatedAt: new Date() })
+        .set({ role, isActive: 1, updatedAt: toMySQLTimestamp(new Date()) })
         .where(eq(accountRoles.id, existing.id));
     } else {
       await db.insert(accountRoles).values({
@@ -99,7 +107,7 @@ export async function assignAccountRoles(
     }
   }
 
-  console.log(`${LOG_PREFIX} Role assignment complete for project ${projectId}`);
+  logger.info(`Role assignment complete for project ${projectId}`);
 }
 
 /**
@@ -126,8 +134,8 @@ export async function getProjectRoles(projectId: number) {
       ),
     );
 
-  console.log(
-    `${LOG_PREFIX} Found ${roles.length} active roles for project ${projectId}`,
+  logger.info(
+    `Found ${roles.length} active roles for project ${projectId}`,
   );
   return roles;
 }
@@ -152,8 +160,8 @@ export async function generateAmplificationPlan(
   postUrl: string,
   postContent: string,
 ): Promise<number> {
-  console.log(
-    `${LOG_PREFIX} Generating amplification plan for project ${projectId}, post ${triggerPostId}`,
+  logger.info(
+    `Generating amplification plan for project ${projectId}, post ${triggerPostId}`,
   );
 
   // Fetch role assignments grouped by role
@@ -257,8 +265,8 @@ export async function generateAmplificationPlan(
 
   const planId = result.insertId;
 
-  console.log(
-    `${LOG_PREFIX} Amplification plan ${planId} created with ${actions.length} actions ` +
+  logger.info(
+    `Amplification plan ${planId} created with ${actions.length} actions ` +
       `(amplifiers: ${amplifierAccounts.length}, engagement: ${engagementAccounts.length}, ` +
       `support: ${supportAccounts.length})`,
   );
@@ -279,13 +287,13 @@ export async function generateConversationThread(
   postContent: string,
   participantAccountIds: number[],
 ): Promise<ConversationTurn[]> {
-  console.log(
-    `${LOG_PREFIX} Generating conversation thread for project ${projectId} ` +
+  logger.info(
+    `Generating conversation thread for project ${projectId} ` +
       `with ${participantAccountIds.length} participants`,
   );
 
   if (participantAccountIds.length < 2) {
-    console.warn(`${LOG_PREFIX} Need at least 2 participants for a conversation`);
+    logger.warn(`Need at least 2 participants for a conversation`);
     return [];
   }
 
@@ -299,7 +307,7 @@ export async function generateConversationThread(
     .where(inArray(accounts.id, limitedIds));
 
   if (participantAccounts.length < 2) {
-    console.warn(`${LOG_PREFIX} Could not find enough participant accounts`);
+    logger.warn(`Could not find enough participant accounts`);
     return [];
   }
 
@@ -390,7 +398,7 @@ export async function generateConversationThread(
         parsed = arrValue || [];
       }
     } catch {
-      console.error(`${LOG_PREFIX} Failed to parse LLM conversation response: ${responseText}`);
+      logger.error(`Failed to parse LLM conversation response: ${responseText}`);
       return [];
     }
 
@@ -413,15 +421,11 @@ export async function generateConversationThread(
       });
     }
 
-    console.log(
-      `${LOG_PREFIX} Generated ${validTurns.length} conversation turns for project ${projectId}`,
-    );
+    logger.info(`Generated ${validTurns.length} conversation turns for project ${projectId}`);
 
     return validTurns;
   } catch (error: any) {
-    console.error(
-      `${LOG_PREFIX} LLM conversation generation failed: ${error.message}`,
-    );
+    logger.error(`LLM conversation generation failed: ${error.message}`);
     return [];
   }
 }
@@ -437,7 +441,7 @@ export async function generateConversationThread(
  * appropriate scheduled times. Updates the plan status to "in_progress".
  */
 export async function executeOrchestrationPlan(planId: number): Promise<void> {
-  console.log(`${LOG_PREFIX} Executing orchestration plan ${planId}`);
+  logger.info(`Executing orchestration plan ${planId}`);
 
   // Load the plan
   const [plan] = await db
@@ -446,14 +450,12 @@ export async function executeOrchestrationPlan(planId: number): Promise<void> {
     .where(eq(orchestrationPlans.id, planId));
 
   if (!plan) {
-    console.error(`${LOG_PREFIX} Plan ${planId} not found`);
+    logger.error(`Plan ${planId} not found`);
     return;
   }
 
   if (plan.status !== "planned") {
-    console.warn(
-      `${LOG_PREFIX} Plan ${planId} is in status "${plan.status}", expected "planned". Skipping.`,
-    );
+    logger.warn(`Plan ${planId} is in status "${plan.status}", expected "planned". Skipping.`);
     return;
   }
 
@@ -462,19 +464,19 @@ export async function executeOrchestrationPlan(planId: number): Promise<void> {
   try {
     actions = JSON.parse(plan.actions) as PlannedAction[];
   } catch {
-    console.error(`${LOG_PREFIX} Failed to parse plan actions for plan ${planId}`);
+    logger.error(`Failed to parse plan actions for plan ${planId}`);
     await db
       .update(orchestrationPlans)
-      .set({ status: "failed", updatedAt: new Date() })
+      .set({ status: "failed", updatedAt: toMySQLTimestamp(new Date()) })
       .where(eq(orchestrationPlans.id, planId));
     return;
   }
 
   if (actions.length === 0) {
-    console.warn(`${LOG_PREFIX} Plan ${planId} has no actions`);
+    logger.warn(`Plan ${planId} has no actions`);
     await db
       .update(orchestrationPlans)
-      .set({ status: "completed", completedAt: new Date(), updatedAt: new Date() })
+      .set({ status: "completed", completedAt: toMySQLTimestamp(new Date()), updatedAt: toMySQLTimestamp(new Date()) })
       .where(eq(orchestrationPlans.id, planId));
     return;
   }
@@ -507,9 +509,10 @@ export async function executeOrchestrationPlan(planId: number): Promise<void> {
 
   // Mark plan as in progress
   const now = new Date();
+  const nowStr = toMySQLTimestamp(now);
   await db
     .update(orchestrationPlans)
-    .set({ status: "in_progress", startedAt: now, updatedAt: now })
+    .set({ status: "in_progress", startedAt: nowStr, updatedAt: nowStr })
     .where(eq(orchestrationPlans.id, planId));
 
   // Create interaction records for each action
@@ -519,9 +522,7 @@ export async function executeOrchestrationPlan(planId: number): Promise<void> {
   for (const action of actions) {
     const deviceId = accountDeviceMap.get(action.accountId);
     if (!deviceId) {
-      console.warn(
-        `${LOG_PREFIX} No device found for account ${action.accountId}, skipping action`,
-      );
+      logger.warn(`No device found for account ${action.accountId}, skipping action`);
       skippedCount++;
       continue;
     }
@@ -552,13 +553,13 @@ export async function executeOrchestrationPlan(planId: number): Promise<void> {
       .update(orchestrationPlans)
       .set({
         failedActions: skippedCount,
-        updatedAt: new Date(),
+        updatedAt: toMySQLTimestamp(new Date()),
       })
       .where(eq(orchestrationPlans.id, planId));
   }
 
-  console.log(
-    `${LOG_PREFIX} Plan ${planId} execution started: ${createdCount} interactions created, ` +
+  logger.info(
+    `Plan ${planId} execution started: ${createdCount} interactions created, ` +
       `${skippedCount} skipped`,
   );
 }
@@ -601,7 +602,7 @@ async function generateSingleComment(
     const text = typeof content === "string" ? content : "";
     return text.trim().slice(0, 280);
   } catch (error: any) {
-    console.error(`${LOG_PREFIX} Failed to generate single comment: ${error.message}`);
+    logger.error(`Failed to generate single comment: ${error.message}`);
     return "";
   }
 }

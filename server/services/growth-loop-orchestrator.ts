@@ -27,6 +27,9 @@ import {
   applyOptimization,
 } from "./strategy-optimizer";
 import { invokeLLM } from "../_core/llm";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger("growth-loop-orchestrator");
 
 // ============================================
 // Types
@@ -79,25 +82,25 @@ const projectTimers = new Map<number, ProjectLoopTimers>();
  */
 export function startGrowthLoopOrchestrator() {
   if (schedulerInterval) {
-    console.log("[GrowthLoop] Orchestrator already running");
+    logger.info("Orchestrator already running");
     return;
   }
 
-  console.log("[GrowthLoop] Starting orchestrator...");
+  logger.info("Starting orchestrator...");
 
   // Initial setup for all active projects
   initializeAllProjects().catch((err) =>
-    console.error("[GrowthLoop] Error during initial project setup:", err)
+    logger.error("Error during initial project setup:", err)
   );
 
   // Periodically discover new/changed projects (every 5 minutes)
   schedulerInterval = setInterval(() => {
     syncActiveProjects().catch((err) =>
-      console.error("[GrowthLoop] Error syncing active projects:", err)
+      logger.error("Error syncing active projects:", err)
     );
   }, 5 * 60 * 1000);
 
-  console.log("[GrowthLoop] Orchestrator started");
+  logger.info("Orchestrator started");
 }
 
 /**
@@ -112,11 +115,11 @@ export function stopGrowthLoopOrchestrator() {
   // Clear all project-level timers
   for (const [projectId, timers] of projectTimers.entries()) {
     clearProjectTimers(timers);
-    console.log(`[GrowthLoop] Stopped timers for project ${projectId}`);
+    logger.info(`Stopped timers for project ${projectId}`);
   }
   projectTimers.clear();
 
-  console.log("[GrowthLoop] Orchestrator stopped");
+  logger.info("Orchestrator stopped");
 }
 
 // ============================================
@@ -128,19 +131,14 @@ async function initializeAllProjects(): Promise<void> {
     where: eq(projects.status, "active"),
   });
 
-  console.log(
-    `[GrowthLoop] Found ${activeProjects.length} active project(s)`
-  );
+  logger.info(`Found ${activeProjects.length} active project(s)`);
 
   for (const project of activeProjects) {
     try {
       await ensureLoopState(project.id);
       setupProjectTimers(project.id, project.executionMode as ExecutionMode);
     } catch (err) {
-      console.error(
-        `[GrowthLoop] Failed to initialize project ${project.id}:`,
-        err
-      );
+      logger.error(`Failed to initialize project ${project.id}:`, err);
     }
   }
 }
@@ -157,9 +155,7 @@ async function syncActiveProjects(): Promise<void> {
     if (!activeIds.has(projectId)) {
       clearProjectTimers(timers);
       projectTimers.delete(projectId);
-      console.log(
-        `[GrowthLoop] Removed timers for inactive project ${projectId}`
-      );
+      logger.info(`Removed timers for inactive project ${projectId}`);
     }
   }
 
@@ -172,14 +168,9 @@ async function syncActiveProjects(): Promise<void> {
           project.id,
           project.executionMode as ExecutionMode
         );
-        console.log(
-          `[GrowthLoop] Started timers for new project ${project.id}`
-        );
+        logger.info(`Started timers for new project ${project.id}`);
       } catch (err) {
-        console.error(
-          `[GrowthLoop] Failed to start timers for project ${project.id}:`,
-          err
-        );
+        logger.error(`Failed to start timers for project ${project.id}:`, err);
       }
     }
   }
@@ -197,55 +188,38 @@ function setupProjectTimers(
   const timers: ProjectLoopTimers = {
     kpiCheck: setInterval(() => {
       runKpiCheck(projectId, executionMode).catch((err) =>
-        console.error(
-          `[GrowthLoop] KPI check error (project ${projectId}):`,
-          err
-        )
+        logger.error(`KPI check error (project ${projectId}):`, err)
       );
     }, INTERVALS.KPI_CHECK_MS),
 
     performanceUpdate: setInterval(() => {
       runPerformanceUpdate(projectId, executionMode).catch((err) =>
-        console.error(
-          `[GrowthLoop] Performance update error (project ${projectId}):`,
-          err
-        )
+        logger.error(`Performance update error (project ${projectId}):`, err)
       );
     }, INTERVALS.PERFORMANCE_UPDATE_MS),
 
     strategyEvaluation: setInterval(() => {
       runStrategyEvaluation(projectId, executionMode).catch((err) =>
-        console.error(
-          `[GrowthLoop] Strategy evaluation error (project ${projectId}):`,
-          err
-        )
+        logger.error(`Strategy evaluation error (project ${projectId}):`, err)
       );
     }, INTERVALS.STRATEGY_EVALUATION_MS),
 
     strategyRegeneration: setInterval(() => {
       runStrategyRegeneration(projectId, executionMode).catch((err) =>
-        console.error(
-          `[GrowthLoop] Strategy regeneration error (project ${projectId}):`,
-          err
-        )
+        logger.error(`Strategy regeneration error (project ${projectId}):`, err)
       );
     }, INTERVALS.STRATEGY_REGENERATION_MS),
 
     fullReview: setInterval(() => {
       runFullReview(projectId, executionMode).catch((err) =>
-        console.error(
-          `[GrowthLoop] Full review error (project ${projectId}):`,
-          err
-        )
+        logger.error(`Full review error (project ${projectId}):`, err)
       );
     }, INTERVALS.FULL_REVIEW_MS),
   };
 
   projectTimers.set(projectId, timers);
 
-  console.log(
-    `[GrowthLoop] Timers set up for project ${projectId} (mode: ${executionMode})`
-  );
+  logger.info(`Timers set up for project ${projectId} (mode: ${executionMode})`);
 }
 
 function clearProjectTimers(timers: ProjectLoopTimers): void {
@@ -273,7 +247,7 @@ async function ensureLoopState(projectId: number): Promise<void> {
       consecutiveDeclines: 0,
       escalationNeeded: 0,
     });
-    console.log(`[GrowthLoop] Created loop state for project ${projectId}`);
+    logger.info(`Created loop state for project ${projectId}`);
   } else if (!existing.isRunning) {
     await db
       .update(growthLoopState)
@@ -317,21 +291,11 @@ async function logAction(params: {
     projectId: params.projectId,
     actionType: params.actionType,
     description: params.description,
-    actionData: params.actionData
-      ? JSON.stringify(params.actionData)
-      : null,
-    triggerReason: params.triggerReason || null,
+    // actionData, triggerReason, resultData, resultSuccess, errorMessage are not in schema
     executionMode: params.executionMode,
     status: params.status || "executed",
     executedAt:
       params.status === "pending" ? null : toMySQLTimestamp(new Date()),
-    resultData: params.resultData
-      ? JSON.stringify(params.resultData)
-      : null,
-    resultSuccess: params.resultSuccess !== undefined
-      ? (params.resultSuccess ? 1 : 0)
-      : null,
-    errorMessage: params.errorMessage || null,
   });
 
   return result.insertId;
@@ -361,7 +325,7 @@ async function runKpiCheck(
   projectId: number,
   executionMode: ExecutionMode
 ): Promise<void> {
-  console.log(`[GrowthLoop] Running KPI check for project ${projectId}`);
+  logger.info(`Running KPI check for project ${projectId}`);
 
   try {
     // Fetch current KPI tracking records
@@ -370,9 +334,7 @@ async function runKpiCheck(
     });
 
     if (kpis.length === 0) {
-      console.log(
-        `[GrowthLoop] No KPI records found for project ${projectId}, skipping`
-      );
+      logger.info(`No KPI records found for project ${projectId}, skipping`);
       return;
     }
 
@@ -433,9 +395,7 @@ async function runKpiCheck(
           status: "executed",
           resultSuccess: true,
         });
-        console.log(
-          `[GrowthLoop] Escalation triggered for project ${projectId}`
-        );
+        logger.info(`Escalation triggered for project ${projectId}`);
       }
     }
 
@@ -451,16 +411,11 @@ async function runKpiCheck(
       resultSuccess: true,
     });
 
-    console.log(
-      `[GrowthLoop] KPI check completed for project ${projectId} (decline: ${hasDecline})`
-    );
+    logger.info(`KPI check completed for project ${projectId} (decline: ${hasDecline})`);
   } catch (error) {
     const errorMsg =
       error instanceof Error ? error.message : "Unknown error";
-    console.error(
-      `[GrowthLoop] KPI check failed for project ${projectId}:`,
-      error
-    );
+    logger.error(`KPI check failed for project ${projectId}:`, error);
     await logAction({
       projectId,
       actionType: "kpi_check",
@@ -480,9 +435,7 @@ async function runPerformanceUpdate(
   projectId: number,
   executionMode: ExecutionMode
 ): Promise<void> {
-  console.log(
-    `[GrowthLoop] Running performance update for project ${projectId}`
-  );
+  logger.info(`Running performance update for project ${projectId}`);
 
   try {
     // Get agents linked to this project
@@ -494,9 +447,7 @@ async function runPerformanceUpdate(
     });
 
     if (projectAgents.length === 0) {
-      console.log(
-        `[GrowthLoop] No active agents for project ${projectId}, skipping performance update`
-      );
+      logger.info(`No active agents for project ${projectId}, skipping performance update`);
       return;
     }
 
@@ -513,14 +464,9 @@ async function runPerformanceUpdate(
           insightsCount: performance.insights.length,
         });
 
-        console.log(
-          `[GrowthLoop] Agent ${agent.id} (${agent.name}): ${performance.totalPosts} posts, ${performance.avgEngagementRate.toFixed(2)}% avg engagement`
-        );
+        logger.info(`Agent ${agent.id} (${agent.name}): ${performance.totalPosts} posts, ${performance.avgEngagementRate.toFixed(2)}% avg engagement`);
       } catch (err) {
-        console.error(
-          `[GrowthLoop] Failed to analyze agent ${agent.id}:`,
-          err
-        );
+        logger.error(`Failed to analyze agent ${agent.id}:`, err);
       }
     }
 
@@ -546,16 +492,11 @@ async function runPerformanceUpdate(
       resultSuccess: true,
     });
 
-    console.log(
-      `[GrowthLoop] Performance update completed for project ${projectId}`
-    );
+    logger.info(`Performance update completed for project ${projectId}`);
   } catch (error) {
     const errorMsg =
       error instanceof Error ? error.message : "Unknown error";
-    console.error(
-      `[GrowthLoop] Performance update failed for project ${projectId}:`,
-      error
-    );
+    logger.error(`Performance update failed for project ${projectId}:`, error);
     await logAction({
       projectId,
       actionType: "performance_update",
@@ -575,9 +516,7 @@ async function runStrategyEvaluation(
   projectId: number,
   executionMode: ExecutionMode
 ): Promise<void> {
-  console.log(
-    `[GrowthLoop] Running strategy evaluation for project ${projectId}`
-  );
+  logger.info(`Running strategy evaluation for project ${projectId}`);
 
   try {
     // Get the active strategy for this project
@@ -590,9 +529,7 @@ async function runStrategyEvaluation(
     });
 
     if (!activeStrategy) {
-      console.log(
-        `[GrowthLoop] No active strategy for project ${projectId}, skipping`
-      );
+      logger.info(`No active strategy for project ${projectId}, skipping`);
       return;
     }
 
@@ -610,9 +547,7 @@ async function runStrategyEvaluation(
     });
 
     if (recentPosts.length === 0) {
-      console.log(
-        `[GrowthLoop] No recent posts for project ${projectId}, skipping strategy evaluation`
-      );
+      logger.info(`No recent posts for project ${projectId}, skipping strategy evaluation`);
       return;
     }
 
@@ -669,9 +604,7 @@ async function runStrategyEvaluation(
 
     // If strategy is performing poorly, generate optimization suggestions
     if (effectivenessScore < POOR_STRATEGY_THRESHOLD) {
-      console.log(
-        `[GrowthLoop] Strategy score ${effectivenessScore} below threshold ${POOR_STRATEGY_THRESHOLD} for project ${projectId}`
-      );
+      logger.info(`Strategy score ${effectivenessScore} below threshold ${POOR_STRATEGY_THRESHOLD} for project ${projectId}`);
 
       // Get agents for this project to generate suggestions
       const projectAgents = await db.query.agents.findMany({
@@ -737,10 +670,7 @@ async function runStrategyEvaluation(
             }
           }
         } catch (err) {
-          console.error(
-            `[GrowthLoop] Strategy evaluation error for agent ${agent.id}:`,
-            err
-          );
+          logger.error(`Strategy evaluation error for agent ${agent.id}:`, err);
         }
       }
     } else {
@@ -761,16 +691,11 @@ async function runStrategyEvaluation(
       });
     }
 
-    console.log(
-      `[GrowthLoop] Strategy evaluation completed for project ${projectId} (score: ${effectivenessScore})`
-    );
+    logger.info(`Strategy evaluation completed for project ${projectId} (score: ${effectivenessScore})`);
   } catch (error) {
     const errorMsg =
       error instanceof Error ? error.message : "Unknown error";
-    console.error(
-      `[GrowthLoop] Strategy evaluation failed for project ${projectId}:`,
-      error
-    );
+    logger.error(`Strategy evaluation failed for project ${projectId}:`, error);
     await logAction({
       projectId,
       actionType: "strategy_evaluation",
@@ -790,9 +715,7 @@ async function runStrategyRegeneration(
   projectId: number,
   executionMode: ExecutionMode
 ): Promise<void> {
-  console.log(
-    `[GrowthLoop] Running strategy regeneration check for project ${projectId}`
-  );
+  logger.info(`Running strategy regeneration check for project ${projectId}`);
 
   try {
     const loopState = await getLoopState(projectId);
@@ -804,15 +727,11 @@ async function runStrategyRegeneration(
 
     // Only regenerate if the strategy is performing poorly
     if (currentScore >= POOR_STRATEGY_THRESHOLD) {
-      console.log(
-        `[GrowthLoop] Strategy score ${currentScore} is acceptable for project ${projectId}, no regeneration needed`
-      );
+      logger.info(`Strategy score ${currentScore} is acceptable for project ${projectId}, no regeneration needed`);
       return;
     }
 
-    console.log(
-      `[GrowthLoop] Strategy score ${currentScore} is poor for project ${projectId}, attempting regeneration`
-    );
+    logger.info(`Strategy score ${currentScore} is poor for project ${projectId}, attempting regeneration`);
 
     // Fetch the project
     const project = await db.query.projects.findFirst({
@@ -1034,9 +953,7 @@ JSON形式で回答してください:
         resultSuccess: true,
       });
 
-      console.log(
-        `[GrowthLoop] Strategy regenerated for project ${projectId}: "${newStrategy.strategyName}"`
-      );
+      logger.info(`Strategy regenerated for project ${projectId}: "${newStrategy.strategyName}"`);
     } else if (shouldCreatePending(executionMode)) {
       await logAction({
         projectId,
@@ -1052,9 +969,7 @@ JSON形式で回答してください:
         status: "pending",
       });
 
-      console.log(
-        `[GrowthLoop] Strategy regeneration pending approval for project ${projectId}`
-      );
+      logger.info(`Strategy regeneration pending approval for project ${projectId}`);
     } else {
       // manual mode
       await logAction({
@@ -1069,17 +984,12 @@ JSON形式で回答してください:
         resultSuccess: true,
       });
 
-      console.log(
-        `[GrowthLoop] Strategy regeneration logged (manual mode) for project ${projectId}`
-      );
+      logger.info(`Strategy regeneration logged (manual mode) for project ${projectId}`);
     }
   } catch (error) {
     const errorMsg =
       error instanceof Error ? error.message : "Unknown error";
-    console.error(
-      `[GrowthLoop] Strategy regeneration failed for project ${projectId}:`,
-      error
-    );
+    logger.error(`Strategy regeneration failed for project ${projectId}:`, error);
     await logAction({
       projectId,
       actionType: "strategy_regeneration",
@@ -1099,9 +1009,7 @@ async function runFullReview(
   projectId: number,
   executionMode: ExecutionMode
 ): Promise<void> {
-  console.log(
-    `[GrowthLoop] Running full review for project ${projectId}`
-  );
+  logger.info(`Running full review for project ${projectId}`);
 
   try {
     const project = await db.query.projects.findFirst({
@@ -1295,16 +1203,11 @@ JSON形式で回答:
       resultSuccess: true,
     });
 
-    console.log(
-      `[GrowthLoop] Full review completed for project ${projectId} (score: ${review.overallScore}/100)`
-    );
+    logger.info(`Full review completed for project ${projectId} (score: ${review.overallScore}/100)`);
   } catch (error) {
     const errorMsg =
       error instanceof Error ? error.message : "Unknown error";
-    console.error(
-      `[GrowthLoop] Full review failed for project ${projectId}:`,
-      error
-    );
+    logger.error(`Full review failed for project ${projectId}:`, error);
     await logAction({
       projectId,
       actionType: "full_review",

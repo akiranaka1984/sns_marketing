@@ -16,6 +16,9 @@ import {
   accounts,
 } from "../../drizzle/schema";
 import { eq, and, gte, desc, sql, sum, count } from "drizzle-orm";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger("conversion-tracker");
 
 /** Convert Date to MySQL-compatible timestamp string */
 function toMySQLTimestamp(date: Date): string {
@@ -108,7 +111,7 @@ export async function createCampaign(data: CreateCampaignData) {
     .replace(/[^a-z0-9]+/g, "_")
     .replace(/^_|_$/g, "");
 
-  console.log(`${LOG_PREFIX} Creating campaign: ${data.name} (utm_campaign=${utmCampaign})`);
+  logger.info(`Creating campaign: ${data.name} (utm_campaign=${utmCampaign})`);
 
   const [result] = await db.insert(campaigns).values({
     userId: data.userId,
@@ -125,7 +128,7 @@ export async function createCampaign(data: CreateCampaignData) {
     endDate: data.endDate ?? null,
   });
 
-  console.log(`${LOG_PREFIX} Campaign created with ID: ${result.insertId}`);
+  logger.info(`Campaign created with ID: ${result.insertId}`);
   return result.insertId;
 }
 
@@ -183,7 +186,7 @@ export async function updateCampaignROI(campaignId: number) {
     .where(eq(campaigns.id, campaignId));
 
   if (!campaign) {
-    console.log(`${LOG_PREFIX} Campaign not found: ${campaignId}`);
+    logger.info(`Campaign not found: ${campaignId}`);
     return null;
   }
 
@@ -213,8 +216,8 @@ export async function updateCampaignROI(campaignId: number) {
     })
     .where(eq(campaigns.id, campaignId));
 
-  console.log(
-    `${LOG_PREFIX} Updated ROI for campaign ${campaignId}: revenue=${revenue}, budget=${budget}, roi=${roi.toFixed(2)}%`
+  logger.info(
+    `Updated ROI for campaign ${campaignId}: revenue=${revenue}, budget=${budget}, roi=${roi.toFixed(2)}%`
   );
 
   return { revenue, budget, roi };
@@ -272,8 +275,8 @@ export async function generateTrackedLink(
     uniqueClickCount: 0,
   });
 
-  console.log(
-    `${LOG_PREFIX} Generated tracked link (ID: ${result.insertId}) for campaign ${campaignId}`
+  logger.info(
+    `Generated tracked link (ID: ${result.insertId}) for campaign ${campaignId}`
   );
 
   return {
@@ -297,7 +300,7 @@ export async function autoTagPostLinks(
   const urls = postContent.match(urlPattern);
 
   if (!urls || urls.length === 0) {
-    console.log(`${LOG_PREFIX} No URLs found in post content for post ${postId}`);
+    logger.info(`No URLs found in post content for post ${postId}`);
     return postContent;
   }
 
@@ -313,13 +316,13 @@ export async function autoTagPostLinks(
       );
       modifiedContent = modifiedContent.replace(url, trackedUrl);
     } catch (error) {
-      console.error(`${LOG_PREFIX} Failed to tag URL ${url}:`, error);
+      logger.error(`Failed to tag URL ${url}:`, error);
       // タグ付け失敗時は元のURLを維持
     }
   }
 
-  console.log(
-    `${LOG_PREFIX} Auto-tagged ${urls.length} URLs in post ${postId} for campaign ${campaignId}`
+  logger.info(
+    `Auto-tagged ${urls.length} URLs in post ${postId} for campaign ${campaignId}`
   );
 
   return modifiedContent;
@@ -343,8 +346,8 @@ export async function recordConversionEvent(data: RecordConversionEventData) {
     metadata: data.metadata ?? null,
   });
 
-  console.log(
-    `${LOG_PREFIX} Recorded conversion event: type=${data.eventType}, campaign=${data.campaignId ?? "none"}, value=${data.eventValue ?? "none"}`
+  logger.info(
+    `Recorded conversion event: type=${data.eventType}, campaign=${data.campaignId ?? "none"}, value=${data.eventValue ?? "none"}`
   );
 
   return result.insertId;
@@ -360,7 +363,7 @@ export async function recordLinkClick(trackedLinkId: number) {
     .update(trackedLinks)
     .set({
       clickCount: sql`${trackedLinks.clickCount} + 1`,
-      lastClickedAt: new Date(),
+      lastClickedAt: toMySQLTimestamp(new Date()),
     })
     .where(eq(trackedLinks.id, trackedLinkId));
 
@@ -380,7 +383,7 @@ export async function recordLinkClick(trackedLinkId: number) {
     });
   }
 
-  console.log(`${LOG_PREFIX} Recorded link click for tracked link: ${trackedLinkId}`);
+  logger.info(`Recorded link click for tracked link: ${trackedLinkId}`);
 }
 
 // ==========================================
@@ -460,8 +463,8 @@ export async function getFunnelAnalysis(campaignId: number) {
   const overallConversionRate =
     topOfFunnel > 0 ? (bottomOfFunnel / topOfFunnel) * 100 : 0;
 
-  console.log(
-    `${LOG_PREFIX} Funnel analysis for campaign ${campaignId}: overall conversion=${overallConversionRate.toFixed(2)}%`
+  logger.info(
+    `Funnel analysis for campaign ${campaignId}: overall conversion=${overallConversionRate.toFixed(2)}%`
   );
 
   return {
@@ -610,8 +613,8 @@ export async function getROIReport(
   const overallROI =
     totalSpend > 0 ? ((totalRevenue - totalSpend) / totalSpend) * 100 : 0;
 
-  console.log(
-    `${LOG_PREFIX} ROI report for project ${projectId}: spend=${totalSpend}, revenue=${totalRevenue}, roi=${overallROI.toFixed(2)}%`
+  logger.info(
+    `ROI report for project ${projectId}: spend=${totalSpend}, revenue=${totalRevenue}, roi=${overallROI.toFixed(2)}%`
   );
 
   return {
@@ -692,7 +695,7 @@ export async function getTopPerformingContent(
   const campaignIds = projectCampaigns.map((c) => c.id);
 
   if (campaignIds.length === 0) {
-    console.log(`${LOG_PREFIX} No campaigns found for project ${projectId}`);
+    logger.info(`No campaigns found for project ${projectId}`);
     return [];
   }
 
@@ -749,8 +752,8 @@ export async function getTopPerformingContent(
     })
   );
 
-  console.log(
-    `${LOG_PREFIX} Found ${results.length} top performing content items for project ${projectId}`
+  logger.info(
+    `Found ${results.length} top performing content items for project ${projectId}`
   );
 
   return results;
