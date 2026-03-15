@@ -1,6 +1,3 @@
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
-
 interface PdfColumn {
   header: string;
   dataKey: string;
@@ -8,21 +5,28 @@ interface PdfColumn {
 
 /**
  * Export data to a PDF file and trigger download.
+ * jsPDF and jspdf-autotable are dynamically imported to avoid bloating the initial bundle.
  *
  * @param title    - Title text displayed at the top of the PDF
  * @param columns  - Column definitions with header labels and data keys
  * @param data     - Array of objects representing rows
  * @param filename - Download filename (without extension)
  */
-export function exportToPdf(
+export async function exportToPdf(
   title: string,
   columns: PdfColumn[],
   data: Record<string, unknown>[],
   filename: string,
-): void {
+): Promise<void> {
   if (!data || data.length === 0) {
     return;
   }
+
+  // Dynamic imports keep jsPDF out of the initial bundle
+  const [{ jsPDF }, { default: autoTable }] = await Promise.all([
+    import("jspdf"),
+    import("jspdf-autotable"),
+  ]);
 
   const doc = new jsPDF({
     orientation: "landscape",

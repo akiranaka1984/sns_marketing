@@ -1,20 +1,22 @@
-import * as XLSX from "xlsx";
-
 /**
  * Export data to an Excel (.xlsx) file and trigger download.
+ * xlsx library is dynamically imported to avoid bloating the initial bundle.
  *
  * @param data      - Array of objects representing rows
  * @param filename  - Download filename (without extension)
  * @param sheetName - Optional worksheet name (defaults to "Sheet1")
  */
-export function exportToExcel(
+export async function exportToExcel(
   data: Record<string, unknown>[],
   filename: string,
   sheetName?: string,
-): void {
+): Promise<void> {
   if (!data || data.length === 0) {
     return;
   }
+
+  // Dynamic import keeps xlsx out of the initial bundle
+  const XLSX = await import("xlsx");
 
   const workbook = XLSX.utils.book_new();
   const worksheet = XLSX.utils.json_to_sheet(data);

@@ -27,7 +27,7 @@ export function ExportButton({
   columns,
   title,
 }: ExportButtonProps) {
-  const handleExcelExport = () => {
+  const handleExcelExport = async () => {
     if (!data || data.length === 0) return;
 
     // If columns are provided, remap data to use header labels as keys
@@ -39,13 +39,13 @@ export function ExportButton({
         }
         return newRow;
       });
-      exportToExcel(remappedData, filename);
+      await exportToExcel(remappedData, filename);
     } else {
-      exportToExcel(data, filename);
+      await exportToExcel(data, filename);
     }
   };
 
-  const handlePdfExport = () => {
+  const handlePdfExport = async () => {
     if (!data || data.length === 0) return;
 
     const pdfColumns =
@@ -56,7 +56,7 @@ export function ExportButton({
             dataKey: key,
           }));
 
-    exportToPdf(title || filename, pdfColumns, data, filename);
+    await exportToPdf(title || filename, pdfColumns, data, filename);
   };
 
   const isDisabled = !data || data.length === 0;
