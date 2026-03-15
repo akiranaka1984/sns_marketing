@@ -490,7 +490,7 @@ async function runPerformanceUpdate(
     const projectAgents = await db.query.agents.findMany({
       where: and(
         eq(agents.projectId, projectId),
-        eq(agents.isActive, true)
+        eq(agents.isActive, 1)
       ),
     });
 
@@ -679,7 +679,7 @@ async function runStrategyEvaluation(
       const projectAgents = await db.query.agents.findMany({
         where: and(
           eq(agents.projectId, projectId),
-          eq(agents.isActive, true)
+          eq(agents.isActive, 1)
         ),
       });
 
@@ -838,7 +838,7 @@ async function runStrategyRegeneration(
     const projectAgents = await db.query.agents.findMany({
       where: and(
         eq(agents.projectId, projectId),
-        eq(agents.isActive, true)
+        eq(agents.isActive, 1)
       ),
     });
 
@@ -1016,7 +1016,7 @@ JSON形式で回答してください:
       await db
         .update(growthLoopState)
         .set({
-          lastStrategyRegenerationAt: toMySQLTimestamp(new Date()),
+          lastStrategyEvaluationAt: toMySQLTimestamp(new Date()),
           currentStrategyScore: 50,
           consecutiveDeclines: 0,
           escalationNeeded: 0,
@@ -1118,7 +1118,7 @@ async function runFullReview(
     const projectAgents = await db.query.agents.findMany({
       where: and(
         eq(agents.projectId, projectId),
-        eq(agents.isActive, true)
+        eq(agents.isActive, 1)
       ),
     });
 
