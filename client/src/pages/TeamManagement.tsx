@@ -152,24 +152,24 @@ const ROLE_CONFIG = {
     label: "管理者",
     color: "#FF6B6B",
     bgColor: "bg-[#FF6B6B]",
-    textColor: "text-[#1A1A1A]",
-    borderColor: "border-[#1A1A1A]",
+    textColor: "text-white",
+    borderColor: "border-white/[0.06]",
     icon: Crown,
   },
   editor: {
     label: "編集者",
     color: "#4ECDC4",
     bgColor: "bg-[#4ECDC4]",
-    textColor: "text-[#1A1A1A]",
-    borderColor: "border-[#1A1A1A]",
+    textColor: "text-white",
+    borderColor: "border-white/[0.06]",
     icon: Edit3,
   },
   viewer: {
     label: "閲覧者",
     color: "#A8E6CF",
     bgColor: "bg-[#A8E6CF]",
-    textColor: "text-[#1A1A1A]",
-    borderColor: "border-[#1A1A1A]",
+    textColor: "text-white",
+    borderColor: "border-white/[0.06]",
     icon: Eye,
   },
 };
@@ -190,15 +190,15 @@ function RoleBadge({ role }: { role: "admin" | "editor" | "viewer" }) {
 function StatusBadge({ status }: { status: "active" | "pending" }) {
   if (status === "active") {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#A8E6CF] text-[#1A1A1A] border-2 border-[#1A1A1A]">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#1A1A1A]" />
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#A8E6CF] text-white border border-white/[0.06]">
+        <span className="w-1.5 h-1.5 rounded-full bg-white/10" />
         アクティブ
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A]">
-      <span className="w-1.5 h-1.5 rounded-full bg-[#1A1A1A]" />
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500 text-white border border-white/[0.06]">
+      <span className="w-1.5 h-1.5 rounded-full bg-white/10" />
       招待中
     </span>
   );
@@ -214,8 +214,8 @@ function MemberAvatar({ member }: { member: TeamMember }) {
     : member.email.charAt(0).toUpperCase();
 
   return (
-    <div className="w-9 h-9 rounded-lg bg-[#DDA0DD] flex items-center justify-center flex-shrink-0 border-2 border-[#1A1A1A]">
-      <span className="text-[#1A1A1A] text-[11px] font-bold">{initials}</span>
+    <div className="w-9 h-9 rounded-lg bg-[#3B82F6] flex items-center justify-center flex-shrink-0 border border-white/[0.06]">
+      <span className="text-white text-[11px] font-bold">{initials}</span>
     </div>
   );
 }
@@ -312,10 +312,10 @@ export default function TeamManagement() {
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-lg bg-[#87CEEB] flex items-center justify-center border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]">
-                <Users className="w-5 h-5 text-[#1A1A1A]" />
+              <div className="w-10 h-10 rounded-lg bg-[#87CEEB] flex items-center justify-center border border-white/[0.06]">
+                <Users className="w-5 h-5 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-[#1A1A1A] tracking-tight">
+              <h1 className="text-2xl font-bold text-white tracking-tight">
                 チーム管理
               </h1>
             </div>
@@ -325,7 +325,7 @@ export default function TeamManagement() {
           </div>
           <Button
             onClick={() => setIsInviteDialogOpen(true)}
-            className="bg-[#FFD700] hover:bg-[#FFD700] text-[#1A1A1A] h-10 px-4 text-[13px] font-bold rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            className="bg-emerald-500 hover:bg-emerald-500 text-white h-10 px-4 text-[13px] font-bold rounded-lg border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
           >
             <UserPlus className="w-4 h-4 mr-2" />
             メンバーを招待
@@ -335,46 +335,46 @@ export default function TeamManagement() {
 
       {/* Summary Stats */}
       <div className="fade-in-up grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-5">
+        <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-5">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#87CEEB] flex items-center justify-center border-2 border-[#1A1A1A]">
-              <Users className="w-4.5 h-4.5 text-[#1A1A1A]" />
+            <div className="w-9 h-9 rounded-lg bg-[#87CEEB] flex items-center justify-center border border-white/[0.06]">
+              <Users className="w-4.5 h-4.5 text-white" />
             </div>
             <div>
               <p className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-wider">
                 総メンバー
               </p>
-              <p className="text-xl font-bold text-[#1A1A1A]">
+              <p className="text-xl font-bold text-white">
                 {members.length}
               </p>
             </div>
           </div>
         </div>
-        <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-5">
+        <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-5">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#A8E6CF] flex items-center justify-center border-2 border-[#1A1A1A]">
-              <Shield className="w-4.5 h-4.5 text-[#1A1A1A]" />
+            <div className="w-9 h-9 rounded-lg bg-[#A8E6CF] flex items-center justify-center border border-white/[0.06]">
+              <Shield className="w-4.5 h-4.5 text-white" />
             </div>
             <div>
               <p className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-wider">
                 アクティブ
               </p>
-              <p className="text-xl font-bold text-[#1A1A1A]">
+              <p className="text-xl font-bold text-white">
                 {activeCount}
               </p>
             </div>
           </div>
         </div>
-        <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-5">
+        <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-5">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#FFD700] flex items-center justify-center border-2 border-[#1A1A1A]">
-              <Mail className="w-4.5 h-4.5 text-[#1A1A1A]" />
+            <div className="w-9 h-9 rounded-lg bg-emerald-500 flex items-center justify-center border border-white/[0.06]">
+              <Mail className="w-4.5 h-4.5 text-white" />
             </div>
             <div>
               <p className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-wider">
                 招待中
               </p>
-              <p className="text-xl font-bold text-[#1A1A1A]">
+              <p className="text-xl font-bold text-white">
                 {pendingCount}
               </p>
             </div>
@@ -384,28 +384,28 @@ export default function TeamManagement() {
 
       {/* Member List */}
       <div className="fade-in-up">
-        <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] overflow-hidden">
-          <div className="px-6 py-4 border-b-2 border-[#1A1A1A] bg-[#FFD700]">
-            <h2 className="text-[15px] font-bold text-[#1A1A1A]">
+        <div className="bg-neutral-950 rounded-lg border border-white/[0.06] overflow-hidden">
+          <div className="px-6 py-4 border-b-2 border-white/[0.06] bg-emerald-500">
+            <h2 className="text-[15px] font-bold text-white">
               メンバー一覧
             </h2>
           </div>
           <Table>
             <TableHeader>
-              <TableRow className="border-b-2 border-[#1A1A1A] hover:bg-transparent">
-                <TableHead className="text-[12px] font-bold text-[#1A1A1A] uppercase tracking-wider pl-6">
+              <TableRow className="border-b-2 border-white/[0.06] hover:bg-transparent">
+                <TableHead className="text-[12px] font-bold text-white uppercase tracking-wider pl-6">
                   メンバー
                 </TableHead>
-                <TableHead className="text-[12px] font-bold text-[#1A1A1A] uppercase tracking-wider">
+                <TableHead className="text-[12px] font-bold text-white uppercase tracking-wider">
                   権限
                 </TableHead>
-                <TableHead className="text-[12px] font-bold text-[#1A1A1A] uppercase tracking-wider">
+                <TableHead className="text-[12px] font-bold text-white uppercase tracking-wider">
                   ステータス
                 </TableHead>
-                <TableHead className="text-[12px] font-bold text-[#1A1A1A] uppercase tracking-wider">
+                <TableHead className="text-[12px] font-bold text-white uppercase tracking-wider">
                   参加日
                 </TableHead>
-                <TableHead className="text-[12px] font-bold text-[#1A1A1A] uppercase tracking-wider text-right pr-6">
+                <TableHead className="text-[12px] font-bold text-white uppercase tracking-wider text-right pr-6">
                   操作
                 </TableHead>
               </TableRow>
@@ -414,13 +414,13 @@ export default function TeamManagement() {
               {members.map((member) => (
                 <TableRow
                   key={member.id}
-                  className="border-b-2 border-[#1A1A1A] hover:bg-[#FFF8DC] transition-colors"
+                  className="border-b-2 border-white/[0.06] hover:bg-neutral-900 transition-colors"
                 >
                   <TableCell className="pl-6">
                     <div className="flex items-center gap-3">
                       <MemberAvatar member={member} />
                       <div className="min-w-0">
-                        <p className="text-[13px] font-bold text-[#1A1A1A] truncate">
+                        <p className="text-[13px] font-bold text-white truncate">
                           {member.name || "(未登録)"}
                         </p>
                         <p className="text-[12px] text-[#6B6B6B] font-bold truncate">
@@ -446,14 +446,14 @@ export default function TeamManagement() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 text-[#6B6B6B] hover:text-[#1A1A1A] hover:bg-[#FFF8DC] rounded-lg"
+                          className="h-8 w-8 p-0 text-[#6B6B6B] hover:text-white hover:bg-neutral-900 rounded-lg"
                         >
                           <MoreHorizontal className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
-                        className="w-[180px] p-1.5 border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]"
+                        className="w-[180px] p-1.5 border border-white/[0.06]"
                       >
                         <DropdownMenuItem
                           onClick={() => openChangeRoleDialog(member)}
@@ -462,7 +462,7 @@ export default function TeamManagement() {
                           <Shield className="w-4 h-4 mr-2" />
                           権限を変更
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-[#1A1A1A]" />
+                        <DropdownMenuSeparator className="bg-white/10" />
                         <DropdownMenuItem
                           onClick={() => openRemoveDialog(member)}
                           className="text-[#FF6B6B] focus:text-[#FF6B6B] text-[13px] font-bold rounded-lg cursor-pointer"
@@ -482,33 +482,33 @@ export default function TeamManagement() {
 
       {/* Activity Log */}
       <div className="fade-in-up">
-        <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] overflow-hidden">
-          <div className="px-6 py-4 border-b-2 border-[#1A1A1A] bg-[#FFD700]">
+        <div className="bg-neutral-950 rounded-lg border border-white/[0.06] overflow-hidden">
+          <div className="px-6 py-4 border-b-2 border-white/[0.06] bg-emerald-500">
             <div className="flex items-center gap-2">
-              <Activity className="w-4 h-4 text-[#1A1A1A]" />
-              <h2 className="text-[15px] font-bold text-[#1A1A1A]">
+              <Activity className="w-4 h-4 text-white" />
+              <h2 className="text-[15px] font-bold text-white">
                 アクティビティログ
               </h2>
             </div>
           </div>
-          <div className="divide-y-2 divide-[#1A1A1A]">
+          <div className="divide-y-2 divide-white/10">
             {activityLog.map((entry) => (
               <div
                 key={entry.id}
-                className="px-6 py-3.5 flex items-start gap-3 hover:bg-[#FFF8DC] transition-colors"
+                className="px-6 py-3.5 flex items-start gap-3 hover:bg-neutral-900 transition-colors"
               >
-                <div className="w-8 h-8 rounded-lg bg-[#FFDAB9] flex items-center justify-center flex-shrink-0 mt-0.5 border-2 border-[#1A1A1A]">
-                  <Clock className="w-3.5 h-3.5 text-[#1A1A1A]" />
+                <div className="w-8 h-8 rounded-lg bg-[#FFDAB9] flex items-center justify-center flex-shrink-0 mt-0.5 border border-white/[0.06]">
+                  <Clock className="w-3.5 h-3.5 text-white" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[13px] text-[#1A1A1A] font-bold">
+                  <p className="text-[13px] text-white font-bold">
                     <span className="font-bold">{entry.actor}</span>
                     <span className="text-[#6B6B6B]">
                       {" "}
                       が{entry.action}
                     </span>
                     {entry.target && (
-                      <span className="text-[#1A1A1A] font-bold">
+                      <span className="text-white font-bold">
                         {" "}
                         {entry.target}
                       </span>
@@ -526,9 +526,9 @@ export default function TeamManagement() {
 
       {/* Invite Member Dialog */}
       <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
-        <DialogContent className="sm:max-w-[440px] bg-[#FFFDF7] border-2 border-[#1A1A1A] shadow-[8px_8px_0_#1A1A1A]">
+        <DialogContent className="sm:max-w-[440px] bg-neutral-950 border border-white/[0.06]">
           <DialogHeader>
-            <DialogTitle className="text-[16px] font-bold text-[#1A1A1A]">
+            <DialogTitle className="text-[16px] font-bold text-white">
               メンバーを招待
             </DialogTitle>
             <DialogDescription className="text-[13px] text-[#6B6B6B] font-bold">
@@ -539,7 +539,7 @@ export default function TeamManagement() {
             <div className="space-y-2">
               <Label
                 htmlFor="invite-email"
-                className="text-[13px] font-bold text-[#1A1A1A]"
+                className="text-[13px] font-bold text-white"
               >
                 メールアドレス
               </Label>
@@ -551,7 +551,7 @@ export default function TeamManagement() {
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="example@company.com"
-                  className="pl-10 h-10 text-[13px] border-2 border-[#1A1A1A] bg-[#FFFDF7] rounded-lg focus:ring-[#FFD700] focus:border-[#1A1A1A] font-bold"
+                  className="pl-10 h-10 text-[13px] border border-white/[0.06] bg-neutral-950 rounded-lg focus:ring-[#FFD700] focus:border-white/[0.06] font-bold"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleInvite();
                   }}
@@ -559,7 +559,7 @@ export default function TeamManagement() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-[13px] font-bold text-[#1A1A1A]">
+              <Label className="text-[13px] font-bold text-white">
                 権限
               </Label>
               <Select
@@ -568,10 +568,10 @@ export default function TeamManagement() {
                   setInviteRole(value as "admin" | "editor" | "viewer")
                 }
               >
-                <SelectTrigger className="h-10 text-[13px] border-2 border-[#1A1A1A] bg-[#FFFDF7] rounded-lg font-bold">
+                <SelectTrigger className="h-10 text-[13px] border border-white/[0.06] bg-neutral-950 rounded-lg font-bold">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]">
+                <SelectContent className="border border-white/[0.06]">
                   <SelectItem value="admin" className="text-[13px] font-bold">
                     <div className="flex items-center gap-2">
                       <Crown className="w-3.5 h-3.5 text-[#FF6B6B]" />
@@ -602,13 +602,13 @@ export default function TeamManagement() {
                 setInviteEmail("");
                 setInviteRole("viewer");
               }}
-              className="text-[13px] text-[#6B6B6B] hover:text-[#1A1A1A] font-bold"
+              className="text-[13px] text-[#6B6B6B] hover:text-white font-bold"
             >
               キャンセル
             </Button>
             <Button
               onClick={handleInvite}
-              className="bg-[#FFD700] hover:bg-[#FFD700] text-[#1A1A1A] text-[13px] font-bold rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="bg-emerald-500 hover:bg-emerald-500 text-white text-[13px] font-bold rounded-lg border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
               <UserPlus className="w-4 h-4 mr-2" />
               招待を送信
@@ -619,9 +619,9 @@ export default function TeamManagement() {
 
       {/* Change Role Dialog */}
       <Dialog open={isChangeRoleDialogOpen} onOpenChange={setIsChangeRoleDialogOpen}>
-        <DialogContent className="sm:max-w-[400px] bg-[#FFFDF7] border-2 border-[#1A1A1A] shadow-[8px_8px_0_#1A1A1A]">
+        <DialogContent className="sm:max-w-[400px] bg-neutral-950 border border-white/[0.06]">
           <DialogHeader>
-            <DialogTitle className="text-[16px] font-bold text-[#1A1A1A]">
+            <DialogTitle className="text-[16px] font-bold text-white">
               権限を変更
             </DialogTitle>
             <DialogDescription className="text-[13px] text-[#6B6B6B] font-bold">
@@ -630,7 +630,7 @@ export default function TeamManagement() {
           </DialogHeader>
           <div className="py-4">
             <div className="space-y-2">
-              <Label className="text-[13px] font-bold text-[#1A1A1A]">
+              <Label className="text-[13px] font-bold text-white">
                 新しい権限
               </Label>
               <Select
@@ -639,10 +639,10 @@ export default function TeamManagement() {
                   setNewRole(value as "admin" | "editor" | "viewer")
                 }
               >
-                <SelectTrigger className="h-10 text-[13px] border-2 border-[#1A1A1A] bg-[#FFFDF7] rounded-lg font-bold">
+                <SelectTrigger className="h-10 text-[13px] border border-white/[0.06] bg-neutral-950 rounded-lg font-bold">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]">
+                <SelectContent className="border border-white/[0.06]">
                   <SelectItem value="admin" className="text-[13px] font-bold">
                     <div className="flex items-center gap-2">
                       <Crown className="w-3.5 h-3.5 text-[#FF6B6B]" />
@@ -672,13 +672,13 @@ export default function TeamManagement() {
                 setIsChangeRoleDialogOpen(false);
                 setSelectedMember(null);
               }}
-              className="text-[13px] text-[#6B6B6B] hover:text-[#1A1A1A] font-bold"
+              className="text-[13px] text-[#6B6B6B] hover:text-white font-bold"
             >
               キャンセル
             </Button>
             <Button
               onClick={handleChangeRole}
-              className="bg-[#FFD700] hover:bg-[#FFD700] text-[#1A1A1A] text-[13px] font-bold rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="bg-emerald-500 hover:bg-emerald-500 text-white text-[13px] font-bold rounded-lg border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
               <Shield className="w-4 h-4 mr-2" />
               変更を保存
@@ -689,9 +689,9 @@ export default function TeamManagement() {
 
       {/* Remove Member Dialog */}
       <Dialog open={isRemoveDialogOpen} onOpenChange={setIsRemoveDialogOpen}>
-        <DialogContent className="sm:max-w-[400px] bg-[#FFFDF7] border-2 border-[#1A1A1A] shadow-[8px_8px_0_#1A1A1A]">
+        <DialogContent className="sm:max-w-[400px] bg-neutral-950 border border-white/[0.06]">
           <DialogHeader>
-            <DialogTitle className="text-[16px] font-bold text-[#1A1A1A]">
+            <DialogTitle className="text-[16px] font-bold text-white">
               メンバーを削除
             </DialogTitle>
             <DialogDescription className="text-[13px] text-[#6B6B6B] font-bold">
@@ -701,7 +701,7 @@ export default function TeamManagement() {
           <div className="py-4">
             <div className="flex items-center gap-3 p-4 bg-[#FF6B6B]/20 rounded-lg border-2 border-[#FF6B6B]">
               <AlertCircle className="w-5 h-5 text-[#FF6B6B] flex-shrink-0" />
-              <p className="text-[13px] text-[#1A1A1A] font-bold">
+              <p className="text-[13px] text-white font-bold">
                 <span className="font-bold">
                   {selectedMember?.name || selectedMember?.email}
                 </span>{" "}
@@ -716,13 +716,13 @@ export default function TeamManagement() {
                 setIsRemoveDialogOpen(false);
                 setSelectedMember(null);
               }}
-              className="text-[13px] text-[#6B6B6B] hover:text-[#1A1A1A] font-bold"
+              className="text-[13px] text-[#6B6B6B] hover:text-white font-bold"
             >
               キャンセル
             </Button>
             <Button
               onClick={handleRemoveMember}
-              className="bg-[#FF6B6B] hover:bg-[#FF6B6B] text-[#1A1A1A] text-[13px] font-bold rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="bg-[#FF6B6B] hover:bg-[#FF6B6B] text-white text-[13px] font-bold rounded-lg border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
               <Trash2 className="w-4 h-4 mr-2" />
               削除する

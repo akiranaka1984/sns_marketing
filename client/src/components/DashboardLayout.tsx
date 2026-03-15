@@ -53,16 +53,16 @@ export default function DashboardLayout({
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#FFFDF7] dark:bg-[#1A1A2E]">
+      <div className="flex items-center justify-center min-h-screen bg-neutral-950">
         <div className="text-center max-w-sm w-full px-4">
-          <div className="mb-5 inline-flex items-center justify-center w-14 h-14 rounded-lg bg-[#FFD700] border-3 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]">
-            <span className="text-[#1A1A1A] font-bold text-xl">S</span>
+          <div className="mb-5 inline-flex items-center justify-center w-14 h-14 rounded-xl bg-emerald-500">
+            <span className="text-white font-semibold text-xl">S</span>
           </div>
-          <h1 className="text-[22px] font-bold text-[#1A1A1A] dark:text-[#FFFDF7] mb-1 tracking-tight">SNS Marketing</h1>
-          <p className="text-[14px] text-[#6B6B6B] dark:text-[#A0A0B0] mb-6 font-medium">Automation Platform</p>
+          <h1 className="text-[22px] font-medium text-white mb-1 tracking-tight">SNS Marketing</h1>
+          <p className="text-[14px] text-neutral-500 mb-6">Automation Platform</p>
           <Button
             onClick={() => { window.location.href = getLoginUrl(); }}
-            className="w-full bg-[#FFD700] hover:bg-[#FFED4A] text-[#1A1A1A] h-12 text-[14px] font-bold rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[2px_2px_0_#1A1A1A] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100"
+            className="w-full bg-emerald-500 hover:bg-emerald-400 text-white h-12 text-[14px] font-medium rounded-xl border-0 transition-colors duration-150"
           >
             ログイン
           </Button>
@@ -187,14 +187,17 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
         onClick={() => handleNavigate(item.path)}
         aria-current={active ? 'page' : undefined}
         className={`
-          group w-full flex items-center gap-2.5 px-2.5 py-[8px] rounded-lg text-[13px] font-medium transition-all duration-100
+          relative group w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-normal transition-all duration-150
           ${active
-            ? "bg-[#FFD700] dark:bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]"
-            : "text-[#1A1A1A] dark:text-[#FFFDF7] hover:bg-[#FFF8DC] dark:hover:bg-[#0F3460] border-2 border-transparent hover:border-[#1A1A1A] dark:hover:border-[#FFFDF7]"
+            ? "bg-white/[0.08] text-white"
+            : "text-neutral-400 hover:bg-white/[0.04] hover:text-neutral-200"
           }
         `}
       >
-        <span className="w-[24px] h-[24px] flex items-center justify-center text-[15px] flex-shrink-0">
+        {active && (
+          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-emerald-500 rounded-full" />
+        )}
+        <span className="w-[22px] h-[22px] flex items-center justify-center text-[14px] flex-shrink-0">
           {item.emoji}
         </span>
         {!(isCollapsed && !isMobile) && (
@@ -212,11 +215,11 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
     const isExpanded = expandedSections[section.title.toLowerCase()] ?? section.defaultOpen ?? false;
 
     return (
-      <div className="mt-4">
+      <div className="mt-5">
         <button
           onClick={() => toggleSection(section.title)}
           aria-expanded={isExpanded}
-          className="w-full flex items-center gap-1.5 px-2.5 py-[4px] text-[11px] font-bold text-[#6B6B6B] dark:text-[#A0A0B0] hover:text-[#1A1A1A] dark:hover:text-[#FFFDF7] transition-colors group uppercase tracking-wider"
+          className="w-full flex items-center gap-1.5 px-2.5 py-[3px] text-[10px] font-normal text-neutral-600 hover:text-neutral-400 transition-colors group uppercase tracking-wider"
         >
           <ChevronDown
             className={`w-3 h-3 transition-transform duration-200 ${isExpanded ? '' : '-rotate-90'}`}
@@ -225,11 +228,11 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
             <span>{section.title}</span>
           )}
           {!(isCollapsed && !isMobile) && (
-            <Plus className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-60 transition-opacity" />
+            <Plus className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-40 transition-opacity" />
           )}
         </button>
         {isExpanded && (
-          <div className="mt-1 space-y-[3px]">
+          <div className="mt-1 space-y-[2px]">
             {section.items.map((item) => (
               <NavItemRow key={item.path} item={item} />
             ))}
@@ -242,28 +245,28 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
   const sidebarContent = (
     <>
       {/* Workspace Switcher */}
-      <div className={`flex items-center h-[60px] ${(isCollapsed && !isMobile) ? 'justify-center px-2' : 'px-4'} border-b-2 border-[#1A1A1A] dark:border-[#FFFDF7]`}>
+      <div className={`flex items-center h-[60px] ${(isCollapsed && !isMobile) ? 'justify-center px-2' : 'px-3'} border-b border-white/[0.06]`}>
         {!(isCollapsed && !isMobile) && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2.5 hover:bg-[#FFF8DC] dark:hover:bg-[#0F3460] rounded-lg px-2 py-1.5 transition-all duration-100 flex-1 min-w-0 group">
-                <div className="w-8 h-8 rounded-lg bg-[#FFD700] border-2 border-[#1A1A1A] flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0_#1A1A1A]">
-                  <span className="text-[#1A1A1A] text-[13px] font-bold">
+              <button className="flex items-center gap-2.5 hover:bg-white/[0.04] rounded-lg px-2 py-1.5 transition-all duration-150 flex-1 min-w-0 group">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white text-[12px] font-medium">
                     {user?.name?.charAt(0).toUpperCase() || "S"}
                   </span>
                 </div>
-                <span className="text-[14px] font-bold text-[#1A1A1A] dark:text-[#FFFDF7] truncate">
+                <span className="text-[13px] font-medium text-white truncate">
                   {user?.name || "Workspace"}
                 </span>
-                <ChevronDown className="w-3.5 h-3.5 text-[#6B6B6B] flex-shrink-0 group-hover:text-[#1A1A1A] transition-colors" />
+                <ChevronDown className="w-3.5 h-3.5 text-neutral-600 flex-shrink-0 group-hover:text-neutral-400 transition-colors" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[240px] p-1.5 border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg">
+            <DropdownMenuContent align="start" className="w-[240px] p-1.5 border border-white/[0.06] bg-neutral-900 rounded-xl shadow-xl">
               <div className="px-2 py-2">
-                <p className="text-[13px] font-bold text-[#1A1A1A] dark:text-[#FFFDF7]">{user?.email}</p>
+                <p className="text-[13px] font-normal text-neutral-400">{user?.email}</p>
               </div>
-              <DropdownMenuSeparator className="bg-[#1A1A1A] dark:bg-[#FFFDF7]" />
-              <DropdownMenuItem onClick={() => logout()} className="text-[#FF6B6B] focus:text-[#FF6B6B] text-[13px] rounded-md font-bold">
+              <DropdownMenuSeparator className="bg-white/[0.06]" />
+              <DropdownMenuItem onClick={() => logout()} className="text-red-400 focus:text-red-300 text-[13px] rounded-lg font-normal focus:bg-white/[0.04]">
                 <LogOut className="w-4 h-4 mr-2" />
                 ログアウト
               </DropdownMenuItem>
@@ -273,18 +276,18 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
         {isMobile ? (
           <button
             onClick={() => setMobileOpen(false)}
-            className="p-1.5 hover:bg-[#FFF8DC] dark:hover:bg-[#0F3460] rounded-lg transition-all duration-100 flex-shrink-0"
+            className="p-1.5 hover:bg-white/[0.04] rounded-lg transition-all duration-150 flex-shrink-0"
             aria-label="メニューを閉じる"
           >
-            <X className="w-5 h-5 text-[#1A1A1A] dark:text-[#FFFDF7]" />
+            <X className="w-4 h-4 text-neutral-400" />
           </button>
         ) : (
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1.5 hover:bg-[#FFF8DC] dark:hover:bg-[#0F3460] rounded-lg transition-all duration-100 flex-shrink-0"
+            className="p-1.5 hover:bg-white/[0.04] rounded-lg transition-all duration-150 flex-shrink-0"
             aria-label={isCollapsed ? "展開" : "折りたたむ"}
           >
-            <ChevronsLeft className={`w-4 h-4 text-[#6B6B6B] hover:text-[#1A1A1A] transition-all duration-200 ${isCollapsed ? 'rotate-180' : ''}`} />
+            <ChevronsLeft className={`w-4 h-4 text-neutral-600 hover:text-neutral-400 transition-all duration-200 ${isCollapsed ? 'rotate-180' : ''}`} />
           </button>
         )}
       </div>
@@ -293,19 +296,19 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
       {!(isCollapsed && !isMobile) && (
         <div className="px-3 py-3">
           <button
-            className="w-full flex items-center gap-2.5 px-3 py-2.5 text-[13px] text-[#6B6B6B] hover:text-[#1A1A1A] bg-white dark:bg-[#0F3460] rounded-lg transition-all duration-100 border-2 border-[#1A1A1A] dark:border-[#FFFDF7] shadow-[2px_2px_0_#1A1A1A] dark:shadow-[2px_2px_0_#FFFDF7] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] font-medium"
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-neutral-500 hover:text-neutral-300 bg-white/[0.04] hover:bg-white/[0.06] rounded-lg transition-all duration-150 border border-white/[0.06]"
             aria-label="検索を開く (Cmd+K)"
           >
             <Search className="w-4 h-4" />
             <span>検索</span>
-            <span className="ml-auto text-[11px] text-[#1A1A1A] dark:text-[#FFFDF7] bg-[#FFD700] px-1.5 py-0.5 rounded font-bold border border-[#1A1A1A]">⌘K</span>
+            <span className="ml-auto text-[11px] text-neutral-600 bg-white/[0.06] px-1.5 py-0.5 rounded font-normal">⌘K</span>
           </button>
         </div>
       )}
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 pb-3" aria-label="メインナビゲーション">
-        <div className="space-y-[3px]">
+        <div className="space-y-[2px]">
           {privatePages.map((item) => (
             <NavItemRow key={item.path} item={item} />
           ))}
@@ -315,9 +318,9 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
           <SectionGroup key={section.title} section={section} />
         ))}
 
-        <div className="my-4 border-t-2 border-[#1A1A1A] dark:border-[#FFFDF7]" />
+        <div className="my-4 border-t border-white/[0.06]" />
 
-        <div className="space-y-[3px]">
+        <div className="space-y-[2px]">
           {bottomItems.map((item) => (
             <NavItemRow key={item.path} item={item} />
           ))}
@@ -326,10 +329,10 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
 
       {/* Footer */}
       {!(isCollapsed && !isMobile) && (
-        <div className="px-3 py-3 border-t-2 border-[#1A1A1A] dark:border-[#FFFDF7] space-y-2">
+        <div className="px-3 py-3 border-t border-white/[0.06] space-y-1">
           <button
             onClick={toggleTheme}
-            className="w-full flex items-center gap-2.5 px-2.5 py-[8px] rounded-lg text-[13px] font-medium text-[#1A1A1A] dark:text-[#FFFDF7] hover:bg-[#FFF8DC] dark:hover:bg-[#0F3460] border-2 border-transparent hover:border-[#1A1A1A] dark:hover:border-[#FFFDF7] transition-all duration-100"
+            className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-normal text-neutral-400 hover:bg-white/[0.04] hover:text-neutral-200 transition-all duration-150"
             aria-label={theme === 'dark' ? 'ライトモードに切替' : 'ダークモードに切替'}
           >
             {theme === 'dark' ? (
@@ -346,11 +349,11 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="flex h-screen bg-[#FFFDF7] dark:bg-[#1A1A2E] overflow-hidden">
+    <div className="flex h-screen bg-neutral-950 overflow-hidden">
       {/* Mobile overlay */}
       {isMobile && mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 transition-opacity"
+          className="fixed inset-0 bg-black/60 z-40 transition-opacity backdrop-blur-sm"
           onClick={() => setMobileOpen(false)}
           aria-hidden="true"
         />
@@ -361,10 +364,10 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
         className={`
           ${isMobile
             ? `fixed inset-y-0 left-0 z-50 w-[280px] transform transition-transform duration-300 ease-in-out ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`
-            : `${isCollapsed ? 'w-[52px]' : 'w-[260px]'} flex-shrink-0 transition-all duration-200 ease-out`
+            : `${isCollapsed ? 'w-[52px]' : 'w-[256px]'} flex-shrink-0 transition-all duration-200 ease-out`
           }
-          bg-[#FFFDF7] dark:bg-[#1A1A2E] flex flex-col
-          border-r-2 border-[#1A1A1A] dark:border-[#FFFDF7]
+          bg-neutral-950 flex flex-col
+          border-r border-white/[0.06]
         `}
         aria-label="サイドバー"
       >
@@ -374,31 +377,31 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <header className="h-[56px] flex items-center justify-between px-5 border-b-2 border-[#1A1A1A] dark:border-[#FFFDF7] flex-shrink-0 bg-[#FFFDF7] dark:bg-[#1A1A2E]">
-          <div className="flex items-center gap-2 text-[13px] text-[#6B6B6B]">
+        <header className="h-[56px] flex items-center justify-between px-5 border-b border-white/[0.06] flex-shrink-0 bg-neutral-950/80 backdrop-blur-xl">
+          <div className="flex items-center gap-2 text-[13px] text-neutral-500">
             {isMobile && (
               <button
                 onClick={() => setMobileOpen(true)}
-                className="p-1.5 -ml-1.5 hover:bg-[#FFF8DC] dark:hover:bg-[#0F3460] rounded-lg transition-colors"
+                className="p-1.5 -ml-1.5 hover:bg-white/[0.04] rounded-lg transition-colors"
                 aria-label="メニューを開く"
               >
-                <Menu className="w-5 h-5 text-[#1A1A1A] dark:text-[#FFFDF7]" />
+                <Menu className="w-4 h-4 text-neutral-400" />
               </button>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <NotificationBell />
             <Button
               variant="ghost"
               size="sm"
-              className="h-9 px-4 text-[13px] text-[#1A1A1A] dark:text-[#FFFDF7] hover:bg-[#FFD700] font-bold rounded-lg border-2 border-[#1A1A1A] dark:border-[#FFFDF7] transition-all duration-100"
+              className="h-8 px-3 text-[13px] text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.06] font-normal rounded-lg border border-white/[0.06] transition-all duration-150"
             >
               共有
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              className="h-9 w-9 p-0 text-[#1A1A1A] dark:text-[#FFFDF7] hover:bg-[#FFD700] rounded-lg border-2 border-[#1A1A1A] dark:border-[#FFFDF7] transition-all duration-100"
+              className="h-8 w-8 p-0 text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.06] rounded-lg border border-white/[0.06] transition-all duration-150"
             >
               <MoreHorizontal className="w-4 h-4" />
             </Button>
@@ -406,7 +409,7 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 overflow-y-auto bg-[#FFFDF7] dark:bg-[#1A1A2E]">
+        <div className="flex-1 overflow-y-auto bg-neutral-950">
           <div className="px-4 sm:px-8 py-6">
             {children}
           </div>

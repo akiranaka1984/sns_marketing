@@ -97,7 +97,7 @@ export default function PostReview() {
     switch (platform) {
       case "twitter": return "bg-[#87CEEB]";
       case "instagram": return "bg-[#FF6B6B]";
-      case "tiktok": return "bg-[#1A1A1A]";
+      case "tiktok": return "bg-white/10";
       case "facebook": return "bg-[#4ECDC4]";
       default: return "bg-[#6B6B6B]";
     }
@@ -127,7 +127,7 @@ export default function PostReview() {
           {selectedPosts.length > 0 && (
             <div className="flex gap-2">
               <button
-                className="inline-flex items-center gap-2 rounded-lg border-2 border-[#1A1A1A] bg-white px-4 py-2 text-sm font-bold text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                 onClick={() => bulkApproveMutation.mutate({ postIds: selectedPosts })}
                 disabled={bulkApproveMutation.isPending}
               >
@@ -135,7 +135,7 @@ export default function PostReview() {
                 {selectedPosts.length}件を承認
               </button>
               <button
-                className="inline-flex items-center gap-2 rounded-lg border-2 border-[#1A1A1A] bg-[#FF6B6B] px-4 py-2 text-sm font-bold text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-[#FF6B6B] px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                 onClick={() => {
                   const reason = prompt("却下理由を入力してください");
                   if (reason) {
@@ -153,26 +153,26 @@ export default function PostReview() {
 
         {/* 統計 */}
         <div className="grid gap-3 grid-cols-3">
-          <div className="fade-in-up bg-[#FFD700] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
+          <div className="fade-in-up bg-emerald-500 rounded-lg border border-white/[0.06] p-4">
             <div className="pl-3">
-              <p className="text-[11px] text-[#1A1A1A] font-bold uppercase tracking-wide">レビュー待ち</p>
-              <p className="text-2xl font-bold text-[#1A1A1A] mt-0.5">{pendingPosts?.length || 0}</p>
+              <p className="text-[11px] text-white font-bold uppercase tracking-wide">レビュー待ち</p>
+              <p className="text-2xl font-bold text-white mt-0.5">{pendingPosts?.length || 0}</p>
             </div>
           </div>
 
-          <div className="fade-in-up bg-[#DDA0DD] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
+          <div className="fade-in-up bg-[#3B82F6] rounded-lg border border-white/[0.06] p-4">
             <div className="pl-3">
-              <p className="text-[11px] text-[#1A1A1A] font-bold uppercase tracking-wide">エージェント</p>
-              <p className="text-2xl font-bold text-[#1A1A1A] mt-0.5">
+              <p className="text-[11px] text-white font-bold uppercase tracking-wide">エージェント</p>
+              <p className="text-2xl font-bold text-white mt-0.5">
                 {new Set(pendingPosts?.map(p => p.agentId).filter(Boolean)).size}
               </p>
             </div>
           </div>
 
-          <div className="fade-in-up bg-[#A8E6CF] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
+          <div className="fade-in-up bg-[#A8E6CF] rounded-lg border border-white/[0.06] p-4">
             <div className="pl-3">
-              <p className="text-[11px] text-[#1A1A1A] font-bold uppercase tracking-wide">24時間以内</p>
-              <p className="text-2xl font-bold text-[#1A1A1A] mt-0.5">
+              <p className="text-[11px] text-white font-bold uppercase tracking-wide">24時間以内</p>
+              <p className="text-2xl font-bold text-white mt-0.5">
                 {pendingPosts?.filter(p => {
                   const scheduledTime = new Date(p.scheduledTime);
                   const now = new Date();
@@ -185,12 +185,12 @@ export default function PostReview() {
         </div>
 
         {/* 投稿一覧 */}
-        <div className="fade-in-up bg-white rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
+        <div className="fade-in-up bg-white rounded-lg border border-white/[0.06] p-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-sm text-[#1A1A1A]">レビュー待ち投稿</h3>
+            <h3 className="font-bold text-sm text-white">レビュー待ち投稿</h3>
             {pendingPosts && pendingPosts.length > 0 && (
               <button
-                className="rounded-lg border-2 border-[#1A1A1A] bg-white px-3 py-1 text-xs font-bold text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
+                className="rounded-lg border border-white/[0.06] bg-white px-3 py-1 text-xs font-bold text-white transition-all hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
                 onClick={handleSelectAll}
               >
                 {selectedPosts.length === pendingPosts.length ? "選択解除" : "すべて選択"}
@@ -201,8 +201,8 @@ export default function PostReview() {
             <div className="text-center py-8 text-[#6B6B6B] font-bold">読み込み中...</div>
           ) : !pendingPosts || pendingPosts.length === 0 ? (
             <div className="text-center py-8">
-              <CheckCircle className="h-12 w-12 mx-auto text-[#A8E6CF] mb-4 border-2 border-[#1A1A1A] rounded-full p-2 bg-white" />
-              <p className="text-lg font-bold text-[#1A1A1A]">レビュー待ちの投稿はありません</p>
+              <CheckCircle className="h-12 w-12 mx-auto text-[#A8E6CF] mb-4 border border-white/[0.06] rounded-full p-2 bg-white" />
+              <p className="text-lg font-bold text-white">レビュー待ちの投稿はありません</p>
               <p className="text-[#6B6B6B] font-bold">すべての投稿が処理されています</p>
             </div>
           ) : (
@@ -210,7 +210,7 @@ export default function PostReview() {
               {pendingPosts.map((post) => (
                 <div
                   key={post.id}
-                  className={`border-2 border-[#1A1A1A] rounded-lg p-4 shadow-[4px_4px_0_#1A1A1A] transition-colors ${
+                  className={`border border-white/[0.06] rounded-lg p-4 transition-colors ${
                     selectedPosts.includes(post.id) ? "bg-[#FFDAB9]" : "bg-white"
                   }`}
                 >
@@ -224,22 +224,22 @@ export default function PostReview() {
                       {/* メタ情報 */}
                       <div className="flex items-center gap-2 flex-wrap">
                         {post.agent && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border-2 border-[#1A1A1A] text-[11px] font-bold bg-[#87CEEB] text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border border-white/[0.06] text-[11px] font-bold bg-[#87CEEB] text-white">
                             <Bot className="h-3 w-3" />
                             {post.agent.name}
                           </span>
                         )}
                         {post.account && (
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-lg border-2 border-[#1A1A1A] text-[11px] font-bold text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] ${getPlatformColor(post.account.platform)}`}>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-lg border border-white/[0.06] text-[11px] font-bold text-white ${getPlatformColor(post.account.platform)}`}>
                             @{post.account.username}
                           </span>
                         )}
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border-2 border-[#1A1A1A] text-[11px] font-bold bg-[#FFFDF7] text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border border-white/[0.06] text-[11px] font-bold bg-neutral-950 text-white">
                           <Calendar className="h-3 w-3" />
                           {formatDate(post.scheduledTime)}
                         </span>
                         {post.contentConfidence && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border-2 border-[#1A1A1A] text-[11px] font-bold bg-[#4ECDC4] text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border border-white/[0.06] text-[11px] font-bold bg-[#4ECDC4] text-white">
                             <Sparkles className="h-3 w-3" />
                             信頼度: {post.contentConfidence}%
                           </span>
@@ -247,14 +247,14 @@ export default function PostReview() {
                       </div>
 
                       {/* コンテンツ */}
-                      <div className="bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg p-3 shadow-[2px_2px_0_#1A1A1A]">
-                        <p className="whitespace-pre-wrap font-bold text-[#1A1A1A]">{post.content}</p>
+                      <div className="bg-neutral-950 border border-white/[0.06] rounded-lg p-3">
+                        <p className="whitespace-pre-wrap font-bold text-white">{post.content}</p>
                       </div>
 
                       {/* アクション */}
                       <div className="flex gap-2">
                         <button
-                          className="inline-flex items-center gap-2 rounded-lg border-2 border-[#1A1A1A] bg-[#FFD700] px-3 py-2 text-sm font-bold text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                          className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-emerald-500 px-3 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                           onClick={() => approveMutation.mutate({ postId: post.id })}
                           disabled={approveMutation.isPending}
                         >
@@ -262,7 +262,7 @@ export default function PostReview() {
                           承認
                         </button>
                         <button
-                          className="inline-flex items-center gap-2 rounded-lg border-2 border-[#1A1A1A] bg-white px-3 py-2 text-sm font-bold text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                          className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white px-3 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                           onClick={() => {
                             setEditingPost(post);
                             setEditContent(post.content);
@@ -272,7 +272,7 @@ export default function PostReview() {
                           編集
                         </button>
                         <button
-                          className="inline-flex items-center gap-2 rounded-lg border-2 border-[#1A1A1A] bg-[#FF6B6B] px-3 py-2 text-sm font-bold text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                          className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-[#FF6B6B] px-3 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                           onClick={() => setRejectingPostId(post.id)}
                         >
                           <XCircle className="h-4 w-4" />
@@ -290,9 +290,9 @@ export default function PostReview() {
 
       {/* 編集ダイアログ */}
       <Dialog open={!!editingPost} onOpenChange={() => setEditingPost(null)}>
-        <DialogContent className="max-w-2xl border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]">
+        <DialogContent className="max-w-2xl border border-white/[0.06]">
           <DialogHeader>
-            <DialogTitle className="text-[#1A1A1A] font-bold">投稿を編集</DialogTitle>
+            <DialogTitle className="text-white font-bold">投稿を編集</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <Textarea
@@ -300,24 +300,24 @@ export default function PostReview() {
               onChange={(e) => setEditContent(e.target.value)}
               rows={8}
               placeholder="投稿内容を編集..."
-              className="border-2 border-[#1A1A1A]"
+              className="border border-white/[0.06]"
             />
             {editingPost?.originalContent && editingPost.originalContent !== editContent && (
               <div className="text-sm text-[#6B6B6B]">
-                <p className="font-bold text-[#1A1A1A]">元のコンテンツ:</p>
-                <p className="bg-[#FFFDF7] border-2 border-[#1A1A1A] p-2 rounded-lg mt-1 font-bold text-[#1A1A1A]">{editingPost.originalContent}</p>
+                <p className="font-bold text-white">元のコンテンツ:</p>
+                <p className="bg-neutral-950 border border-white/[0.06] p-2 rounded-lg mt-1 font-bold text-white">{editingPost.originalContent}</p>
               </div>
             )}
           </div>
           <DialogFooter>
             <button
-              className="rounded-lg border-2 border-[#1A1A1A] bg-white px-4 py-2 text-sm font-bold text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+              className="rounded-lg border border-white/[0.06] bg-white px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
               onClick={() => setEditingPost(null)}
             >
               キャンセル
             </button>
             <button
-              className="rounded-lg border-2 border-[#1A1A1A] bg-[#FFD700] px-4 py-2 text-sm font-bold text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+              className="rounded-lg border border-white/[0.06] bg-emerald-500 px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
               onClick={() => {
                 editMutation.mutate({
                   postId: editingPost.id,
@@ -334,9 +334,9 @@ export default function PostReview() {
 
       {/* 却下ダイアログ */}
       <Dialog open={!!rejectingPostId} onOpenChange={() => setRejectingPostId(null)}>
-        <DialogContent className="border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]">
+        <DialogContent className="border border-white/[0.06]">
           <DialogHeader>
-            <DialogTitle className="text-[#1A1A1A] font-bold">投稿を却下</DialogTitle>
+            <DialogTitle className="text-white font-bold">投稿を却下</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <Textarea
@@ -344,18 +344,18 @@ export default function PostReview() {
               onChange={(e) => setRejectReason(e.target.value)}
               rows={4}
               placeholder="却下理由を入力..."
-              className="border-2 border-[#1A1A1A]"
+              className="border border-white/[0.06]"
             />
           </div>
           <DialogFooter>
             <button
-              className="rounded-lg border-2 border-[#1A1A1A] bg-white px-4 py-2 text-sm font-bold text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+              className="rounded-lg border border-white/[0.06] bg-white px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
               onClick={() => setRejectingPostId(null)}
             >
               キャンセル
             </button>
             <button
-              className="rounded-lg border-2 border-[#1A1A1A] bg-[#FF6B6B] px-4 py-2 text-sm font-bold text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+              className="rounded-lg border border-white/[0.06] bg-[#FF6B6B] px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
               onClick={() => {
                 if (rejectingPostId && rejectReason) {
                   rejectMutation.mutate({

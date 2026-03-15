@@ -109,7 +109,7 @@ export default function AccountAgentsTab({ accountId }: AccountAgentsTabProps) {
                   availableAgents.map((agent: any) => (
                     <SelectItem key={agent.id} value={agent.id.toString()}>
                       <div className="flex items-center gap-2">
-                        <Bot className="h-4 w-4 text-violet-500" />
+                        <Bot className="h-4 w-4 text-teal-500" />
                         <span>{agent.name}</span>
                         <span className="text-xs text-slate-400">({agent.theme?.substring(0, 20)}...)</span>
                       </div>
@@ -141,7 +141,7 @@ export default function AccountAgentsTab({ accountId }: AccountAgentsTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Bot className="h-5 w-5 text-violet-500" />
+            <Bot className="h-5 w-5 text-teal-500" />
             リンク中のエージェント
           </CardTitle>
           <CardDescription>
@@ -161,12 +161,12 @@ export default function AccountAgentsTab({ accountId }: AccountAgentsTabProps) {
                   className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-violet-100 rounded-full">
-                      <Bot className="h-5 w-5 text-violet-600" />
+                    <div className="p-2 bg-teal-100 rounded-full">
+                      <Bot className="h-5 w-5 text-teal-600" />
                     </div>
                     <div>
                       <Link href={`/agents/${link.agentId}`}>
-                        <span className="font-medium text-slate-900 hover:text-violet-600 cursor-pointer">
+                        <span className="font-medium text-slate-900 hover:text-teal-600 cursor-pointer">
                           {link.agentName || `エージェント #${link.agentId}`}
                         </span>
                       </Link>

@@ -180,7 +180,7 @@ export default function ProjectModelAccounts({ projectId, projectAccounts = [] }
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Users2 className="h-5 w-5 text-purple-500" />
+                <Users2 className="h-5 w-5 text-blue-500" />
                 モデルアカウント連携
               </CardTitle>
               <CardDescription>
@@ -220,7 +220,7 @@ export default function ProjectModelAccounts({ projectId, projectAccounts = [] }
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold text-sm">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-white font-bold text-sm">
                         {item.modelAccount?.username?.charAt(0).toUpperCase() || "?"}
                       </div>
                       <div>

@@ -62,7 +62,7 @@ export default function KPIProgressCard({ targets, currentMetrics = {} }: KPIPro
       target: targets.clicks,
       current: currentMetrics.clicks || 0,
       unit: "",
-      color: "bg-purple-500",
+      color: "bg-blue-500",
     });
   }
 

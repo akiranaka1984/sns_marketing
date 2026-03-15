@@ -106,26 +106,26 @@ export default function Engagement() {
   const getTaskTypeBadge = (type: string) => {
     switch (type) {
       case "like":
-        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#FF6B6B] text-[#1A1A1A] border-2 border-[#1A1A1A]"><Heart className="h-3 w-3" />いいね</span>;
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#FF6B6B] text-white border border-white/[0.06]"><Heart className="h-3 w-3" />いいね</span>;
       case "follow":
-        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#4ECDC4] text-[#1A1A1A] border-2 border-[#1A1A1A]"><UserPlus className="h-3 w-3" />フォロー</span>;
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#4ECDC4] text-white border border-white/[0.06]"><UserPlus className="h-3 w-3" />フォロー</span>;
       case "comment":
-        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#87CEEB] text-[#1A1A1A] border-2 border-[#1A1A1A]"><MessageCircle className="h-3 w-3" />コメント</span>;
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#87CEEB] text-white border border-white/[0.06]"><MessageCircle className="h-3 w-3" />コメント</span>;
       default:
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border-2 border-[#1A1A1A] text-[#6B6B6B]">{type}</span>;
+        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-[#6B6B6B]">{type}</span>;
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#A8E6CF] text-[#1A1A1A] border-2 border-[#1A1A1A]">アクティブ</span>;
+        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#A8E6CF] text-white border border-white/[0.06]">アクティブ</span>;
       case "paused":
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border-2 border-[#1A1A1A] text-[#6B6B6B] bg-[#FFFDF7]">一時停止</span>;
+        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-[#6B6B6B] bg-neutral-950">一時停止</span>;
       case "completed":
-        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#DDA0DD] text-[#1A1A1A] border-2 border-[#1A1A1A]">完了</span>;
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#3B82F6] text-white border border-white/[0.06]">完了</span>;
       default:
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border-2 border-[#1A1A1A] text-[#6B6B6B]">{status}</span>;
+        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-[#6B6B6B]">{status}</span>;
     }
   };
 
@@ -140,7 +140,7 @@ export default function Engagement() {
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-[#FFD700] hover:bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] hover:shadow-[1px_1px_0_#1A1A1A] hover:translate-x-[1px] hover:translate-y-[1px] transition-all font-bold">
+            <Button className="bg-emerald-500 hover:bg-emerald-500 text-white border border-white/[0.06] hover:hover:translate-x-[1px] hover:translate-y-[1px] transition-all font-bold">
               <Plus className="h-4 w-4 mr-2" />
               新規タスク作成
             </Button>
@@ -207,10 +207,10 @@ export default function Engagement() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="border-2 border-[#1A1A1A] font-bold">
+              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="border border-white/[0.06] font-bold">
                 キャンセル
               </Button>
-              <Button className="bg-[#FFD700] hover:bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] hover:shadow-[1px_1px_0_#1A1A1A] hover:translate-x-[1px] hover:translate-y-[1px] transition-all font-bold" onClick={handleCreate} disabled={createMutation.isPending}>
+              <Button className="bg-emerald-500 hover:bg-emerald-500 text-white border border-white/[0.06] hover:hover:translate-x-[1px] hover:translate-y-[1px] transition-all font-bold" onClick={handleCreate} disabled={createMutation.isPending}>
                 作成
               </Button>
             </DialogFooter>
@@ -219,16 +219,16 @@ export default function Engagement() {
       </div>
 
       <div className="grid gap-4 mb-0">
-        <div className="fade-in-up bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
-          <h3 className="font-bold text-sm text-[#1A1A1A] mb-1">アクティブなタスク</h3>
+        <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
+          <h3 className="font-bold text-sm text-white mb-1">アクティブなタスク</h3>
           <p className="text-xs text-[#6B6B6B] mb-3 font-bold">
             {tasksQuery.data?.filter((t: any) => t.status === "active").length || 0}件のタスクが実行中
           </p>
           {tasksQuery.isLoading ? (
             <p className="text-center text-[#6B6B6B] py-8 font-bold">読み込み中...</p>
           ) : tasksQuery.data && tasksQuery.data.length > 0 ? (
-            <div className="border-2 border-[#1A1A1A] rounded-lg overflow-hidden shadow-[2px_2px_0_#1A1A1A]">
-              <div className="grid grid-cols-6 gap-0 bg-[#FFD700] text-[11px] font-bold text-[#1A1A1A] uppercase tracking-wide border-b-2 border-[#1A1A1A]">
+            <div className="border border-white/[0.06] rounded-lg overflow-hidden">
+              <div className="grid grid-cols-6 gap-0 bg-emerald-500 text-[11px] font-bold text-white uppercase tracking-wide border-b-2 border-white/[0.06]">
                 <div className="px-3 py-2">タイプ</div>
                 <div className="px-3 py-2">アカウント</div>
                 <div className="px-3 py-2">ターゲット</div>
@@ -239,26 +239,26 @@ export default function Engagement() {
               {tasksQuery.data.map((task: any) => {
                 const account = accountsQuery.data?.find((a) => a.id === task.accountId);
                 return (
-                  <div key={task.id} className="grid grid-cols-6 gap-0 border-b-2 border-[#1A1A1A] last:border-b-0 hover:bg-[#FFF8DC] transition-colors bg-[#FFFDF7]">
-                    <div className="px-3 py-2.5 text-xs text-[#1A1A1A] font-bold">{getTaskTypeBadge(task.taskType)}</div>
-                    <div className="px-3 py-2.5 text-xs text-[#1A1A1A] font-bold">{account?.username || `ID: ${task.accountId}`}</div>
-                    <div className="px-3 py-2.5 text-xs text-[#1A1A1A] max-w-xs truncate font-bold">
-                      <a href={task.targetUrl} target="_blank" rel="noopener noreferrer" className="text-[#1A1A1A] hover:underline">
+                  <div key={task.id} className="grid grid-cols-6 gap-0 border-b-2 border-white/[0.06] last:border-b-0 hover:bg-neutral-900 transition-colors bg-neutral-950">
+                    <div className="px-3 py-2.5 text-xs text-white font-bold">{getTaskTypeBadge(task.taskType)}</div>
+                    <div className="px-3 py-2.5 text-xs text-white font-bold">{account?.username || `ID: ${task.accountId}`}</div>
+                    <div className="px-3 py-2.5 text-xs text-white max-w-xs truncate font-bold">
+                      <a href={task.targetUrl} target="_blank" rel="noopener noreferrer" className="text-white hover:underline">
                         {task.targetUrl}
                       </a>
                     </div>
-                    <div className="px-3 py-2.5 text-xs text-[#1A1A1A] font-bold">
+                    <div className="px-3 py-2.5 text-xs text-white font-bold">
                       {task.executedCount || 0} / {task.dailyLimit}
                     </div>
-                    <div className="px-3 py-2.5 text-xs text-[#1A1A1A]">{getStatusBadge(task.status)}</div>
-                    <div className="px-3 py-2.5 text-xs text-[#1A1A1A]">
+                    <div className="px-3 py-2.5 text-xs text-white">{getStatusBadge(task.status)}</div>
+                    <div className="px-3 py-2.5 text-xs text-white">
                       <div className="flex items-center gap-2">
                         {task.status === "active" ? (
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => pauseMutation.mutate({ id: task.id, isActive: false })}
-                            className="border-2 border-[#1A1A1A] font-bold shadow-[2px_2px_0_#1A1A1A] hover:shadow-[1px_1px_0_#1A1A1A] hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
+                            className="border border-white/[0.06] font-bold hover:hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
                           >
                             <Pause className="h-3 w-3 mr-1" />
                             一時停止
@@ -268,7 +268,7 @@ export default function Engagement() {
                             size="sm"
                             variant="outline"
                             onClick={() => resumeMutation.mutate({ id: task.id, isActive: true })}
-                            className="border-2 border-[#1A1A1A] font-bold shadow-[2px_2px_0_#1A1A1A] hover:shadow-[1px_1px_0_#1A1A1A] hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
+                            className="border border-white/[0.06] font-bold hover:hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
                           >
                             <Play className="h-3 w-3 mr-1" />
                             再開
@@ -278,7 +278,7 @@ export default function Engagement() {
                           size="sm"
                           variant="destructive"
                           onClick={() => deleteMutation.mutate({ id: task.id })}
-                          className="border-2 border-[#1A1A1A] font-bold shadow-[2px_2px_0_#1A1A1A] hover:shadow-[1px_1px_0_#1A1A1A] hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
+                          className="border border-white/[0.06] font-bold hover:hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
                         >
                           <Trash2 className="h-3 w-3" />
                         </Button>
@@ -295,32 +295,32 @@ export default function Engagement() {
           )}
         </div>
 
-        <div className="fade-in-up bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
-          <h3 className="font-bold text-sm text-[#1A1A1A] mb-1">実行ログ</h3>
+        <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
+          <h3 className="font-bold text-sm text-white mb-1">実行ログ</h3>
           <p className="text-xs text-[#6B6B6B] mb-3 font-bold">
             最近の{logsQuery.data?.length || 0}件の実行記録
           </p>
           {logsQuery.isLoading ? (
             <p className="text-center text-[#6B6B6B] py-8 font-bold">読み込み中...</p>
           ) : logsQuery.data && logsQuery.data.length > 0 ? (
-            <div className="border-2 border-[#1A1A1A] rounded-lg overflow-hidden shadow-[2px_2px_0_#1A1A1A]">
-              <div className="grid grid-cols-4 gap-0 bg-[#FFD700] text-[11px] font-bold text-[#1A1A1A] uppercase tracking-wide border-b-2 border-[#1A1A1A]">
+            <div className="border border-white/[0.06] rounded-lg overflow-hidden">
+              <div className="grid grid-cols-4 gap-0 bg-emerald-500 text-[11px] font-bold text-white uppercase tracking-wide border-b-2 border-white/[0.06]">
                 <div className="px-3 py-2">実行日時</div>
                 <div className="px-3 py-2">タスクID</div>
                 <div className="px-3 py-2">結果</div>
                 <div className="px-3 py-2">詳細</div>
               </div>
               {logsQuery.data.map((log: any) => (
-                <div key={log.id} className="grid grid-cols-4 gap-0 border-b-2 border-[#1A1A1A] last:border-b-0 hover:bg-[#FFF8DC] transition-colors bg-[#FFFDF7]">
-                  <div className="px-3 py-2.5 text-xs text-[#1A1A1A] font-bold">
+                <div key={log.id} className="grid grid-cols-4 gap-0 border-b-2 border-white/[0.06] last:border-b-0 hover:bg-neutral-900 transition-colors bg-neutral-950">
+                  <div className="px-3 py-2.5 text-xs text-white font-bold">
                     {new Date(log.executedAt).toLocaleString("ja-JP")}
                   </div>
-                  <div className="px-3 py-2.5 text-xs text-[#1A1A1A] font-mono font-bold">{log.taskId}</div>
-                  <div className="px-3 py-2.5 text-xs text-[#1A1A1A]">
+                  <div className="px-3 py-2.5 text-xs text-white font-mono font-bold">{log.taskId}</div>
+                  <div className="px-3 py-2.5 text-xs text-white">
                     {log.success ? (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#A8E6CF] text-[#1A1A1A] border-2 border-[#1A1A1A]">成功</span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#A8E6CF] text-white border border-white/[0.06]">成功</span>
                     ) : (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-red-50 text-red-700 border-2 border-[#1A1A1A]">失敗</span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-red-50 text-red-700 border border-white/[0.06]">失敗</span>
                     )}
                   </div>
                   <div className="px-3 py-2.5 text-xs text-[#6B6B6B] max-w-xs truncate font-bold">

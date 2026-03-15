@@ -171,7 +171,7 @@ export default function AccountModelAccountsTab({ accountId }: AccountModelAccou
                 className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-600 flex items-center justify-center text-white font-bold">
                     {link.modelAccount.username.charAt(0).toUpperCase()}
                   </div>
                   <div>

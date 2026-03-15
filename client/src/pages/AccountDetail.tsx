@@ -22,13 +22,13 @@ import AccountAgentsTab from "@/components/AccountAgentsTab";
 
 function SessionStatusBadge({ status }: { status: string }) {
   const config: Record<string, { bg: string; text: string; border: string; icon: typeof ShieldCheck; label: string }> = {
-    active: { bg: "bg-[#A8E6CF]", text: "text-[#1A1A1A]", border: "border-[#1A1A1A]", icon: ShieldCheck, label: "Active" },
-    expired: { bg: "bg-[#FFDAB9]", text: "text-[#1A1A1A]", border: "border-[#1A1A1A]", icon: ShieldAlert, label: "Expired" },
-    needs_login: { bg: "bg-[#FF6B6B]", text: "text-[#1A1A1A]", border: "border-[#1A1A1A]", icon: ShieldX, label: "Needs Login" },
+    active: { bg: "bg-[#A8E6CF]", text: "text-white", border: "border-white/[0.06]", icon: ShieldCheck, label: "Active" },
+    expired: { bg: "bg-[#FFDAB9]", text: "text-white", border: "border-white/[0.06]", icon: ShieldAlert, label: "Expired" },
+    needs_login: { bg: "bg-[#FF6B6B]", text: "text-white", border: "border-white/[0.06]", icon: ShieldX, label: "Needs Login" },
   };
   const { bg, text, border, icon: Icon, label } = config[status] || config.needs_login;
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${bg} ${text} border-2 ${border} shadow-[4px_4px_0_#1A1A1A]`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${bg} ${text} border-2 ${border}`}>
       <Icon className="w-3.5 h-3.5" />
       {label}
     </span>
@@ -202,9 +202,9 @@ export default function AccountDetail() {
   if (!account) {
     return (
       <div className="max-w-5xl">
-        <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-8 text-center">
+        <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-8 text-center">
           <p className="text-[#6B6B6B] font-bold mb-4">Account not found</p>
-          <Button asChild size="sm" className="bg-[#FFD700] hover:bg-[#FFD700] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-[#1A1A1A] font-bold border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg">
+          <Button asChild size="sm" className="bg-emerald-500 hover:bg-emerald-500 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg">
             <Link href="/accounts">
               <ArrowLeft className="mr-2 h-4 w-4" />
               {t('accountDetail.backToAccounts')}
@@ -222,7 +222,7 @@ export default function AccountDetail() {
       {/* Back + Header */}
       <div className="fade-in-up">
         <Link href="/accounts">
-          <button className="flex items-center gap-1.5 text-xs font-bold text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors mb-4 px-3 py-1.5 rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] bg-[#FFFDF7] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+          <button className="flex items-center gap-1.5 text-xs font-bold text-[#6B6B6B] hover:text-white transition-colors mb-4 px-3 py-1.5 rounded-lg border border-white/[0.06] bg-neutral-950 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to Accounts
           </button>
@@ -230,7 +230,7 @@ export default function AccountDetail() {
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] mb-1">Account Detail</p>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#1A1A1A]">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
               @{account.username}
             </h1>
             <p className="text-sm text-[#6B6B6B] font-bold capitalize mt-0.5">
@@ -238,8 +238,8 @@ export default function AccountDetail() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] ${
-              (account as any).postingMethod === 'api_v2' ? 'bg-[#4ECDC4]' : 'bg-[#DDA0DD]'
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-white border border-white/[0.06] ${
+              (account as any).postingMethod === 'api_v2' ? 'bg-[#4ECDC4]' : 'bg-[#3B82F6]'
             }`}>
               {(account as any).postingMethod === 'api_v2' ? (
                 <><Zap className="w-3.5 h-3.5" />API v2</>
@@ -248,12 +248,12 @@ export default function AccountDetail() {
               )}
             </span>
             {/* Status badge */}
-            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] ${
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border border-white/[0.06] ${
               account.status === 'active'
-                ? 'bg-[#A8E6CF] text-[#1A1A1A]'
+                ? 'bg-[#A8E6CF] text-white'
                 : account.status === 'pending'
-                ? 'bg-[#FFDAB9] text-[#1A1A1A]'
-                : 'bg-[#FF6B6B] text-[#1A1A1A]'
+                ? 'bg-[#FFDAB9] text-white'
+                : 'bg-[#FF6B6B] text-white'
             }`}>
               {account.status}
             </span>
@@ -279,7 +279,7 @@ export default function AccountDetail() {
       {/* Tabs */}
       <div className="fade-in-up" style={{ animationDelay: '160ms' }}>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <div className="flex items-center gap-1 p-1 bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg w-fit shadow-[4px_4px_0_#1A1A1A]">
+          <div className="flex items-center gap-1 p-1 bg-neutral-950 border border-white/[0.06] rounded-lg w-fit">
             {[
               { value: "overview", icon: LayoutDashboard, label: "概要" },
               { value: "session", icon: Shield, label: "セッション" },
@@ -294,8 +294,8 @@ export default function AccountDetail() {
                 onClick={() => setActiveTab(tab.value)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                   activeTab === tab.value
-                    ? "bg-[#1A1A1A] text-white"
-                    : "text-[#6B6B6B] hover:text-[#1A1A1A] hover:bg-[#FFF8DC]"
+                    ? "bg-white/10 text-white"
+                    : "text-[#6B6B6B] hover:text-white hover:bg-neutral-900"
                 }`}
               >
                 <tab.icon className="w-3.5 h-3.5" />
@@ -309,14 +309,14 @@ export default function AccountDetail() {
             <div className="space-y-4">
               {/* Quick Stats */}
               <div className="grid gap-3 md:grid-cols-3">
-                <div className="bg-[#4ECDC4] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
+                <div className="bg-[#4ECDC4] rounded-lg border border-white/[0.06] p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#1A1A1A]">投稿方式</p>
-                    <div className="p-1.5 rounded-lg bg-[#FFFDF7] border-2 border-[#1A1A1A]">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-white">投稿方式</p>
+                    <div className="p-1.5 rounded-lg bg-neutral-950 border border-white/[0.06]">
                       {(account as any).postingMethod === 'api_v2' ? (
-                        <Zap className="h-3.5 w-3.5 text-[#1A1A1A]" />
+                        <Zap className="h-3.5 w-3.5 text-white" />
                       ) : (
-                        <Monitor className="h-3.5 w-3.5 text-[#1A1A1A]" />
+                        <Monitor className="h-3.5 w-3.5 text-white" />
                       )}
                     </div>
                   </div>
@@ -330,10 +330,10 @@ export default function AccountDetail() {
                         type="button"
                         onClick={() => updatePostingMethodMutation.mutate({ accountId, postingMethod: method.value })}
                         disabled={updatePostingMethodMutation.isPending}
-                        className={`flex-1 px-2 py-1.5 rounded-lg border-2 border-[#1A1A1A] text-left transition-all ${
+                        className={`flex-1 px-2 py-1.5 rounded-lg border border-white/[0.06] text-left transition-all ${
                           ((account as any).postingMethod || 'playwright') === method.value
-                            ? 'bg-[#1A1A1A] text-white shadow-none'
-                            : 'bg-[#FFFDF7] text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]'
+                            ? 'bg-white/10 text-white shadow-none'
+                            : 'bg-neutral-950 text-white hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]'
                         }`}
                       >
                         <p className="text-[11px] font-bold">{method.label}</p>
@@ -343,35 +343,35 @@ export default function AccountDetail() {
                   </div>
                 </div>
 
-                <div className="bg-[#FFD700] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
+                <div className="bg-emerald-500 rounded-lg border border-white/[0.06] p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#1A1A1A]">作成日</p>
-                    <div className="p-1.5 rounded-lg bg-[#FFFDF7] border-2 border-[#1A1A1A]">
-                      <Calendar className="h-3.5 w-3.5 text-[#1A1A1A]" />
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-white">作成日</p>
+                    <div className="p-1.5 rounded-lg bg-neutral-950 border border-white/[0.06]">
+                      <Calendar className="h-3.5 w-3.5 text-white" />
                     </div>
                   </div>
-                  <p className="text-sm font-bold text-[#1A1A1A]">
+                  <p className="text-sm font-bold text-white">
                     {new Date(account.createdAt).toLocaleDateString("ja-JP")}
                   </p>
-                  <p className="text-[10px] font-bold text-[#1A1A1A] mt-0.5">
+                  <p className="text-[10px] font-bold text-white mt-0.5">
                     {new Date(account.createdAt).toLocaleTimeString("ja-JP")}
                   </p>
                 </div>
 
-                <div className="bg-[#FF6B6B] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
+                <div className="bg-[#FF6B6B] rounded-lg border border-white/[0.06] p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#1A1A1A]">成長データ</p>
-                    <div className="p-1.5 rounded-lg bg-[#FFFDF7] border-2 border-[#1A1A1A]">
-                      <Activity className="h-3.5 w-3.5 text-[#1A1A1A]" />
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-white">成長データ</p>
+                    <div className="p-1.5 rounded-lg bg-neutral-950 border border-white/[0.06]">
+                      <Activity className="h-3.5 w-3.5 text-white" />
                     </div>
                   </div>
-                  <p className="text-xs font-bold text-[#1A1A1A]">
+                  <p className="text-xs font-bold text-white">
                     既存の学習データから経験値を再計算
                   </p>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="mt-3 w-full h-7 text-xs font-bold border-2 border-[#1A1A1A] bg-[#FFFDF7] text-[#1A1A1A] hover:bg-[#FFF8DC] rounded-lg"
+                    className="mt-3 w-full h-7 text-xs font-bold border border-white/[0.06] bg-neutral-950 text-white hover:bg-neutral-900 rounded-lg"
                     onClick={() => syncGrowthMutation.mutate({ accountId })}
                     disabled={syncGrowthMutation.isPending}
                   >
@@ -386,24 +386,24 @@ export default function AccountDetail() {
               </div>
 
               {/* X API OAuth Connection */}
-              <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-5">
+              <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-5">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B]">X API 連携</p>
                   {oauthStatus?.oauthTokenStatus === 'active' && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#A8E6CF] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
-                      <span className="w-[5px] h-[5px] rounded-full bg-[#1A1A1A]" />
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#A8E6CF] text-white border border-white/[0.06]">
+                      <span className="w-[5px] h-[5px] rounded-full bg-white/10" />
                       連携済み
                     </span>
                   )}
                   {oauthStatus?.oauthTokenStatus === 'expired' && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#FFDAB9] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#FFDAB9] text-white border border-white/[0.06]">
                       <AlertTriangle className="w-3.5 h-3.5" />
                       期限切れ
                     </span>
                   )}
                   {(oauthStatus?.oauthTokenStatus === 'not_connected' || oauthStatus?.oauthTokenStatus === 'revoked' || !oauthStatus) && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#FF6B6B] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
-                      <span className="w-[5px] h-[5px] rounded-full bg-[#1A1A1A]" />
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#FF6B6B] text-white border border-white/[0.06]">
+                      <span className="w-[5px] h-[5px] rounded-full bg-white/10" />
                       未連携
                     </span>
                   )}
@@ -412,12 +412,12 @@ export default function AccountDetail() {
                 {/* Connected state */}
                 {oauthStatus?.oauthTokenStatus === 'active' && (
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-[#A8E6CF] border-2 border-[#1A1A1A]">
-                      <div className="p-2 rounded-lg bg-[#FFFDF7] border-2 border-[#1A1A1A]">
-                        <Link2 className="w-4 h-4 text-[#1A1A1A]" />
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-[#A8E6CF] border border-white/[0.06]">
+                      <div className="p-2 rounded-lg bg-neutral-950 border border-white/[0.06]">
+                        <Link2 className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-bold text-[#1A1A1A]">
+                        <p className="text-sm font-bold text-white">
                           @{oauthStatus.oauthUsername || account.username}
                         </p>
                         {oauthStatus.oauthConnectedAt && (
@@ -435,7 +435,7 @@ export default function AccountDetail() {
                           }
                         }}
                         disabled={disconnectMutation.isPending}
-                        className="h-8 text-xs font-bold border-2 border-[#1A1A1A] bg-[#FF6B6B] text-[#1A1A1A] hover:bg-[#FF6B6B] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+                        className="h-8 text-xs font-bold border border-white/[0.06] bg-[#FF6B6B] text-white hover:bg-[#FF6B6B] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
                       >
                         {disconnectMutation.isPending ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
@@ -454,12 +454,12 @@ export default function AccountDetail() {
                 {/* Expired / Revoked state */}
                 {(oauthStatus?.oauthTokenStatus === 'expired' || oauthStatus?.oauthTokenStatus === 'revoked') && (
                   <div className="space-y-3">
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-[#FFDAB9] border-2 border-[#1A1A1A]">
-                      <div className="p-2 rounded-lg bg-[#FFFDF7] border-2 border-[#1A1A1A]">
-                        <AlertTriangle className="w-4 h-4 text-[#1A1A1A]" />
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-[#FFDAB9] border border-white/[0.06]">
+                      <div className="p-2 rounded-lg bg-neutral-950 border border-white/[0.06]">
+                        <AlertTriangle className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-bold text-[#1A1A1A]">アクセストークンが無効です</p>
+                        <p className="text-sm font-bold text-white">アクセストークンが無効です</p>
                         <p className="text-[10px] font-bold text-[#6B6B6B] mt-0.5">
                           {oauthStatus.oauthTokenStatus === 'expired'
                             ? 'トークンの有効期限が切れました。再連携してください。'
@@ -471,7 +471,7 @@ export default function AccountDetail() {
                       size="sm"
                       onClick={() => startOAuthMutation.mutate({ accountId })}
                       disabled={startOAuthMutation.isPending}
-                      className="h-8 text-xs font-bold bg-[#FFD700] hover:bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[2px_2px_0_#1A1A1A] hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
+                      className="h-8 text-xs font-bold bg-emerald-500 hover:bg-emerald-500 text-white border border-white/[0.06] hover:hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
                     >
                       {startOAuthMutation.isPending ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
@@ -493,7 +493,7 @@ export default function AccountDetail() {
                       size="sm"
                       onClick={() => startOAuthMutation.mutate({ accountId })}
                       disabled={startOAuthMutation.isPending}
-                      className="h-9 text-xs font-bold bg-[#FFD700] hover:bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[2px_2px_0_#1A1A1A] hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
+                      className="h-9 text-xs font-bold bg-emerald-500 hover:bg-emerald-500 text-white border border-white/[0.06] hover:hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
                     >
                       {startOAuthMutation.isPending ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
@@ -507,12 +507,12 @@ export default function AccountDetail() {
               </div>
 
               {/* Account Details */}
-              <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-5">
+              <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-5">
                 <p className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] mb-4">アカウント詳細</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-[10px] font-bold uppercase tracking-wider text-[#6B6B6B]">Username</label>
-                    <p className="text-sm font-bold text-[#1A1A1A] mt-0.5">{account.username}</p>
+                    <p className="text-sm font-bold text-white mt-0.5">{account.username}</p>
                   </div>
                   <div>
                     <label className="text-[10px] font-bold uppercase tracking-wider text-[#6B6B6B]">X Handle</label>
@@ -523,12 +523,12 @@ export default function AccountDetail() {
                           value={xHandleInput}
                           onChange={(e) => setXHandleInput(e.target.value)}
                           placeholder="例: elonmusk"
-                          className="flex-1 h-8 text-sm font-bold border-2 border-[#1A1A1A] bg-[#FFFDF7] rounded-lg"
+                          className="flex-1 h-8 text-sm font-bold border border-white/[0.06] bg-neutral-950 rounded-lg"
                         />
                         <button
                           onClick={handleSaveXHandle}
                           disabled={updateAccountMutation.isPending}
-                          className="p-1.5 rounded-lg hover:bg-[#A8E6CF] text-[#1A1A1A] font-bold transition-colors border-2 border-[#1A1A1A]"
+                          className="p-1.5 rounded-lg hover:bg-[#A8E6CF] text-white font-bold transition-colors border border-white/[0.06]"
                         >
                           {updateAccountMutation.isPending ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -538,7 +538,7 @@ export default function AccountDetail() {
                         </button>
                         <button
                           onClick={handleCancelEdit}
-                          className="p-1.5 rounded-lg hover:bg-[#FFF8DC] text-[#6B6B6B] font-bold transition-colors border-2 border-[#1A1A1A]"
+                          className="p-1.5 rounded-lg hover:bg-neutral-900 text-[#6B6B6B] font-bold transition-colors border border-white/[0.06]"
                         >
                           <X className="h-4 w-4" />
                         </button>
@@ -546,13 +546,13 @@ export default function AccountDetail() {
                     ) : (
                       <div className="flex items-center gap-2 mt-0.5">
                         {(account as any).xHandle ? (
-                          <code className="text-sm font-bold bg-[#FFF8DC] text-[#1A1A1A] px-2 py-0.5 rounded-lg border-2 border-[#1A1A1A]">
+                          <code className="text-sm font-bold bg-neutral-900 text-white px-2 py-0.5 rounded-lg border border-white/[0.06]">
                             @{(account as any).xHandle}
                           </code>
                         ) : (
                           <span className="text-sm font-bold text-[#6B6B6B]">未設定</span>
                         )}
-                        <button onClick={handleEditXHandle} className="p-1 rounded-lg hover:bg-[#FFF8DC] text-[#6B6B6B] font-bold transition-colors border-2 border-[#1A1A1A]">
+                        <button onClick={handleEditXHandle} className="p-1 rounded-lg hover:bg-neutral-900 text-[#6B6B6B] font-bold transition-colors border border-white/[0.06]">
                           <Edit2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
@@ -560,11 +560,11 @@ export default function AccountDetail() {
                   </div>
                   <div>
                     <label className="text-[10px] font-bold uppercase tracking-wider text-[#6B6B6B]">Platform</label>
-                    <p className="text-sm font-bold text-[#1A1A1A] mt-0.5 capitalize">{account.platform}</p>
+                    <p className="text-sm font-bold text-white mt-0.5 capitalize">{account.platform}</p>
                   </div>
                   <div>
                     <label className="text-[10px] font-bold uppercase tracking-wider text-[#6B6B6B]">Device ID</label>
-                    <p className="text-sm font-bold text-[#1A1A1A] mt-0.5 font-mono">{account.deviceId || 'N/A'}</p>
+                    <p className="text-sm font-bold text-white mt-0.5 font-mono">{account.deviceId || 'N/A'}</p>
                   </div>
                 </div>
               </div>
@@ -575,7 +575,7 @@ export default function AccountDetail() {
           {activeTab === "session" && (
             <div className="space-y-4">
               {/* Session Status */}
-              <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-5">
+              <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-5">
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B]">ブラウザセッション</p>
                     <SessionStatusBadge status={currentSessionStatus} />
@@ -583,22 +583,22 @@ export default function AccountDetail() {
 
                   <div className="space-y-3">
                     {/* Status detail */}
-                    <div className="p-3 rounded-lg bg-[#FFF8DC] border-2 border-[#1A1A1A]">
+                    <div className="p-3 rounded-lg bg-neutral-900 border border-white/[0.06]">
                       <div className="flex items-start gap-3">
-                        <div className={`p-2 rounded-lg border-2 border-[#1A1A1A] ${
+                        <div className={`p-2 rounded-lg border border-white/[0.06] ${
                           currentSessionStatus === 'active' ? 'bg-[#A8E6CF]' :
                           currentSessionStatus === 'expired' ? 'bg-[#FFDAB9]' : 'bg-[#FF6B6B]'
                         }`}>
                           {currentSessionStatus === 'active' ? (
-                            <ShieldCheck className="w-5 h-5 text-[#1A1A1A]" />
+                            <ShieldCheck className="w-5 h-5 text-white" />
                           ) : currentSessionStatus === 'expired' ? (
-                            <ShieldAlert className="w-5 h-5 text-[#1A1A1A]" />
+                            <ShieldAlert className="w-5 h-5 text-white" />
                           ) : (
-                            <ShieldX className="w-5 h-5 text-[#1A1A1A]" />
+                            <ShieldX className="w-5 h-5 text-white" />
                           )}
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-bold text-[#1A1A1A]">
+                          <p className="text-sm font-bold text-white">
                             {currentSessionStatus === 'active'
                               ? 'セッション有効'
                               : currentSessionStatus === 'expired'
@@ -622,7 +622,7 @@ export default function AccountDetail() {
                         variant="outline"
                         size="sm"
                         onClick={() => setPreviewOpen(true)}
-                        className="h-8 text-xs font-bold border-2 border-[#1A1A1A] bg-[#DDA0DD] text-[#1A1A1A] hover:bg-[#DDA0DD] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+                        className="h-8 text-xs font-bold border border-white/[0.06] bg-[#3B82F6] text-white hover:bg-[#3B82F6] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
                       >
                         <Eye className="h-3.5 w-3.5 mr-1.5" />
                         ライブプレビュー
@@ -636,7 +636,7 @@ export default function AccountDetail() {
                           testPreviewMutation.mutate({ accountId });
                         }}
                         disabled={testPreviewMutation.isPending}
-                        className="h-8 text-xs font-bold border-2 border-[#1A1A1A] bg-[#A8E6CF] text-[#1A1A1A] hover:bg-[#A8E6CF] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+                        className="h-8 text-xs font-bold border border-white/[0.06] bg-[#A8E6CF] text-white hover:bg-[#A8E6CF] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
                       >
                         {testPreviewMutation.isPending ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
@@ -653,7 +653,7 @@ export default function AccountDetail() {
                           loginMutation.mutate({ accountId });
                         }}
                         disabled={loginMutation.isPending}
-                        className="h-8 text-xs font-bold bg-[#FFD700] hover:bg-[#FFD700] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+                        className="h-8 text-xs font-bold bg-emerald-500 hover:bg-emerald-500 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white border border-white/[0.06] rounded-lg"
                       >
                         {loginMutation.isPending ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
@@ -671,7 +671,7 @@ export default function AccountDetail() {
                           healthCheckMutation.mutate({ accountId });
                         }}
                         disabled={healthCheckMutation.isPending}
-                        className="h-8 text-xs font-bold border-2 border-[#1A1A1A] bg-[#FFFDF7] text-[#1A1A1A] hover:bg-[#FFF8DC] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+                        className="h-8 text-xs font-bold border border-white/[0.06] bg-neutral-950 text-white hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
                       >
                         {healthCheckMutation.isPending ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
@@ -691,7 +691,7 @@ export default function AccountDetail() {
                             }
                           }}
                           disabled={deleteSessionMutation.isPending}
-                          className="h-8 text-xs font-bold border-2 border-[#1A1A1A] bg-[#FF6B6B] text-[#1A1A1A] hover:bg-[#FF6B6B] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+                          className="h-8 text-xs font-bold border border-white/[0.06] bg-[#FF6B6B] text-white hover:bg-[#FF6B6B] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
                         >
                           {deleteSessionMutation.isPending ? (
                             <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
@@ -706,10 +706,10 @@ export default function AccountDetail() {
                 </div>
 
               {/* Info note */}
-              <div className="flex items-start gap-2.5 p-3 rounded-lg bg-[#FFF8DC] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]">
+              <div className="flex items-start gap-2.5 p-3 rounded-lg bg-neutral-900 border border-white/[0.06]">
                 <Info className="w-4 h-4 text-[#6B6B6B] mt-0.5 flex-shrink-0" />
                 <div className="text-xs font-bold text-[#6B6B6B] leading-relaxed">
-                  <p className="font-bold text-[#1A1A1A] mb-1">セッションについて</p>
+                  <p className="font-bold text-white mb-1">セッションについて</p>
                   <p>
                     Playwrightブラウザ自動化を使用してX.comに投稿します。
                     X.comへのログインセッションの管理が必要です。

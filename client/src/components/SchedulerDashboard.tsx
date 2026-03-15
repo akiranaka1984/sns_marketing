@@ -133,7 +133,7 @@ export default function SchedulerDashboard({ projectId }: SchedulerDashboardProp
                   {task.type === "like" && <Heart className="w-4 h-4 text-red-500" />}
                   {task.type === "comment" && <MessageCircle className="w-4 h-4 text-blue-500" />}
                   {task.type === "retweet" && <Repeat2 className="w-4 h-4 text-green-500" />}
-                  {task.type === "follow" && <UserPlus className="w-4 h-4 text-purple-500" />}
+                  {task.type === "follow" && <UserPlus className="w-4 h-4 text-blue-500" />}
                   <span className="text-sm truncate max-w-md text-slate-700">{task.postUrl}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-500">
@@ -165,7 +165,7 @@ export default function SchedulerDashboard({ projectId }: SchedulerDashboardProp
                   {task.type === "like" && <Heart className="w-4 h-4 text-red-500" />}
                   {task.type === "comment" && <MessageCircle className="w-4 h-4 text-blue-500" />}
                   {task.type === "retweet" && <Repeat2 className="w-4 h-4 text-green-500" />}
-                  {task.type === "follow" && <UserPlus className="w-4 h-4 text-purple-500" />}
+                  {task.type === "follow" && <UserPlus className="w-4 h-4 text-blue-500" />}
                   <span className="text-sm truncate max-w-md text-slate-700">{task.postUrl}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -233,7 +233,7 @@ function AgentExecutionList({
     <Card>
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
-          <Bot className="w-5 h-5 text-violet-500" />
+          <Bot className="w-5 h-5 text-teal-500" />
           自動投稿の実行予定
         </CardTitle>
       </CardHeader>
@@ -244,10 +244,10 @@ function AgentExecutionList({
               <div key={`agent-${exec.agentId}-${exec.accountId}-${index}`}>
                 <div
                   onClick={() => toggleExpand(index)}
-                  className="flex items-center justify-between p-3 bg-violet-50 rounded-lg cursor-pointer hover:bg-violet-100 transition-colors"
+                  className="flex items-center justify-between p-3 bg-teal-50 rounded-lg cursor-pointer hover:bg-teal-100 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <FileText className="w-4 h-4 text-violet-500" />
+                    <FileText className="w-4 h-4 text-teal-500" />
                     <div>
                       <span className="text-sm font-medium text-slate-700">{exec.agentName}</span>
                       <span className="text-xs text-slate-500 ml-2">({exec.platform})</span>

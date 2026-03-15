@@ -27,7 +27,7 @@ export default function AccountLevelCard({
   const otherPatterns = totalLearningsCount - successPatterns - stylePatterns;
 
   return (
-    <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
+    <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
       <CardContent className="pt-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -35,13 +35,13 @@ export default function AccountLevelCard({
               <Star className="h-7 w-7 text-white fill-white" />
             </div>
             <div>
-              <div className="text-sm text-purple-600 font-medium">アカウントレベル</div>
-              <div className="text-3xl font-bold text-purple-900">Lv. {level}</div>
+              <div className="text-sm text-blue-600 font-medium">アカウントレベル</div>
+              <div className="text-3xl font-bold text-blue-900">Lv. {level}</div>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-sm text-purple-600">経験値</div>
-            <div className="text-lg font-semibold text-purple-900">
+            <div className="text-sm text-blue-600">経験値</div>
+            <div className="text-lg font-semibold text-blue-900">
               {experiencePoints.toLocaleString()} XP
             </div>
           </div>
@@ -49,16 +49,16 @@ export default function AccountLevelCard({
 
         {/* Progress bar */}
         <div className="mb-4">
-          <div className="flex justify-between text-xs text-purple-600 mb-1">
+          <div className="flex justify-between text-xs text-blue-600 mb-1">
             <span>次のレベルまで</span>
             <span>{currentLevelXP} / {requiredXP} XP</span>
           </div>
-          <Progress value={progressPercent} className="h-3 bg-purple-200" />
-          <div className="text-right text-xs text-purple-500 mt-1">{progressPercent}%</div>
+          <Progress value={progressPercent} className="h-3 bg-blue-200" />
+          <div className="text-right text-xs text-blue-500 mt-1">{progressPercent}%</div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-3 pt-3 border-t border-purple-200">
+        <div className="grid grid-cols-3 gap-3 pt-3 border-t border-blue-200">
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-green-600 mb-1">
               <TrendingUp className="h-4 w-4" />

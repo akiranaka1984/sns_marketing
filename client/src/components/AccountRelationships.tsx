@@ -38,7 +38,7 @@ interface AccountRelationshipsProps {
 const RELATIONSHIP_TYPE_LABELS: Record<string, { label: string; color: string }> = {
   friend: { label: "友人", color: "bg-green-100 text-green-800" },
   acquaintance: { label: "知人", color: "bg-blue-100 text-blue-800" },
-  follower: { label: "フォロワー", color: "bg-purple-100 text-purple-800" },
+  follower: { label: "フォロワー", color: "bg-blue-100 text-blue-800" },
   colleague: { label: "同僚", color: "bg-yellow-100 text-yellow-800" },
   rival: { label: "ライバル", color: "bg-red-100 text-red-800" },
   stranger: { label: "他人", color: "bg-slate-100 text-slate-800" },

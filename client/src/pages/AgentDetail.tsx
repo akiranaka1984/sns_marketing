@@ -59,7 +59,7 @@ const knowledgeTypes = [
   { value: "failure_pattern", label: "失敗パターン", icon: XCircle, color: "text-[#FF6B6B]" },
   { value: "content_template", label: "コンテンツテンプレート", icon: Lightbulb, color: "text-[#FFD700]" },
   { value: "hashtag_strategy", label: "ハッシュタグ戦略", icon: Zap, color: "text-[#87CEEB]" },
-  { value: "timing_insight", label: "タイミングの知見", icon: Clock, color: "text-[#DDA0DD]" },
+  { value: "timing_insight", label: "タイミングの知見", icon: Clock, color: "text-[#3B82F6]" },
   { value: "audience_insight", label: "オーディエンスの知見", icon: Bot, color: "text-[#FF6B6B]" },
   { value: "engagement_tactic", label: "エンゲージメント戦術", icon: Zap, color: "text-[#FFDAB9]" },
   { value: "general", label: "一般的な知見", icon: Brain, color: "text-[#6B6B6B]" },
@@ -302,9 +302,9 @@ export default function AgentDetail() {
     return (
       <div className="container py-8">
         <div className="text-center">
-          <h1 className="text-2xl font-black text-[#1A1A1A] mb-4">エージェントが見つかりません</h1>
+          <h1 className="text-2xl font-black text-white mb-4">エージェントが見つかりません</h1>
           <Button
-            className="bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            className="bg-emerald-500 text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             onClick={() => setLocation("/agents")}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -332,25 +332,25 @@ export default function AgentDetail() {
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <Button
-          className="bg-[#FFFDF7] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#FFF8DC] transition-all"
+          className="bg-neutral-950 text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-neutral-900 transition-all"
           onClick={() => setLocation("/agents")}
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <div className="bg-[#DDA0DD] border-2 border-[#1A1A1A] rounded-lg p-2 shadow-[2px_2px_0_#1A1A1A]">
-              <Bot className="h-8 w-8 text-[#1A1A1A]" />
+            <div className="bg-[#3B82F6] border border-white/[0.06] rounded-lg p-2">
+              <Bot className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-black text-[#1A1A1A]">{agent.name}</h1>
+              <h1 className="text-3xl font-black text-white">{agent.name}</h1>
               <p className="text-[#6B6B6B] font-bold">{agent.theme}</p>
             </div>
           </div>
         </div>
         <div className="flex gap-3">
           <Button
-            className="bg-[#4ECDC4] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            className="bg-[#4ECDC4] text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             onClick={() => generateScheduledPostsMutation.mutate({ agentId, count: 5 })}
             disabled={generateScheduledPostsMutation.isPending || linkedAccounts.length === 0}
           >
@@ -358,7 +358,7 @@ export default function AgentDetail() {
             {generateScheduledPostsMutation.isPending ? "生成中..." : "スケジュール投稿を生成"}
           </Button>
           <Button
-            className="bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            className="bg-emerald-500 text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             onClick={() => runAgentMutation.mutate({ agentId })}
             disabled={runAgentMutation.isPending || linkedAccounts.length === 0}
           >
@@ -370,39 +370,39 @@ export default function AgentDetail() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-[#87CEEB] border-2 border-[#1A1A1A] rounded-lg shadow-[4px_4px_0_#1A1A1A] p-6 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+        <div className="bg-[#87CEEB] border border-white/[0.06] rounded-lg p-6 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
           <div className="flex items-center gap-3">
-            <Brain className="h-6 w-6 text-[#1A1A1A]" />
+            <Brain className="h-6 w-6 text-white" />
             <div>
-              <p className="text-3xl font-black text-[#1A1A1A]">{agent.knowledgeCount || 0}</p>
-              <p className="text-sm font-bold text-[#1A1A1A]">蓄積された知見</p>
+              <p className="text-3xl font-black text-white">{agent.knowledgeCount || 0}</p>
+              <p className="text-sm font-bold text-white">蓄積された知見</p>
             </div>
           </div>
         </div>
-        <div className="bg-[#FFDAB9] border-2 border-[#1A1A1A] rounded-lg shadow-[4px_4px_0_#1A1A1A] p-6 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+        <div className="bg-[#FFDAB9] border border-white/[0.06] rounded-lg p-6 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
           <div className="flex items-center gap-3">
-            <Shield className="h-6 w-6 text-[#1A1A1A]" />
+            <Shield className="h-6 w-6 text-white" />
             <div>
-              <p className="text-3xl font-black text-[#1A1A1A]">{agent.rulesCount || 0}</p>
-              <p className="text-sm font-bold text-[#1A1A1A]">設定されたルール</p>
+              <p className="text-3xl font-black text-white">{agent.rulesCount || 0}</p>
+              <p className="text-sm font-bold text-white">設定されたルール</p>
             </div>
           </div>
         </div>
-        <div className="bg-[#A8E6CF] border-2 border-[#1A1A1A] rounded-lg shadow-[4px_4px_0_#1A1A1A] p-6 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+        <div className="bg-[#A8E6CF] border border-white/[0.06] rounded-lg p-6 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
           <div className="flex items-center gap-3">
-            <Link2 className="h-6 w-6 text-[#1A1A1A]" />
+            <Link2 className="h-6 w-6 text-white" />
             <div>
-              <p className="text-3xl font-black text-[#1A1A1A]">{linkedAccounts.length}</p>
-              <p className="text-sm font-bold text-[#1A1A1A]">リンクされたアカウント</p>
+              <p className="text-3xl font-black text-white">{linkedAccounts.length}</p>
+              <p className="text-sm font-bold text-white">リンクされたアカウント</p>
             </div>
           </div>
         </div>
-        <div className="bg-[#DDA0DD] border-2 border-[#1A1A1A] rounded-lg shadow-[4px_4px_0_#1A1A1A] p-6 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+        <div className="bg-[#3B82F6] border border-white/[0.06] rounded-lg p-6 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
           <div className="flex items-center gap-3">
-            <History className="h-6 w-6 text-[#1A1A1A]" />
+            <History className="h-6 w-6 text-white" />
             <div>
-              <p className="text-3xl font-black text-[#1A1A1A]">{executionLogs.length}</p>
-              <p className="text-sm font-bold text-[#1A1A1A]">実行履歴</p>
+              <p className="text-3xl font-black text-white">{executionLogs.length}</p>
+              <p className="text-sm font-bold text-white">実行履歴</p>
             </div>
           </div>
         </div>
@@ -410,28 +410,28 @@ export default function AgentDetail() {
 
       {/* Tabs */}
       <Tabs defaultValue="knowledge" className="space-y-4">
-        <TabsList className="bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg shadow-[4px_4px_0_#1A1A1A] p-1 gap-1">
-          <TabsTrigger value="knowledge" className="font-bold text-[#1A1A1A] rounded-lg data-[state=active]:bg-[#FFD700] data-[state=active]:border-2 data-[state=active]:border-[#1A1A1A] data-[state=active]:shadow-[2px_2px_0_#1A1A1A]">
+        <TabsList className="bg-neutral-950 border border-white/[0.06] rounded-lg p-1 gap-1">
+          <TabsTrigger value="knowledge" className="font-bold text-white rounded-lg data-[state=active]:bg-emerald-500 data-[state=active]:border-2 data-[state=active]:border-white/[0.06] data-[state=active]:">
             <Brain className="mr-2 h-4 w-4" />
             知見
           </TabsTrigger>
-          <TabsTrigger value="rules" className="font-bold text-[#1A1A1A] rounded-lg data-[state=active]:bg-[#FFDAB9] data-[state=active]:border-2 data-[state=active]:border-[#1A1A1A] data-[state=active]:shadow-[2px_2px_0_#1A1A1A]">
+          <TabsTrigger value="rules" className="font-bold text-white rounded-lg data-[state=active]:bg-[#FFDAB9] data-[state=active]:border-2 data-[state=active]:border-white/[0.06] data-[state=active]:">
             <Shield className="mr-2 h-4 w-4" />
             ルール
           </TabsTrigger>
-          <TabsTrigger value="accounts" className="font-bold text-[#1A1A1A] rounded-lg data-[state=active]:bg-[#A8E6CF] data-[state=active]:border-2 data-[state=active]:border-[#1A1A1A] data-[state=active]:shadow-[2px_2px_0_#1A1A1A]">
+          <TabsTrigger value="accounts" className="font-bold text-white rounded-lg data-[state=active]:bg-[#A8E6CF] data-[state=active]:border-2 data-[state=active]:border-white/[0.06] data-[state=active]:">
             <Link2 className="mr-2 h-4 w-4" />
             アカウント
           </TabsTrigger>
-          <TabsTrigger value="logs" className="font-bold text-[#1A1A1A] rounded-lg data-[state=active]:bg-[#DDA0DD] data-[state=active]:border-2 data-[state=active]:border-[#1A1A1A] data-[state=active]:shadow-[2px_2px_0_#1A1A1A]">
+          <TabsTrigger value="logs" className="font-bold text-white rounded-lg data-[state=active]:bg-[#3B82F6] data-[state=active]:border-2 data-[state=active]:border-white/[0.06] data-[state=active]:">
             <History className="mr-2 h-4 w-4" />
             実行履歴
           </TabsTrigger>
-          <TabsTrigger value="engagement" className="font-bold text-[#1A1A1A] rounded-lg data-[state=active]:bg-[#87CEEB] data-[state=active]:border-2 data-[state=active]:border-[#1A1A1A] data-[state=active]:shadow-[2px_2px_0_#1A1A1A]">
+          <TabsTrigger value="engagement" className="font-bold text-white rounded-lg data-[state=active]:bg-[#87CEEB] data-[state=active]:border-2 data-[state=active]:border-white/[0.06] data-[state=active]:">
             <BarChart3 className="mr-2 h-4 w-4" />
             エンゲージメント
           </TabsTrigger>
-          <TabsTrigger value="optimization" className="font-bold text-[#1A1A1A] rounded-lg data-[state=active]:bg-[#BFFF00] data-[state=active]:border-2 data-[state=active]:border-[#1A1A1A] data-[state=active]:shadow-[2px_2px_0_#1A1A1A]">
+          <TabsTrigger value="optimization" className="font-bold text-white rounded-lg data-[state=active]:bg-[#BFFF00] data-[state=active]:border-2 data-[state=active]:border-white/[0.06] data-[state=active]:">
             <Zap className="mr-2 h-4 w-4" />
             AI最適化
           </TabsTrigger>
@@ -439,18 +439,18 @@ export default function AgentDetail() {
 
         {/* Knowledge Tab */}
         <TabsContent value="knowledge">
-          <div className="bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg shadow-[4px_4px_0_#1A1A1A]">
-            <div className="p-6 border-b-2 border-[#1A1A1A]">
+          <div className="bg-neutral-950 border border-white/[0.06] rounded-lg">
+            <div className="p-6 border-b-2 border-white/[0.06]">
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="text-xl font-black text-[#1A1A1A]">蓄積された知見</h3>
+                  <h3 className="text-xl font-black text-white">蓄積された知見</h3>
                   <p className="text-[#6B6B6B] font-bold text-sm mt-1">
                     エージェントが学習した成功パターン、失敗パターン、コンテンツテンプレートなど
                   </p>
                 </div>
                 <div className="flex gap-2">
                   <Button
-                    className="bg-[#4ECDC4] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                    className="bg-[#4ECDC4] text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                     onClick={() => consolidateMutation.mutate({ agentId })}
                     disabled={consolidateMutation.isPending}
                   >
@@ -458,7 +458,7 @@ export default function AgentDetail() {
                     知見を統合
                   </Button>
                   <Button
-                    className="bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                    className="bg-emerald-500 text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                     onClick={() => setIsAddKnowledgeOpen(true)}
                   >
                     <Plus className="mr-2 h-4 w-4" />
@@ -469,7 +469,7 @@ export default function AgentDetail() {
             </div>
             <div className="p-6">
               {knowledge.length === 0 ? (
-                <div className="text-center py-8 text-[#6B6B6B] font-bold border-2 border-dashed border-[#1A1A1A] rounded-lg bg-[#FFF8DC]">
+                <div className="text-center py-8 text-[#6B6B6B] font-bold border-2 border-dashed border-white/[0.06] rounded-lg bg-neutral-900">
                   まだ知見がありません。エージェントを実行すると自動的に学習します。
                 </div>
               ) : (
@@ -478,15 +478,15 @@ export default function AgentDetail() {
                     const typeInfo = getKnowledgeTypeInfo(k.knowledgeType);
                     const TypeIcon = typeInfo.icon;
                     return (
-                      <div key={k.id} className="border-2 border-[#1A1A1A] rounded-lg p-4 bg-[#FFFDF7] shadow-[2px_2px_0_#1A1A1A] hover:bg-[#FFF8DC] transition-all">
+                      <div key={k.id} className="border border-white/[0.06] rounded-lg p-4 bg-neutral-950 hover:bg-neutral-900 transition-all">
                         <div className="flex items-start justify-between">
                           <div className="flex items-start gap-3">
                             <TypeIcon className={`h-5 w-5 mt-1 ${typeInfo.color}`} />
                             <div>
                               <div className="flex items-center gap-2 flex-wrap">
-                                <h4 className="font-bold text-[#1A1A1A]">{k.title}</h4>
-                                <span className="inline-flex items-center px-2 py-0.5 border-2 border-[#1A1A1A] rounded-lg text-xs font-bold bg-[#87CEEB] shadow-[2px_2px_0_#1A1A1A] text-[#1A1A1A]">{typeInfo.label}</span>
-                                <span className="inline-flex items-center px-2 py-0.5 border-2 border-[#1A1A1A] rounded-lg text-xs font-bold bg-[#DDA0DD] shadow-[2px_2px_0_#1A1A1A] text-[#1A1A1A]">信頼度: {k.confidence}%</span>
+                                <h4 className="font-bold text-white">{k.title}</h4>
+                                <span className="inline-flex items-center px-2 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#87CEEB] text-white">{typeInfo.label}</span>
+                                <span className="inline-flex items-center px-2 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#3B82F6] text-white">信頼度: {k.confidence}%</span>
                               </div>
                               <p className="text-sm text-[#6B6B6B] font-bold mt-1">{k.content}</p>
                               {k.usageCount > 0 && (
@@ -497,7 +497,7 @@ export default function AgentDetail() {
                             </div>
                           </div>
                           <Button
-                            className="bg-[#FF6B6B] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-8 w-8 p-0"
+                            className="bg-[#FF6B6B] text-white border border-white/[0.06] rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-8 w-8 p-0"
                             onClick={() => deleteKnowledgeMutation.mutate({ id: k.id })}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -514,17 +514,17 @@ export default function AgentDetail() {
 
         {/* Rules Tab */}
         <TabsContent value="rules">
-          <div className="bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg shadow-[4px_4px_0_#1A1A1A]">
-            <div className="p-6 border-b-2 border-[#1A1A1A]">
+          <div className="bg-neutral-950 border border-white/[0.06] rounded-lg">
+            <div className="p-6 border-b-2 border-white/[0.06]">
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="text-xl font-black text-[#1A1A1A]">ルール設定</h3>
+                  <h3 className="text-xl font-black text-white">ルール設定</h3>
                   <p className="text-[#6B6B6B] font-bold text-sm mt-1">
                     エージェントの行動を制御するルールと制約
                   </p>
                 </div>
                 <Button
-                  className="bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                  className="bg-emerald-500 text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                   onClick={() => setIsAddRuleOpen(true)}
                 >
                   <Plus className="mr-2 h-4 w-4" />
@@ -534,24 +534,24 @@ export default function AgentDetail() {
             </div>
             <div className="p-6">
               {rules.length === 0 ? (
-                <div className="text-center py-8 text-[#6B6B6B] font-bold border-2 border-dashed border-[#1A1A1A] rounded-lg bg-[#FFF8DC]">
+                <div className="text-center py-8 text-[#6B6B6B] font-bold border-2 border-dashed border-white/[0.06] rounded-lg bg-neutral-900">
                   まだルールが設定されていません。
                 </div>
               ) : (
                 <div className="space-y-4">
                   {rules.map((r: any) => (
-                    <div key={r.id} className="border-2 border-[#1A1A1A] rounded-lg p-4 bg-[#FFFDF7] shadow-[2px_2px_0_#1A1A1A] hover:bg-[#FFF8DC] transition-all">
+                    <div key={r.id} className="border border-white/[0.06] rounded-lg p-4 bg-neutral-950 hover:bg-neutral-900 transition-all">
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="font-bold text-[#1A1A1A]">{r.ruleName}</h4>
-                            <span className="inline-flex items-center px-2 py-0.5 border-2 border-[#1A1A1A] rounded-lg text-xs font-bold bg-[#FFDAB9] shadow-[2px_2px_0_#1A1A1A] text-[#1A1A1A]">{getRuleTypeLabel(r.ruleType)}</span>
-                            <span className="inline-flex items-center px-2 py-0.5 border-2 border-[#1A1A1A] rounded-lg text-xs font-bold bg-[#4ECDC4] shadow-[2px_2px_0_#1A1A1A] text-[#1A1A1A]">優先度: {r.priority}</span>
+                            <h4 className="font-bold text-white">{r.ruleName}</h4>
+                            <span className="inline-flex items-center px-2 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#FFDAB9] text-white">{getRuleTypeLabel(r.ruleType)}</span>
+                            <span className="inline-flex items-center px-2 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#4ECDC4] text-white">優先度: {r.priority}</span>
                           </div>
                           <p className="text-sm text-[#6B6B6B] font-bold mt-1">{r.ruleValue}</p>
                         </div>
                         <Button
-                          className="bg-[#FF6B6B] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-8 w-8 p-0"
+                          className="bg-[#FF6B6B] text-white border border-white/[0.06] rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-8 w-8 p-0"
                           onClick={() => deleteRuleMutation.mutate({ id: r.id })}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -567,17 +567,17 @@ export default function AgentDetail() {
 
         {/* Accounts Tab */}
         <TabsContent value="accounts">
-          <div className="bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg shadow-[4px_4px_0_#1A1A1A]">
-            <div className="p-6 border-b-2 border-[#1A1A1A]">
+          <div className="bg-neutral-950 border border-white/[0.06] rounded-lg">
+            <div className="p-6 border-b-2 border-white/[0.06]">
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="text-xl font-black text-[#1A1A1A]">リンクされたアカウント</h3>
+                  <h3 className="text-xl font-black text-white">リンクされたアカウント</h3>
                   <p className="text-[#6B6B6B] font-bold text-sm mt-1">
                     このエージェントが投稿に使用するSNSアカウント
                   </p>
                 </div>
                 <Button
-                  className="bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                  className="bg-emerald-500 text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                   onClick={() => setIsLinkAccountOpen(true)}
                   disabled={availableAccounts.length === 0}
                 >
@@ -588,19 +588,19 @@ export default function AgentDetail() {
             </div>
             <div className="p-6">
               {linkedAccounts.length === 0 ? (
-                <div className="text-center py-8 border-2 border-dashed border-[#1A1A1A] rounded-lg bg-[#FFDAB9]">
-                  <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-[#1A1A1A]" />
-                  <p className="font-bold text-[#1A1A1A]">アカウントがリンクされていません。</p>
+                <div className="text-center py-8 border-2 border-dashed border-white/[0.06] rounded-lg bg-[#FFDAB9]">
+                  <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-white" />
+                  <p className="font-bold text-white">アカウントがリンクされていません。</p>
                   <p className="text-sm font-bold text-[#6B6B6B]">エージェントを実行するにはアカウントをリンクしてください。</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {linkedAccounts.map((la: any) => (
-                    <div key={la.id} className="border-2 border-[#1A1A1A] rounded-lg p-4 bg-[#FFFDF7] shadow-[2px_2px_0_#1A1A1A] hover:bg-[#FFF8DC] transition-all">
+                    <div key={la.id} className="border border-white/[0.06] rounded-lg p-4 bg-neutral-950 hover:bg-neutral-900 transition-all">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <span className="inline-flex items-center px-2 py-0.5 border-2 border-[#1A1A1A] rounded-lg text-xs font-bold bg-[#87CEEB] shadow-[2px_2px_0_#1A1A1A] text-[#1A1A1A]">{la.account?.platform}</span>
-                          <span className="font-bold text-[#1A1A1A]">@{la.account?.username}</span>
+                          <span className="inline-flex items-center px-2 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#87CEEB] text-white">{la.account?.platform}</span>
+                          <span className="font-bold text-white">@{la.account?.username}</span>
                           {la.account?.deviceId && (
                             <span className="text-sm font-bold text-[#6B6B6B]">
                               デバイス: {la.account.deviceId}
@@ -608,7 +608,7 @@ export default function AgentDetail() {
                           )}
                         </div>
                         <Button
-                          className="bg-[#FF6B6B] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-8 w-8 p-0"
+                          className="bg-[#FF6B6B] text-white border border-white/[0.06] rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-8 w-8 p-0"
                           onClick={() => unlinkAccountMutation.mutate({
                             agentId,
                             accountId: la.accountId
@@ -627,39 +627,39 @@ export default function AgentDetail() {
 
         {/* Logs Tab */}
         <TabsContent value="logs">
-          <div className="bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg shadow-[4px_4px_0_#1A1A1A]">
-            <div className="p-6 border-b-2 border-[#1A1A1A]">
-              <h3 className="text-xl font-black text-[#1A1A1A]">実行履歴</h3>
+          <div className="bg-neutral-950 border border-white/[0.06] rounded-lg">
+            <div className="p-6 border-b-2 border-white/[0.06]">
+              <h3 className="text-xl font-black text-white">実行履歴</h3>
               <p className="text-[#6B6B6B] font-bold text-sm mt-1">
                 エージェントの実行ログと結果
               </p>
             </div>
             <div className="p-6">
               {executionLogs.length === 0 ? (
-                <div className="text-center py-8 text-[#6B6B6B] font-bold border-2 border-dashed border-[#1A1A1A] rounded-lg bg-[#FFF8DC]">
+                <div className="text-center py-8 text-[#6B6B6B] font-bold border-2 border-dashed border-white/[0.06] rounded-lg bg-neutral-900">
                   まだ実行履歴がありません。
                 </div>
               ) : (
                 <div className="space-y-4">
                   {executionLogs.map((log: any) => (
-                    <div key={log.id} className="border-2 border-[#1A1A1A] rounded-lg p-4 bg-[#FFFDF7] shadow-[2px_2px_0_#1A1A1A] hover:bg-[#FFF8DC] transition-all">
+                    <div key={log.id} className="border border-white/[0.06] rounded-lg p-4 bg-neutral-950 hover:bg-neutral-900 transition-all">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           {log.status === "success" ? (
-                            <div className="bg-[#A8E6CF] border-2 border-[#1A1A1A] rounded-lg p-1">
-                              <CheckCircle className="h-5 w-5 text-[#1A1A1A]" />
+                            <div className="bg-[#A8E6CF] border border-white/[0.06] rounded-lg p-1">
+                              <CheckCircle className="h-5 w-5 text-white" />
                             </div>
                           ) : log.status === "failed" ? (
-                            <div className="bg-[#FF6B6B] border-2 border-[#1A1A1A] rounded-lg p-1">
-                              <XCircle className="h-5 w-5 text-[#1A1A1A]" />
+                            <div className="bg-[#FF6B6B] border border-white/[0.06] rounded-lg p-1">
+                              <XCircle className="h-5 w-5 text-white" />
                             </div>
                           ) : (
-                            <div className="bg-[#FFD700] border-2 border-[#1A1A1A] rounded-lg p-1">
-                              <Clock className="h-5 w-5 text-[#1A1A1A]" />
+                            <div className="bg-emerald-500 border border-white/[0.06] rounded-lg p-1">
+                              <Clock className="h-5 w-5 text-white" />
                             </div>
                           )}
                           <div>
-                            <p className="font-bold text-[#1A1A1A]">
+                            <p className="font-bold text-white">
                               {log.executionType === "content_generation" && "コンテンツ生成"}
                               {log.executionType === "post_execution" && "投稿実行"}
                               {log.executionType === "learning" && "学習"}
@@ -674,7 +674,7 @@ export default function AgentDetail() {
                         </div>
                         <div className="text-right">
                           {log.postId && (
-                            <span className="inline-flex items-center px-2 py-0.5 border-2 border-[#1A1A1A] rounded-lg text-xs font-bold bg-[#87CEEB] shadow-[2px_2px_0_#1A1A1A] text-[#1A1A1A]">投稿ID: {log.postId}</span>
+                            <span className="inline-flex items-center px-2 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#87CEEB] text-white">投稿ID: {log.postId}</span>
                           )}
                           {log.errorMessage && (
                             <p className="text-sm font-bold text-[#FF6B6B] mt-1">{log.errorMessage}</p>
@@ -691,18 +691,18 @@ export default function AgentDetail() {
 
         {/* Engagement Tab */}
         <TabsContent value="engagement">
-          <div className="bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg shadow-[4px_4px_0_#1A1A1A]">
-            <div className="p-6 border-b-2 border-[#1A1A1A]">
+          <div className="bg-neutral-950 border border-white/[0.06] rounded-lg">
+            <div className="p-6 border-b-2 border-white/[0.06]">
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="text-xl font-black text-[#1A1A1A]">エンゲージメント収集</h3>
+                  <h3 className="text-xl font-black text-white">エンゲージメント収集</h3>
                   <p className="text-[#6B6B6B] font-bold text-sm mt-1">
                     投稿のエンゲージメント（いいね数・コメント数など）を自動収集し、知見の精度を向上させます
                   </p>
                 </div>
                 <div className="flex gap-2">
                   <Button
-                    className="bg-[#4ECDC4] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                    className="bg-[#4ECDC4] text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                     onClick={() => collectAllMutation.mutate()}
                     disabled={collectAllMutation.isPending}
                   >
@@ -710,7 +710,7 @@ export default function AgentDetail() {
                     今すぐ収集
                   </Button>
                   <Button
-                    className="bg-[#DDA0DD] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                    className="bg-[#3B82F6] text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                     onClick={() => updateConfidenceMutation.mutate({ agentId })}
                     disabled={updateConfidenceMutation.isPending}
                   >
@@ -723,21 +723,21 @@ export default function AgentDetail() {
             <div className="p-6">
               <div className="space-y-6">
                 {/* Auto Collection Status */}
-                <div className="border-2 border-[#1A1A1A] rounded-lg p-4 bg-[#FFFDF7] shadow-[2px_2px_0_#1A1A1A]">
+                <div className="border border-white/[0.06] rounded-lg p-4 bg-neutral-950">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-bold text-[#1A1A1A]">自動収集スケジューラー</h4>
+                      <h4 className="font-bold text-white">自動収集スケジューラー</h4>
                       <p className="text-sm font-bold text-[#6B6B6B]">
                         投稿後1時間、6時間、24時間、48時間で自動的にエンゲージメントを収集します
                       </p>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className={`inline-flex items-center px-3 py-1 border-2 border-[#1A1A1A] rounded-lg text-sm font-bold shadow-[2px_2px_0_#1A1A1A] ${collectorStatus?.isRunning ? 'bg-[#A8E6CF]' : 'bg-[#FFF8DC]'} text-[#1A1A1A]`}>
+                      <span className={`inline-flex items-center px-3 py-1 border border-white/[0.06] rounded-lg text-sm font-bold ${collectorStatus?.isRunning ? 'bg-[#A8E6CF]' : 'bg-neutral-900'} text-white`}>
                         {collectorStatus?.isRunning ? "実行中" : "停止中"}
                       </span>
                       {collectorStatus?.isRunning ? (
                         <Button
-                          className="bg-[#FF6B6B] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                          className="bg-[#FF6B6B] text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                           onClick={() => stopCollectorMutation.mutate()}
                           disabled={stopCollectorMutation.isPending}
                         >
@@ -745,7 +745,7 @@ export default function AgentDetail() {
                         </Button>
                       ) : (
                         <Button
-                          className="bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                          className="bg-emerald-500 text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                           onClick={() => startCollectorMutation.mutate()}
                           disabled={startCollectorMutation.isPending}
                         >
@@ -758,32 +758,32 @@ export default function AgentDetail() {
 
                 {/* Collection Schedule Info */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="border-2 border-[#1A1A1A] rounded-lg p-4 text-center bg-[#87CEEB] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-                    <Clock className="h-8 w-8 mx-auto mb-2 text-[#1A1A1A]" />
-                    <p className="font-black text-[#1A1A1A]">1時間後</p>
-                    <p className="text-sm font-bold text-[#1A1A1A]">初期反応を取得</p>
+                  <div className="border border-white/[0.06] rounded-lg p-4 text-center bg-[#87CEEB] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                    <Clock className="h-8 w-8 mx-auto mb-2 text-white" />
+                    <p className="font-black text-white">1時間後</p>
+                    <p className="text-sm font-bold text-white">初期反応を取得</p>
                   </div>
-                  <div className="border-2 border-[#1A1A1A] rounded-lg p-4 text-center bg-[#A8E6CF] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-                    <Clock className="h-8 w-8 mx-auto mb-2 text-[#1A1A1A]" />
-                    <p className="font-black text-[#1A1A1A]">6時間後</p>
-                    <p className="text-sm font-bold text-[#1A1A1A]">中間反応を取得</p>
+                  <div className="border border-white/[0.06] rounded-lg p-4 text-center bg-[#A8E6CF] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                    <Clock className="h-8 w-8 mx-auto mb-2 text-white" />
+                    <p className="font-black text-white">6時間後</p>
+                    <p className="text-sm font-bold text-white">中間反応を取得</p>
                   </div>
-                  <div className="border-2 border-[#1A1A1A] rounded-lg p-4 text-center bg-[#FFDAB9] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-                    <Clock className="h-8 w-8 mx-auto mb-2 text-[#1A1A1A]" />
-                    <p className="font-black text-[#1A1A1A]">24時間後</p>
-                    <p className="text-sm font-bold text-[#1A1A1A]">知見生成開始</p>
+                  <div className="border border-white/[0.06] rounded-lg p-4 text-center bg-[#FFDAB9] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                    <Clock className="h-8 w-8 mx-auto mb-2 text-white" />
+                    <p className="font-black text-white">24時間後</p>
+                    <p className="text-sm font-bold text-white">知見生成開始</p>
                   </div>
-                  <div className="border-2 border-[#1A1A1A] rounded-lg p-4 text-center bg-[#DDA0DD] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-                    <Clock className="h-8 w-8 mx-auto mb-2 text-[#1A1A1A]" />
-                    <p className="font-black text-[#1A1A1A]">48時間後</p>
-                    <p className="text-sm font-bold text-[#1A1A1A]">最終分析</p>
+                  <div className="border border-white/[0.06] rounded-lg p-4 text-center bg-[#3B82F6] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                    <Clock className="h-8 w-8 mx-auto mb-2 text-white" />
+                    <p className="font-black text-white">48時間後</p>
+                    <p className="text-sm font-bold text-white">最終分析</p>
                   </div>
                 </div>
 
                 {/* How it works */}
-                <div className="bg-[#BFFF00] border-2 border-[#1A1A1A] rounded-lg p-4 shadow-[4px_4px_0_#1A1A1A]">
-                  <h4 className="font-black text-[#1A1A1A] mb-2">エンゲージメント収集の仕組み</h4>
-                  <ul className="text-sm font-bold text-[#1A1A1A] space-y-2">
+                <div className="bg-[#BFFF00] border border-white/[0.06] rounded-lg p-4">
+                  <h4 className="font-black text-white mb-2">エンゲージメント収集の仕組み</h4>
+                  <ul className="text-sm font-bold text-white space-y-2">
                     <li>・ 投稿後、設定された時間に自動でエンゲージメントを取得します</li>
                     <li>・ 取得したデータは投稿のパフォーマンス分析に使用されます</li>
                     <li>・ 高パフォーマンスの投稿から成功パターンを抽出し、知見として蓄積します</li>
@@ -804,26 +804,26 @@ export default function AgentDetail() {
 
       {/* Add Knowledge Dialog */}
       <Dialog open={isAddKnowledgeOpen} onOpenChange={setIsAddKnowledgeOpen}>
-        <DialogContent className="bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg shadow-[8px_8px_0_#1A1A1A]">
+        <DialogContent className="bg-neutral-950 border border-white/[0.06] rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black text-[#1A1A1A]">知見を追加</DialogTitle>
+            <DialogTitle className="text-xl font-black text-white">知見を追加</DialogTitle>
             <DialogDescription className="text-[#6B6B6B] font-bold">
               エージェントに新しい知見を教えます
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label className="font-bold text-[#1A1A1A]">知見タイプ</Label>
+              <Label className="font-bold text-white">知見タイプ</Label>
               <Select
                 value={knowledgeForm.knowledgeType}
                 onValueChange={(v: any) => setKnowledgeForm({ ...knowledgeForm, knowledgeType: v })}
               >
-                <SelectTrigger className="border-2 border-[#1A1A1A] rounded-lg font-bold bg-[#FFFDF7] shadow-[2px_2px_0_#1A1A1A] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all">
+                <SelectTrigger className="border border-white/[0.06] rounded-lg font-bold bg-neutral-950 focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="border-2 border-[#1A1A1A] rounded-lg bg-[#FFFDF7] shadow-[4px_4px_0_#1A1A1A]">
+                <SelectContent className="border border-white/[0.06] rounded-lg bg-neutral-950">
                   {knowledgeTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value} className="font-bold hover:bg-[#FFF8DC]">
+                    <SelectItem key={type.value} value={type.value} className="font-bold hover:bg-neutral-900">
                       {type.label}
                     </SelectItem>
                   ))}
@@ -831,18 +831,18 @@ export default function AgentDetail() {
               </Select>
             </div>
             <div>
-              <Label className="font-bold text-[#1A1A1A]">タイトル</Label>
+              <Label className="font-bold text-white">タイトル</Label>
               <Input
-                className="border-2 border-[#1A1A1A] rounded-lg font-bold bg-[#FFFDF7] shadow-[2px_2px_0_#1A1A1A] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all"
+                className="border border-white/[0.06] rounded-lg font-bold bg-neutral-950 focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all"
                 value={knowledgeForm.title}
                 onChange={(e) => setKnowledgeForm({ ...knowledgeForm, title: e.target.value })}
                 placeholder="例: 朝の投稿は反応が良い"
               />
             </div>
             <div>
-              <Label className="font-bold text-[#1A1A1A]">内容</Label>
+              <Label className="font-bold text-white">内容</Label>
               <Textarea
-                className="border-2 border-[#1A1A1A] rounded-lg font-bold bg-[#FFFDF7] shadow-[2px_2px_0_#1A1A1A] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all"
+                className="border border-white/[0.06] rounded-lg font-bold bg-neutral-950 focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all"
                 value={knowledgeForm.content}
                 onChange={(e) => setKnowledgeForm({ ...knowledgeForm, content: e.target.value })}
                 placeholder="詳細な説明を入力..."
@@ -850,9 +850,9 @@ export default function AgentDetail() {
               />
             </div>
             <div>
-              <Label className="font-bold text-[#1A1A1A]">信頼度 ({knowledgeForm.confidence}%)</Label>
+              <Label className="font-bold text-white">信頼度 ({knowledgeForm.confidence}%)</Label>
               <Input
-                className="border-2 border-[#1A1A1A] rounded-lg accent-[#FFD700]"
+                className="border border-white/[0.06] rounded-lg accent-[#FFD700]"
                 type="range"
                 min="0"
                 max="100"
@@ -863,13 +863,13 @@ export default function AgentDetail() {
           </div>
           <DialogFooter className="gap-2">
             <Button
-              className="bg-[#FFFDF7] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#FFF8DC] transition-all"
+              className="bg-neutral-950 text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-neutral-900 transition-all"
               onClick={() => setIsAddKnowledgeOpen(false)}
             >
               キャンセル
             </Button>
             <Button
-              className="bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="bg-emerald-500 text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
               onClick={() => addKnowledgeMutation.mutate({ agentId, ...knowledgeForm })}
               disabled={!knowledgeForm.title || !knowledgeForm.content}
             >
@@ -881,26 +881,26 @@ export default function AgentDetail() {
 
       {/* Add Rule Dialog */}
       <Dialog open={isAddRuleOpen} onOpenChange={setIsAddRuleOpen}>
-        <DialogContent className="bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg shadow-[8px_8px_0_#1A1A1A]">
+        <DialogContent className="bg-neutral-950 border border-white/[0.06] rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black text-[#1A1A1A]">ルールを追加</DialogTitle>
+            <DialogTitle className="text-xl font-black text-white">ルールを追加</DialogTitle>
             <DialogDescription className="text-[#6B6B6B] font-bold">
               エージェントの行動を制御するルールを設定します
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label className="font-bold text-[#1A1A1A]">ルールタイプ</Label>
+              <Label className="font-bold text-white">ルールタイプ</Label>
               <Select
                 value={ruleForm.ruleType}
                 onValueChange={(v: any) => setRuleForm({ ...ruleForm, ruleType: v })}
               >
-                <SelectTrigger className="border-2 border-[#1A1A1A] rounded-lg font-bold bg-[#FFFDF7] shadow-[2px_2px_0_#1A1A1A] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all">
+                <SelectTrigger className="border border-white/[0.06] rounded-lg font-bold bg-neutral-950 focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="border-2 border-[#1A1A1A] rounded-lg bg-[#FFFDF7] shadow-[4px_4px_0_#1A1A1A]">
+                <SelectContent className="border border-white/[0.06] rounded-lg bg-neutral-950">
                   {ruleTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value} className="font-bold hover:bg-[#FFF8DC]">
+                    <SelectItem key={type.value} value={type.value} className="font-bold hover:bg-neutral-900">
                       {type.label}
                     </SelectItem>
                   ))}
@@ -908,18 +908,18 @@ export default function AgentDetail() {
               </Select>
             </div>
             <div>
-              <Label className="font-bold text-[#1A1A1A]">ルール名</Label>
+              <Label className="font-bold text-white">ルール名</Label>
               <Input
-                className="border-2 border-[#1A1A1A] rounded-lg font-bold bg-[#FFFDF7] shadow-[2px_2px_0_#1A1A1A] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all"
+                className="border border-white/[0.06] rounded-lg font-bold bg-neutral-950 focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all"
                 value={ruleForm.ruleName}
                 onChange={(e) => setRuleForm({ ...ruleForm, ruleName: e.target.value })}
                 placeholder="例: 競合他社名の使用禁止"
               />
             </div>
             <div>
-              <Label className="font-bold text-[#1A1A1A]">ルール値</Label>
+              <Label className="font-bold text-white">ルール値</Label>
               <Textarea
-                className="border-2 border-[#1A1A1A] rounded-lg font-bold bg-[#FFFDF7] shadow-[2px_2px_0_#1A1A1A] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all"
+                className="border border-white/[0.06] rounded-lg font-bold bg-neutral-950 focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all"
                 value={ruleForm.ruleValue}
                 onChange={(e) => setRuleForm({ ...ruleForm, ruleValue: e.target.value })}
                 placeholder="例: 「A社」「B社」という単語を使用しない"
@@ -927,9 +927,9 @@ export default function AgentDetail() {
               />
             </div>
             <div>
-              <Label className="font-bold text-[#1A1A1A]">優先度 ({ruleForm.priority})</Label>
+              <Label className="font-bold text-white">優先度 ({ruleForm.priority})</Label>
               <Input
-                className="border-2 border-[#1A1A1A] rounded-lg accent-[#FFD700]"
+                className="border border-white/[0.06] rounded-lg accent-[#FFD700]"
                 type="range"
                 min="0"
                 max="100"
@@ -940,13 +940,13 @@ export default function AgentDetail() {
           </div>
           <DialogFooter className="gap-2">
             <Button
-              className="bg-[#FFFDF7] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#FFF8DC] transition-all"
+              className="bg-neutral-950 text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-neutral-900 transition-all"
               onClick={() => setIsAddRuleOpen(false)}
             >
               キャンセル
             </Button>
             <Button
-              className="bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="bg-emerald-500 text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
               onClick={() => addRuleMutation.mutate({ agentId, ...ruleForm })}
               disabled={!ruleForm.ruleName || !ruleForm.ruleValue}
             >
@@ -958,35 +958,35 @@ export default function AgentDetail() {
 
       {/* Link Account Dialog */}
       <Dialog open={isLinkAccountOpen} onOpenChange={setIsLinkAccountOpen}>
-        <DialogContent className="bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg shadow-[8px_8px_0_#1A1A1A]">
+        <DialogContent className="bg-neutral-950 border border-white/[0.06] rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black text-[#1A1A1A]">アカウントをリンク</DialogTitle>
+            <DialogTitle className="text-xl font-black text-white">アカウントをリンク</DialogTitle>
             <DialogDescription className="text-[#6B6B6B] font-bold">
               エージェントが投稿に使用するアカウントを選択します。Playwrightブラウザ自動化で投稿が実行されます。
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label className="font-bold text-[#1A1A1A]">アカウント</Label>
+              <Label className="font-bold text-white">アカウント</Label>
               <Select
                 value={selectedAccountId?.toString() || ""}
                 onValueChange={(v) => setSelectedAccountId(parseInt(v))}
               >
-                <SelectTrigger className="border-2 border-[#1A1A1A] rounded-lg font-bold bg-[#FFFDF7] shadow-[2px_2px_0_#1A1A1A] focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all">
+                <SelectTrigger className="border border-white/[0.06] rounded-lg font-bold bg-neutral-950 focus:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] transition-all">
                   <SelectValue placeholder="アカウントを選択..." />
                 </SelectTrigger>
-                <SelectContent className="border-2 border-[#1A1A1A] rounded-lg bg-[#FFFDF7] shadow-[4px_4px_0_#1A1A1A]">
+                <SelectContent className="border border-white/[0.06] rounded-lg bg-neutral-950">
                   {availableAccounts.map((account: any) => (
-                    <SelectItem key={account.id} value={account.id.toString()} className="font-bold hover:bg-[#FFF8DC]">
+                    <SelectItem key={account.id} value={account.id.toString()} className="font-bold hover:bg-neutral-900">
                       <div className="flex items-center gap-2">
-                        <span className="font-black text-[#1A1A1A]">{account.platform}</span>
+                        <span className="font-black text-white">{account.platform}</span>
                         <span className="font-bold">@{account.username}</span>
                         {account.deviceId ? (
-                          <span className="inline-flex items-center px-1.5 py-0.5 border-2 border-[#1A1A1A] rounded-lg text-xs font-bold bg-[#87CEEB] shadow-[1px_1px_0_#1A1A1A] text-[#1A1A1A] ml-2">
+                          <span className="inline-flex items-center px-1.5 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#87CEEB] text-white ml-2">
                             デバイス: {account.deviceId.slice(0, 8)}...
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-1.5 py-0.5 border-2 border-[#1A1A1A] rounded-lg text-xs font-bold bg-[#FF6B6B] shadow-[1px_1px_0_#1A1A1A] text-[#1A1A1A] ml-2">
+                          <span className="inline-flex items-center px-1.5 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#FF6B6B] text-white ml-2">
                             デバイス未設定
                           </span>
                         )}
@@ -1004,13 +1004,13 @@ export default function AgentDetail() {
           </div>
           <DialogFooter className="gap-2">
             <Button
-              className="bg-[#FFFDF7] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#FFF8DC] transition-all"
+              className="bg-neutral-950 text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-neutral-900 transition-all"
               onClick={() => setIsLinkAccountOpen(false)}
             >
               キャンセル
             </Button>
             <Button
-              className="bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="bg-emerald-500 text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
               onClick={() => selectedAccountId && linkAccountMutation.mutate({ agentId, accountId: selectedAccountId })}
               disabled={!selectedAccountId}
             >

@@ -19,14 +19,14 @@ type SortOrder = "asc" | "desc";
 // Neobrutalism status tag
 function StatusTag({ status }: { status: string }) {
   const config: Record<string, { bg: string; text: string; dot: string }> = {
-    active: { bg: "bg-[#A8E6CF]", text: "text-[#1A1A1A]", dot: "bg-[#1A1A1A]" },
-    pending: { bg: "bg-[#FFD700]", text: "text-[#1A1A1A]", dot: "bg-[#1A1A1A]" },
-    failed: { bg: "bg-[#FF6B6B]", text: "text-[#1A1A1A]", dot: "bg-[#1A1A1A]" },
-    suspended: { bg: "bg-[#FF6B6B]", text: "text-[#1A1A1A]", dot: "bg-[#1A1A1A]" },
+    active: { bg: "bg-[#A8E6CF]", text: "text-white", dot: "bg-white/10" },
+    pending: { bg: "bg-emerald-500", text: "text-white", dot: "bg-white/10" },
+    failed: { bg: "bg-[#FF6B6B]", text: "text-white", dot: "bg-white/10" },
+    suspended: { bg: "bg-[#FF6B6B]", text: "text-white", dot: "bg-white/10" },
   };
   const { bg, text, dot } = config[status] || config.pending;
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[12px] font-bold border-2 border-[#1A1A1A] ${bg} ${text}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[12px] font-bold border border-white/[0.06] ${bg} ${text}`}>
       <span className={`w-[6px] h-[6px] rounded-full ${dot}`} />
       {status}
     </span>
@@ -36,9 +36,9 @@ function StatusTag({ status }: { status: string }) {
 // Neobrutalism plan tag
 function PlanTag({ plan }: { plan: string }) {
   const config: Record<string, { bg: string; text: string }> = {
-    free: { bg: "bg-[#87CEEB]", text: "text-[#1A1A1A]" },
-    premium: { bg: "bg-[#DDA0DD]", text: "text-[#1A1A1A]" },
-    premium_plus: { bg: "bg-[#FFD700]", text: "text-[#1A1A1A]" },
+    free: { bg: "bg-[#87CEEB]", text: "text-white" },
+    premium: { bg: "bg-[#3B82F6]", text: "text-white" },
+    premium_plus: { bg: "bg-emerald-500", text: "text-white" },
   };
   const labels: Record<string, string> = {
     free: "Free",
@@ -47,7 +47,7 @@ function PlanTag({ plan }: { plan: string }) {
   };
   const { bg, text } = config[plan] || config.free;
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[12px] font-bold border-2 border-[#1A1A1A] ${bg} ${text}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[12px] font-bold border border-white/[0.06] ${bg} ${text}`}>
       {labels[plan] || plan}
     </span>
   );
@@ -58,7 +58,7 @@ function PropertyPill({ label, value }: { label: string; value: string | number 
   return (
     <div className="flex items-center gap-1.5 text-[13px]">
       <span className="text-[#6B6B6B] font-bold">{label}</span>
-      <span className="text-[#1A1A1A] font-black">{value}</span>
+      <span className="text-white font-black">{value}</span>
     </div>
   );
 }
@@ -184,30 +184,30 @@ export default function Accounts() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-[#1A1A1A]" />
-          <span className="text-[14px] font-bold text-[#1A1A1A]">読み込み中...</span>
+          <Loader2 className="h-8 w-8 animate-spin text-white" />
+          <span className="text-[14px] font-bold text-white">読み込み中...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-full bg-[#FFFDF7]">
+    <div className="min-h-full bg-neutral-950">
       {/* Page Title - Neobrutalism style */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-3">
           <span className="text-[40px]">👥</span>
-          <h1 className="text-[40px] font-black text-[#1A1A1A]">アカウント</h1>
+          <h1 className="text-[40px] font-black text-white">アカウント</h1>
         </div>
-        <div className="inline-block bg-[#FFD700] border-2 border-[#1A1A1A] px-3 py-1 rounded-lg">
-          <p className="text-[14px] font-bold text-[#1A1A1A]">
+        <div className="inline-block bg-emerald-500 border border-white/[0.06] px-3 py-1 rounded-lg">
+          <p className="text-[14px] font-bold text-white">
             SNSアカウントの管理・監視
           </p>
         </div>
       </div>
 
       {/* Quick Stats - Neobrutalism callout */}
-      <div className="bg-[#FFD700] border-2 border-[#1A1A1A] rounded-lg p-5 mb-6 shadow-[4px_4px_0_#1A1A1A]">
+      <div className="bg-emerald-500 border border-white/[0.06] rounded-lg p-5 mb-6">
         <div className="flex items-center gap-6 flex-wrap">
           <PropertyPill label="アカウント総数" value={platformCounts.all} />
           <PropertyPill label="アクティブ" value={activeCount} />
@@ -217,7 +217,7 @@ export default function Accounts() {
             <button
               onClick={() => batchActivateMutation.mutate()}
               disabled={batchActivateMutation.isPending}
-              className="flex items-center gap-1.5 px-3 py-2 text-[13px] font-bold text-[#1A1A1A] bg-[#A8E6CF] border-2 border-[#1A1A1A] rounded-lg shadow-[2px_2px_0_#1A1A1A] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-2 text-[13px] font-bold text-white bg-[#A8E6CF] border border-white/[0.06] rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50"
             >
               <Power className="w-3.5 h-3.5" />
               一括アクティブ化
@@ -225,7 +225,7 @@ export default function Accounts() {
           )}
           <Link
             href="/accounts/new"
-            className="flex items-center gap-1.5 px-3 py-2 text-[13px] font-bold text-[#1A1A1A] bg-[#4ECDC4] border-2 border-[#1A1A1A] rounded-lg shadow-[2px_2px_0_#1A1A1A] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all"
+            className="flex items-center gap-1.5 px-3 py-2 text-[13px] font-bold text-white bg-[#4ECDC4] border border-white/[0.06] rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all"
           >
             <Plus className="w-3.5 h-3.5" />
             アカウント追加
@@ -245,10 +245,10 @@ export default function Accounts() {
           <button
             key={tab.key}
             onClick={() => setSelectedPlatform(tab.key)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold border-2 border-[#1A1A1A] transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold border border-white/[0.06] transition-all ${
               selectedPlatform === tab.key
-                ? "bg-[#4ECDC4] text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]"
-                : "bg-white text-[#1A1A1A] hover:translate-x-[2px] hover:translate-y-[2px]"
+                ? "bg-[#4ECDC4] text-white"
+                : "bg-white text-white hover:translate-x-[2px] hover:translate-y-[2px]"
             }`}
           >
             <span>{tab.emoji}</span>
@@ -264,11 +264,11 @@ export default function Accounts() {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-2 text-[12px] font-bold text-[#1A1A1A] bg-white border-2 border-[#1A1A1A] rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <button className="flex items-center gap-1.5 px-3 py-2 text-[12px] font-bold text-white bg-white border border-white/[0.06] rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
               <Filter className="w-3.5 h-3.5" />
               フィルター
             </button>
-            <button className="flex items-center gap-1.5 px-3 py-2 text-[12px] font-bold text-[#1A1A1A] bg-white border-2 border-[#1A1A1A] rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <button className="flex items-center gap-1.5 px-3 py-2 text-[12px] font-bold text-white bg-white border border-white/[0.06] rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
               <ArrowUpDown className="w-3.5 h-3.5" />
               ソート
             </button>
@@ -276,33 +276,33 @@ export default function Accounts() {
         </div>
 
         {/* Table View */}
-        <div className="border-2 border-[#1A1A1A] rounded-lg overflow-hidden shadow-[4px_4px_0_#1A1A1A]">
+        <div className="border border-white/[0.06] rounded-lg overflow-hidden">
           {/* Header */}
-          <div className="grid grid-cols-[1fr_140px_100px_80px_120px_60px] bg-[#FFD700] border-b-2 border-[#1A1A1A]">
+          <div className="grid grid-cols-[1fr_140px_100px_80px_120px_60px] bg-emerald-500 border-b-2 border-white/[0.06]">
             <button
               onClick={() => handleSort("username")}
-              className="px-3 py-3 text-[12px] font-black text-[#1A1A1A] text-left hover:bg-[#FFC700] flex items-center gap-1"
+              className="px-3 py-3 text-[12px] font-black text-white text-left hover:bg-[#FFC700] flex items-center gap-1"
             >
               名前
               {sortField === "username" && <ArrowUpDown className="w-3 h-3" />}
             </button>
-            <div className="px-3 py-3 text-[12px] font-black text-[#1A1A1A]">プラットフォーム</div>
+            <div className="px-3 py-3 text-[12px] font-black text-white">プラットフォーム</div>
             <button
               onClick={() => handleSort("status")}
-              className="px-3 py-3 text-[12px] font-black text-[#1A1A1A] text-left hover:bg-[#FFC700] flex items-center gap-1"
+              className="px-3 py-3 text-[12px] font-black text-white text-left hover:bg-[#FFC700] flex items-center gap-1"
             >
               ステータス
               {sortField === "status" && <ArrowUpDown className="w-3 h-3" />}
             </button>
-            <div className="px-3 py-3 text-[12px] font-black text-[#1A1A1A]">プラン</div>
+            <div className="px-3 py-3 text-[12px] font-black text-white">プラン</div>
             <button
               onClick={() => handleSort("createdAt")}
-              className="px-3 py-3 text-[12px] font-black text-[#1A1A1A] text-left hover:bg-[#FFC700] flex items-center gap-1"
+              className="px-3 py-3 text-[12px] font-black text-white text-left hover:bg-[#FFC700] flex items-center gap-1"
             >
               作成日
               {sortField === "createdAt" && <ArrowUpDown className="w-3 h-3" />}
             </button>
-            <div className="px-3 py-3 text-[12px] font-black text-[#1A1A1A]"></div>
+            <div className="px-3 py-3 text-[12px] font-black text-white"></div>
           </div>
 
           {/* Rows */}
@@ -311,7 +311,7 @@ export default function Accounts() {
               <p className="text-[14px] font-bold text-[#6B6B6B] mb-4">アカウントがありません</p>
               <Link
                 href="/accounts/new"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#4ECDC4] text-[#1A1A1A] text-[13px] font-bold rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#4ECDC4] text-white text-[13px] font-bold rounded-lg border border-white/[0.06] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all"
               >
                 <Plus className="w-3.5 h-3.5" />
                 新規作成
@@ -322,12 +322,12 @@ export default function Accounts() {
               <div
                 key={account.id}
                 onClick={() => navigate(`/accounts/${account.id}`)}
-                className="grid grid-cols-[1fr_140px_100px_80px_120px_60px] bg-white border-b-2 border-[#1A1A1A] last:border-b-0 hover:bg-[#FFF8DC] transition-colors cursor-pointer group"
+                className="grid grid-cols-[1fr_140px_100px_80px_120px_60px] bg-white border-b-2 border-white/[0.06] last:border-b-0 hover:bg-neutral-900 transition-colors cursor-pointer group"
               >
                 <div className="px-3 py-3 flex items-center gap-2">
                   <span className="text-[14px]">{getPlatformEmoji(account.platform)}</span>
                   <div className="min-w-0">
-                    <span className="text-[14px] font-bold text-[#1A1A1A] truncate block">
+                    <span className="text-[14px] font-bold text-white truncate block">
                       {account.username}
                     </span>
                     {(account as any).xHandle && (
@@ -335,7 +335,7 @@ export default function Accounts() {
                     )}
                   </div>
                 </div>
-                <div className="px-3 py-3 text-[13px] font-bold text-[#1A1A1A]">
+                <div className="px-3 py-3 text-[13px] font-bold text-white">
                   {getPlatformName(account.platform)}
                 </div>
                 <div className="px-3 py-3">
@@ -357,7 +357,7 @@ export default function Accounts() {
                       onClick={(e) => handleActivate(account.id, e)}
                       disabled={activateMutation.isPending}
                       title="アクティブ化"
-                      className="opacity-0 group-hover:opacity-100 p-1.5 bg-[#A8E6CF] border-2 border-[#1A1A1A] rounded-lg transition-all text-[#1A1A1A] hover:translate-x-[1px] hover:translate-y-[1px]"
+                      className="opacity-0 group-hover:opacity-100 p-1.5 bg-[#A8E6CF] border border-white/[0.06] rounded-lg transition-all text-white hover:translate-x-[1px] hover:translate-y-[1px]"
                     >
                       <Power className="w-3.5 h-3.5" />
                     </button>
@@ -366,12 +366,12 @@ export default function Accounts() {
                     onClick={(e) => handleDelete(account.id, e)}
                     disabled={deleteMutation.isPending}
                     title="削除"
-                    className="opacity-0 group-hover:opacity-100 p-1.5 bg-[#FF6B6B] border-2 border-[#1A1A1A] rounded-lg transition-all text-[#1A1A1A] hover:translate-x-[1px] hover:translate-y-[1px]"
+                    className="opacity-0 group-hover:opacity-100 p-1.5 bg-[#FF6B6B] border border-white/[0.06] rounded-lg transition-all text-white hover:translate-x-[1px] hover:translate-y-[1px]"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
-                  <button className="opacity-0 group-hover:opacity-100 p-1.5 bg-white border-2 border-[#1A1A1A] rounded-lg transition-all hover:translate-x-[1px] hover:translate-y-[1px]">
-                    <MoreHorizontal className="w-4 h-4 text-[#1A1A1A]" />
+                  <button className="opacity-0 group-hover:opacity-100 p-1.5 bg-white border border-white/[0.06] rounded-lg transition-all hover:translate-x-[1px] hover:translate-y-[1px]">
+                    <MoreHorizontal className="w-4 h-4 text-white" />
                   </button>
                 </div>
               </div>
@@ -382,7 +382,7 @@ export default function Accounts() {
           {filteredAndSortedAccounts.length > 0 && (
             <Link
               href="/accounts/new"
-              className="flex items-center gap-2 px-3 py-3 text-[13px] font-bold text-[#1A1A1A] bg-white hover:bg-[#FFF8DC] transition-colors border-t-2 border-[#1A1A1A]"
+              className="flex items-center gap-2 px-3 py-3 text-[13px] font-bold text-white bg-white hover:bg-neutral-900 transition-colors border-t-2 border-white/[0.06]"
             >
               <Plus className="w-3.5 h-3.5" />
               新規追加

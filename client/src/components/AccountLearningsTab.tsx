@@ -12,7 +12,7 @@ interface AccountLearningsTabProps {
 const LEARNING_TYPE_CONFIG: Record<string, { label: string; icon: any; color: string; xp: number }> = {
   success_pattern: { label: "成功パターン", icon: TrendingUp, color: "text-green-600 bg-green-50", xp: 50 },
   posting_style: { label: "投稿スタイル", icon: Sparkles, color: "text-blue-600 bg-blue-50", xp: 30 },
-  comment_style: { label: "コメントスタイル", icon: MessageSquare, color: "text-purple-600 bg-purple-50", xp: 30 },
+  comment_style: { label: "コメントスタイル", icon: MessageSquare, color: "text-blue-600 bg-blue-50", xp: 30 },
   hashtag_strategy: { label: "ハッシュタグ", icon: Hash, color: "text-cyan-600 bg-cyan-50", xp: 25 },
   timing_pattern: { label: "タイミング", icon: Clock, color: "text-orange-600 bg-orange-50", xp: 25 },
   failure_pattern: { label: "失敗パターン", icon: AlertTriangle, color: "text-red-600 bg-red-50", xp: 20 },

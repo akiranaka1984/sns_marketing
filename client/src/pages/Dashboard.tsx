@@ -156,9 +156,9 @@ export default function Dashboard() {
       value: totalAccounts,
       sub: "登録済みアカウント",
       icon: Users,
-      barColor: "#6366F1",
-      iconColor: "text-indigo-500",
-      iconBg: "bg-indigo-500/10",
+      barColor: "#3B82F6",
+      iconColor: "text-blue-500",
+      iconBg: "bg-blue-500/10",
     },
     {
       label: "アクティブ",
@@ -183,16 +183,16 @@ export default function Dashboard() {
       value: scheduledTotal,
       sub: `成功率 ${postStats?.successRate || 0}%（30日間）`,
       icon: CalendarCheck,
-      barColor: "#8B5CF6",
-      iconColor: "text-violet-500",
-      iconBg: "bg-violet-500/10",
+      barColor: "#4ECDC4",
+      iconColor: "text-teal-400",
+      iconBg: "bg-teal-400/10",
     },
   ];
 
   const quickActions = [
     { href: "/automation", icon: Zap, label: "自動化設定", sub: "ワークフロー管理", iconColor: "text-amber-500", iconBg: "bg-amber-500/10" },
-    { href: "/strategies/new", icon: Lightbulb, label: "AI戦略を生成", sub: "AI戦略アシスト", iconColor: "text-violet-500", iconBg: "bg-violet-500/10" },
-    { href: "/analytics", icon: BarChart3, label: "分析を見る", sub: "パフォーマンス分析", iconColor: "text-indigo-500", iconBg: "bg-indigo-500/10" },
+    { href: "/strategies/new", icon: Lightbulb, label: "AI戦略を生成", sub: "AI戦略アシスト", iconColor: "text-teal-400", iconBg: "bg-teal-400/10" },
+    { href: "/analytics", icon: BarChart3, label: "分析を見る", sub: "パフォーマンス分析", iconColor: "text-blue-500", iconBg: "bg-blue-500/10" },
     { href: "/scheduled-posts", icon: Send, label: "スケジュール投稿", sub: "投稿管理", iconColor: "text-emerald-500", iconBg: "bg-emerald-500/10" },
   ];
 
@@ -238,17 +238,17 @@ export default function Dashboard() {
               style={{ "--metric-color": m.barColor } as React.CSSProperties}
             >
               <div className="flex items-center justify-between mb-2">
-                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                <p className="text-xs text-neutral-500 uppercase tracking-wider">
                   {m.label}
                 </p>
                 <div className={`w-7 h-7 rounded-md ${m.iconBg} flex items-center justify-center`}>
                   <Icon className={`w-3.5 h-3.5 ${m.iconColor}`} strokeWidth={1.5} />
                 </div>
               </div>
-              <p className="text-[26px] font-bold text-foreground tabular-nums tracking-tight leading-none mb-1">
+              <p className="text-2xl font-semibold text-white tabular-nums tracking-tight leading-none mb-1">
                 {m.value}
               </p>
-              <p className="text-[11px] text-muted-foreground">{m.sub}</p>
+              <p className="text-xs text-neutral-500">{m.sub}</p>
             </div>
           );
         })}
@@ -259,32 +259,32 @@ export default function Dashboard() {
         {/* Left: Accounts Table */}
         <div>
           <div className="flex items-center justify-between mb-2.5">
-            <h2 className="text-[13px] font-semibold text-foreground flex items-center gap-2 tracking-[-0.01em]">
+            <h2 className="text-[13px] font-semibold text-white flex items-center gap-2 tracking-[-0.01em]">
               アカウント
               {totalAccounts > 0 && (
-                <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-md">
+                <span className="text-[11px] font-medium text-neutral-500 bg-white/[0.06] px-1.5 py-0.5 rounded-md">
                   {totalAccounts}
                 </span>
               )}
             </h2>
             <Link
               href="/accounts"
-              className="flex items-center gap-1 px-2 py-1 text-[12px] text-primary hover:bg-primary/5 rounded-md transition-colors font-medium"
+              className="flex items-center gap-1 px-2 py-1 text-[12px] text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.04] rounded-md transition-colors font-medium"
             >
               すべて表示
               <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
 
-          <div className="border border-border rounded-lg overflow-hidden bg-card shadow-[var(--shadow-card)]">
-            <div className="grid grid-cols-[1fr_100px_100px] border-b border-border">
-              <div className="px-4 py-2 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+          <div className="border border-white/[0.06] rounded-xl overflow-hidden bg-neutral-900">
+            <div className="grid grid-cols-[1fr_100px_100px] border-b border-white/[0.06] bg-white/[0.02]">
+              <div className="px-4 py-2 text-[11px] font-medium text-neutral-500 uppercase tracking-wider">
                 名前
               </div>
-              <div className="px-4 py-2 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="px-4 py-2 text-[11px] font-medium text-neutral-500 uppercase tracking-wider">
                 ステータス
               </div>
-              <div className="px-4 py-2 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="px-4 py-2 text-[11px] font-medium text-neutral-500 uppercase tracking-wider">
                 作成日
               </div>
             </div>
@@ -304,29 +304,29 @@ export default function Dashboard() {
                 <Link
                   key={account.id}
                   href={`/accounts/${account.id}`}
-                  className="grid grid-cols-[1fr_100px_100px] border-b border-border/50 last:border-b-0 hover:bg-accent/40 transition-colors group"
+                  className="grid grid-cols-[1fr_100px_100px] border-b border-white/[0.04] last:border-b-0 hover:bg-white/[0.02] transition-colors group"
                 >
                   <div className="px-4 py-2.5 flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
-                      <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 text-foreground" fill="currentColor">
+                    <div className="w-7 h-7 rounded-md bg-white/[0.06] flex items-center justify-center flex-shrink-0">
+                      <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 text-neutral-300" fill="currentColor">
                         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                       </svg>
                     </div>
-                    <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                    <span className="text-[13px] font-medium text-white group-hover:text-neutral-200 transition-colors truncate">
                       {account.username}
                     </span>
                   </div>
                   <div className="px-4 py-2.5 flex items-center">
                     <StatusTag status={account.status} />
                   </div>
-                  <div className="px-4 py-2.5 text-[12px] text-muted-foreground tabular-nums flex items-center font-mono">
+                  <div className="px-4 py-2.5 text-[12px] text-neutral-500 tabular-nums flex items-center font-mono">
                     {new Date(account.createdAt).toLocaleDateString("ja-JP")}
                   </div>
                 </Link>
               ))
             ) : (
               <div className="p-10 text-center">
-                <p className="text-[13px] text-muted-foreground mb-3">アカウントがありません</p>
+                <p className="text-[13px] text-neutral-500 mb-3">アカウントがありません</p>
                 <Link
                   href="/accounts/new"
                   className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground text-[13px] font-medium rounded-md transition-colors hover:opacity-90"
@@ -340,7 +340,7 @@ export default function Dashboard() {
             {accounts && accounts.length > 0 && (
               <Link
                 href="/accounts/new"
-                className="flex items-center gap-2 px-4 py-2 text-[12px] text-muted-foreground hover:text-primary hover:bg-accent/40 transition-colors border-t border-border/50"
+                className="flex items-center gap-2 px-4 py-2 text-[12px] text-neutral-500 hover:text-neutral-300 hover:bg-white/[0.02] transition-colors border-t border-white/[0.04]"
               >
                 <Plus className="w-3 h-3" />
                 新規追加
@@ -354,19 +354,19 @@ export default function Dashboard() {
           {/* Recent Activity — Timeline */}
           <div>
             <div className="flex items-center justify-between mb-2.5">
-              <h2 className="text-[13px] font-semibold text-foreground flex items-center gap-2 tracking-[-0.01em]">
+              <h2 className="text-[13px] font-semibold text-white flex items-center gap-2 tracking-[-0.01em]">
                 最近のアクティビティ
               </h2>
               <Link
                 href="/logs"
-                className="flex items-center gap-1 px-2 py-1 text-[12px] text-primary hover:bg-primary/5 rounded-md transition-colors font-medium"
+                className="flex items-center gap-1 px-2 py-1 text-[12px] text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.04] rounded-md transition-colors font-medium"
               >
                 すべて表示
                 <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
 
-            <div className="bg-card rounded-lg border border-border overflow-hidden shadow-[var(--shadow-card)]">
+            <div className="bg-neutral-900 rounded-xl border border-white/[0.06] overflow-hidden">
               {logsLoading ? (
                 <div className="p-4 space-y-3">
                   {Array.from({ length: 3 }).map((_, i) => (
@@ -380,7 +380,7 @@ export default function Dashboard() {
               ) : recentLogs && recentLogs.length > 0 ? (
                 <div className="relative">
                   {/* Timeline line */}
-                  <div className="absolute left-[19px] top-3 bottom-3 w-px bg-border" />
+                  <div className="absolute left-[19px] top-3 bottom-3 w-px bg-white/[0.06]" />
 
                   {recentLogs.slice(0, 5).map((log) => {
                     const icon =
@@ -399,17 +399,17 @@ export default function Dashboard() {
                     return (
                       <div
                         key={log.id}
-                        className="flex items-start gap-3 px-4 py-2.5 hover:bg-accent/40 transition-colors relative"
+                        className="flex items-start gap-3 px-4 py-2.5 hover:bg-white/[0.02] transition-colors relative"
                       >
-                        <div className="relative z-10 mt-0.5 w-3 h-3 flex items-center justify-center bg-card">
+                        <div className="relative z-10 mt-0.5 w-3 h-3 flex items-center justify-center bg-neutral-900">
                           <Icon className={`w-3 h-3 ${iconColor}`} strokeWidth={2} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[13px] text-foreground truncate leading-tight">
+                          <p className="text-[13px] text-neutral-200 truncate leading-tight">
                             {log.action}
                           </p>
                           <p
-                            className="text-[11px] text-muted-foreground mt-0.5"
+                            className="text-[11px] text-neutral-500 mt-0.5"
                             title={new Date(log.createdAt).toLocaleString("ja-JP")}
                           >
                             {relativeTime(log.createdAt)}
@@ -420,7 +420,7 @@ export default function Dashboard() {
                   })}
                 </div>
               ) : (
-                <div className="text-center py-8 text-[13px] text-muted-foreground">
+                <div className="text-center py-8 text-[13px] text-neutral-500">
                   アクティビティがありません
                 </div>
               )}
@@ -429,7 +429,7 @@ export default function Dashboard() {
 
           {/* Quick Actions */}
           <div>
-            <h2 className="text-[13px] font-semibold text-foreground flex items-center gap-2 mb-2.5 tracking-[-0.01em]">
+            <h2 className="text-[13px] font-semibold text-white flex items-center gap-2 mb-2.5 tracking-[-0.01em]">
               クイックアクション
             </h2>
             <div className="space-y-2">
@@ -439,18 +439,18 @@ export default function Dashboard() {
                   <Link
                     key={action.href}
                     href={action.href}
-                    className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover-lift hover:shadow-[var(--shadow-card-hover)] transition-all group shadow-[var(--shadow-card)]"
+                    className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] bg-neutral-900 hover:border-white/[0.10] transition-all group"
                   >
                     <div className={`w-8 h-8 rounded-md ${action.iconBg} flex items-center justify-center flex-shrink-0`}>
                       <ActionIcon className={`w-4 h-4 ${action.iconColor}`} strokeWidth={1.5} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <span className="text-[13px] font-medium text-foreground block tracking-[-0.01em]">
+                      <span className="text-[13px] font-medium text-white block tracking-[-0.01em]">
                         {action.label}
                       </span>
-                      <span className="text-[11px] text-muted-foreground">{action.sub}</span>
+                      <span className="text-[11px] text-neutral-500">{action.sub}</span>
                     </div>
-                    <ArrowRight className="w-3.5 h-3.5 text-muted-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                    <ArrowRight className="w-3.5 h-3.5 text-neutral-600 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                   </Link>
                 );
               })}

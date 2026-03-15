@@ -90,17 +90,17 @@ export default function ContentCollection() {
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#1A1A1A]">コンテンツ収集</h1>
+          <h1 className="text-3xl font-bold text-white">コンテンツ収集</h1>
           <p className="text-[#6B6B6B] font-bold">SNSプラットフォームからコンテンツを自動収集します</p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-[#FFD700] hover:bg-[#FFD700] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-[#1A1A1A] font-bold border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg">
+            <Button className="bg-emerald-500 hover:bg-emerald-500 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg">
               <Plus className="mr-2 h-4 w-4" />
               収集スケジュール作成
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg">
+          <DialogContent className="max-w-2xl border border-white/[0.06] rounded-lg">
             <DialogHeader>
               <DialogTitle className="font-bold">収集スケジュール作成</DialogTitle>
               <DialogDescription className="font-bold text-[#6B6B6B]">
@@ -111,10 +111,10 @@ export default function ContentCollection() {
               <div className="grid gap-2">
                 <Label htmlFor="platform" className="font-bold">プラットフォーム</Label>
                 <Select value={platform} onValueChange={(value: any) => setPlatform(value)}>
-                  <SelectTrigger className="border-2 border-[#1A1A1A] rounded-lg font-bold">
+                  <SelectTrigger className="border border-white/[0.06] rounded-lg font-bold">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="border-2 border-[#1A1A1A] rounded-lg">
+                  <SelectContent className="border border-white/[0.06] rounded-lg">
                     <SelectItem value="twitter" className="font-bold">Twitter</SelectItem>
                     <SelectItem value="tiktok" className="font-bold">TikTok</SelectItem>
                     <SelectItem value="instagram" className="font-bold">Instagram</SelectItem>
@@ -131,7 +131,7 @@ export default function ContentCollection() {
                   placeholder="AI, マーケティング, SNS"
                   value={keywords}
                   onChange={(e) => setKeywords(e.target.value)}
-                  className="border-2 border-[#1A1A1A] rounded-lg font-bold"
+                  className="border border-white/[0.06] rounded-lg font-bold"
                 />
               </div>
               <div className="grid gap-2">
@@ -141,7 +141,7 @@ export default function ContentCollection() {
                   placeholder="trending, viral, popular"
                   value={hashtags}
                   onChange={(e) => setHashtags(e.target.value)}
-                  className="border-2 border-[#1A1A1A] rounded-lg font-bold"
+                  className="border border-white/[0.06] rounded-lg font-bold"
                 />
               </div>
               <div className="grid gap-2">
@@ -151,16 +151,16 @@ export default function ContentCollection() {
                   placeholder="@user1, @user2"
                   value={accounts}
                   onChange={(e) => setAccounts(e.target.value)}
-                  className="border-2 border-[#1A1A1A] rounded-lg font-bold"
+                  className="border border-white/[0.06] rounded-lg font-bold"
                 />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="frequency" className="font-bold">収集頻度</Label>
                 <Select value={frequency} onValueChange={(value: any) => setFrequency(value)}>
-                  <SelectTrigger className="border-2 border-[#1A1A1A] rounded-lg font-bold">
+                  <SelectTrigger className="border border-white/[0.06] rounded-lg font-bold">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="border-2 border-[#1A1A1A] rounded-lg">
+                  <SelectContent className="border border-white/[0.06] rounded-lg">
                     <SelectItem value="hourly" className="font-bold">1時間ごと</SelectItem>
                     <SelectItem value="daily" className="font-bold">1日ごと</SelectItem>
                     <SelectItem value="weekly" className="font-bold">1週間ごと</SelectItem>
@@ -174,15 +174,15 @@ export default function ContentCollection() {
                   type="number"
                   value={maxItems}
                   onChange={(e) => setMaxItems(e.target.value)}
-                  className="border-2 border-[#1A1A1A] rounded-lg font-bold"
+                  className="border border-white/[0.06] rounded-lg font-bold"
                 />
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="bg-white hover:bg-[#FFF8DC] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-[#1A1A1A] font-bold border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg">
+              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="bg-white hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg">
                 キャンセル
               </Button>
-              <Button onClick={handleCreateSchedule} disabled={createSchedule.isPending} className="bg-[#FFD700] hover:bg-[#FFD700] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-[#1A1A1A] font-bold border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg">
+              <Button onClick={handleCreateSchedule} disabled={createSchedule.isPending} className="bg-emerald-500 hover:bg-emerald-500 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg">
                 {createSchedule.isPending ? "作成中..." : "作成"}
               </Button>
             </DialogFooter>
@@ -192,14 +192,14 @@ export default function ContentCollection() {
 
       {/* Collection Schedules */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-[#1A1A1A] mb-4">収集スケジュール</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">収集スケジュール</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {schedules?.map((schedule) => (
-            <Card key={schedule.id} className="bg-[#FFFDF7] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg">
+            <Card key={schedule.id} className="bg-neutral-950 border border-white/[0.06] rounded-lg">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between font-bold">
                   <span className="capitalize">{schedule.platform}</span>
-                  <Badge variant={schedule.isActive ? "default" : "secondary"} className={`font-bold border-2 border-[#1A1A1A] ${schedule.isActive ? 'bg-[#4ECDC4] text-[#1A1A1A]' : 'bg-[#A8E6CF] text-[#1A1A1A]'}`}>
+                  <Badge variant={schedule.isActive ? "default" : "secondary"} className={`font-bold border border-white/[0.06] ${schedule.isActive ? 'bg-[#4ECDC4] text-white' : 'bg-[#A8E6CF] text-white'}`}>
                     {schedule.isActive ? "有効" : "無効"}
                   </Badge>
                 </CardTitle>
@@ -255,7 +255,7 @@ export default function ContentCollection() {
                     size="sm"
                     onClick={() => handleCollectNow(schedule.id)}
                     disabled={collectContent.isPending}
-                    className="bg-[#4ECDC4] hover:bg-[#4ECDC4] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-[#1A1A1A] font-bold border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+                    className="bg-[#4ECDC4] hover:bg-[#4ECDC4] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg"
                   >
                     <Play className="mr-2 h-4 w-4" />
                     今すぐ収集
@@ -264,7 +264,7 @@ export default function ContentCollection() {
                     size="sm"
                     variant="destructive"
                     onClick={() => deleteSchedule.mutate({ id: schedule.id })}
-                    className="bg-[#FF6B6B] hover:bg-[#FF6B6B] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-[#1A1A1A] font-bold border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+                    className="bg-[#FF6B6B] hover:bg-[#FF6B6B] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -277,20 +277,20 @@ export default function ContentCollection() {
 
       {/* Collected Content */}
       <div>
-        <h2 className="text-2xl font-bold text-[#1A1A1A] mb-4">収集済みコンテンツ</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">収集済みコンテンツ</h2>
         <div className="grid gap-4">
           {contents?.map((content) => (
-            <Card key={content.id} className="bg-[#FFFDF7] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg">
+            <Card key={content.id} className="bg-neutral-950 border border-white/[0.06] rounded-lg">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between font-bold">
                   <span className="capitalize">{content.platform}</span>
                   <div className="flex gap-2">
-                    <Badge variant="outline" className="font-bold border-2 border-[#1A1A1A] bg-[#DDA0DD] text-[#1A1A1A]">{content.author}</Badge>
+                    <Badge variant="outline" className="font-bold border border-white/[0.06] bg-[#3B82F6] text-white">{content.author}</Badge>
                     <Button
                       size="sm"
                       variant="ghost"
                       onClick={() => deleteContent.mutate({ id: content.id })}
-                      className="hover:bg-[#FFF8DC] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] font-bold border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+                      className="hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] font-bold border border-white/[0.06] rounded-lg"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -305,7 +305,7 @@ export default function ContentCollection() {
                 {content.hashtags && content.hashtags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
                     {content.hashtags.map((tag: string, idx: number) => (
-                      <Badge key={idx} variant="secondary" className="font-bold border-2 border-[#1A1A1A] bg-[#FFD700] text-[#1A1A1A]">
+                      <Badge key={idx} variant="secondary" className="font-bold border border-white/[0.06] bg-emerald-500 text-white">
                         #{tag}
                       </Badge>
                     ))}

@@ -90,7 +90,7 @@ export default function NewStrategy() {
     <div className="space-y-5 max-w-3xl">
       <div className="fade-in-up">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#1A1A1A] flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
             <Sparkles className="h-8 w-8 text-[#FFD700]" />
             戦略生成
           </h1>
@@ -98,17 +98,17 @@ export default function NewStrategy() {
         </div>
       </div>
 
-      <div className="fade-in-up bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
-        <h3 className="text-sm font-bold text-[#1A1A1A] mb-1">マーケティング目標</h3>
+      <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
+        <h3 className="text-sm font-bold text-white mb-1">マーケティング目標</h3>
         <p className="text-xs text-[#6B6B6B] font-bold mb-3">マーケティングの目標とターゲットオーディエンスを説明してください。できるだけ具体的に記述してください。</p>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="project" className="text-sm font-bold text-[#1A1A1A]">プロジェクト *</Label>
+            <Label htmlFor="project" className="text-sm font-bold text-white">プロジェクト *</Label>
             <Select value={projectId} onValueChange={setProjectId} disabled={generateMutation.isPending}>
-              <SelectTrigger className="border-2 border-[#1A1A1A] bg-[#FFFDF7] rounded-lg font-bold">
+              <SelectTrigger className="border border-white/[0.06] bg-neutral-950 rounded-lg font-bold">
                 <SelectValue placeholder="プロジェクトを選択" />
               </SelectTrigger>
-              <SelectContent className="border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] bg-[#FFFDF7]">
+              <SelectContent className="border border-white/[0.06] bg-neutral-950">
                 {projects?.map((project) => (
                   <SelectItem key={project.id} value={project.id.toString()}>
                     {project.name}
@@ -122,7 +122,7 @@ export default function NewStrategy() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="objective" className="text-sm font-bold text-[#1A1A1A]">マーケティング目標 *</Label>
+            <Label htmlFor="objective" className="text-sm font-bold text-white">マーケティング目標 *</Label>
             <Textarea
               id="objective"
               placeholder="例：InstagramとTikTokでミレニアル世代をターゲットにした新しいエコフレンドリー製品ラインのブランド認知度を向上させる..."
@@ -130,7 +130,7 @@ export default function NewStrategy() {
               onChange={(e) => setObjective(e.target.value)}
               disabled={generateMutation.isPending}
               rows={6}
-              className="resize-none border-2 border-[#1A1A1A] bg-[#FFFDF7] rounded-lg font-bold"
+              className="resize-none border border-white/[0.06] bg-neutral-950 rounded-lg font-bold"
             />
             <p className="text-xs text-[#6B6B6B] font-bold">
               最低20文字。ターゲットオーディエンス、プラットフォーム、目標についての詳細を含めてください。
@@ -141,7 +141,7 @@ export default function NewStrategy() {
             <Button
               type="button"
               variant="outline"
-              className="flex-1 border-2 border-[#1A1A1A] text-[#1A1A1A] font-bold bg-[#FFFDF7] hover:bg-[#FFF8DC] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
+              className="flex-1 border border-white/[0.06] text-white font-bold bg-neutral-950 hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
               onClick={() => setLocation('/strategies')}
               disabled={generateMutation.isPending}
             >
@@ -149,7 +149,7 @@ export default function NewStrategy() {
             </Button>
             <Button
               type="submit"
-              className="flex-1 gap-2 bg-[#FFD700] hover:bg-[#FFD700] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-[#1A1A1A] font-bold border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+              className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-500 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg"
               disabled={generateMutation.isPending || objective.length < 20 || !projectId}
             >
               {generateMutation.isPending ? (
@@ -168,15 +168,15 @@ export default function NewStrategy() {
         </form>
       </div>
 
-      <div className="fade-in-up bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
-        <h3 className="text-sm font-bold text-[#1A1A1A] mb-1 flex items-center gap-2">
+      <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
+        <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
           <Target className="h-5 w-5 text-[#FFD700]" />
           KPI目標（オプション）
         </h3>
         <p className="text-xs text-[#6B6B6B] font-bold mb-3">プロジェクトの具体的な数値目標を設定します。後から変更することもできます。</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="followers" className="text-sm font-bold text-[#1A1A1A]">フォロワー目標数</Label>
+            <Label htmlFor="followers" className="text-sm font-bold text-white">フォロワー目標数</Label>
             <Input
               id="followers"
               type="number"
@@ -184,11 +184,11 @@ export default function NewStrategy() {
               value={kpis.followers}
               onChange={(e) => setKpis({ ...kpis, followers: e.target.value })}
               disabled={generateMutation.isPending}
-              className="border-2 border-[#1A1A1A] bg-[#FFFDF7] rounded-lg font-bold"
+              className="border border-white/[0.06] bg-neutral-950 rounded-lg font-bold"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="engagement" className="text-sm font-bold text-[#1A1A1A]">エンゲージメント率目標（%）</Label>
+            <Label htmlFor="engagement" className="text-sm font-bold text-white">エンゲージメント率目標（%）</Label>
             <Input
               id="engagement"
               type="number"
@@ -197,11 +197,11 @@ export default function NewStrategy() {
               value={kpis.engagement}
               onChange={(e) => setKpis({ ...kpis, engagement: e.target.value })}
               disabled={generateMutation.isPending}
-              className="border-2 border-[#1A1A1A] bg-[#FFFDF7] rounded-lg font-bold"
+              className="border border-white/[0.06] bg-neutral-950 rounded-lg font-bold"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="clicks" className="text-sm font-bold text-[#1A1A1A]">クリック数目標</Label>
+            <Label htmlFor="clicks" className="text-sm font-bold text-white">クリック数目標</Label>
             <Input
               id="clicks"
               type="number"
@@ -209,11 +209,11 @@ export default function NewStrategy() {
               value={kpis.clicks}
               onChange={(e) => setKpis({ ...kpis, clicks: e.target.value })}
               disabled={generateMutation.isPending}
-              className="border-2 border-[#1A1A1A] bg-[#FFFDF7] rounded-lg font-bold"
+              className="border border-white/[0.06] bg-neutral-950 rounded-lg font-bold"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="conversions" className="text-sm font-bold text-[#1A1A1A]">コンバージョン数目標</Label>
+            <Label htmlFor="conversions" className="text-sm font-bold text-white">コンバージョン数目標</Label>
             <Input
               id="conversions"
               type="number"
@@ -221,14 +221,14 @@ export default function NewStrategy() {
               value={kpis.conversions}
               onChange={(e) => setKpis({ ...kpis, conversions: e.target.value })}
               disabled={generateMutation.isPending}
-              className="border-2 border-[#1A1A1A] bg-[#FFFDF7] rounded-lg font-bold"
+              className="border border-white/[0.06] bg-neutral-950 rounded-lg font-bold"
             />
           </div>
         </div>
       </div>
 
-      <div className="fade-in-up bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
-        <h3 className="text-sm font-bold text-[#1A1A1A] mb-1">目標の例</h3>
+      <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
+        <h3 className="text-sm font-bold text-white mb-1">目標の例</h3>
         <p className="text-xs text-[#6B6B6B] font-bold mb-3">クリックして例を使用できます</p>
         <div className="space-y-3">
           {exampleObjectives.map((example, index) => (
@@ -236,59 +236,59 @@ export default function NewStrategy() {
               key={index}
               onClick={() => handleUseExample(example)}
               disabled={generateMutation.isPending}
-              className="w-full text-left p-4 rounded-lg border-2 border-[#1A1A1A] bg-[#FFF8DC] hover:bg-[#FFDAB9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-bold shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+              className="w-full text-left p-4 rounded-lg border border-white/[0.06] bg-neutral-900 hover:bg-[#FFDAB9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-bold hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
             >
-              <p className="text-sm text-[#1A1A1A]">{example}</p>
+              <p className="text-sm text-white">{example}</p>
             </button>
           ))}
         </div>
       </div>
 
-      <div className="fade-in-up bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
-        <h3 className="text-sm font-bold text-[#1A1A1A] mb-1">生成される内容</h3>
+      <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
+        <h3 className="text-sm font-bold text-white mb-1">生成される内容</h3>
         <div className="space-y-3 text-sm font-bold text-[#6B6B6B] mt-3">
           <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#A8E6CF] text-[#1A1A1A] flex items-center justify-center font-bold text-xs border-2 border-[#1A1A1A]">
+            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#A8E6CF] text-white flex items-center justify-center font-bold text-xs border border-white/[0.06]">
               ✓
             </div>
             <div>
-              <p className="font-bold text-[#1A1A1A]">コンテンツタイプの推奨</p>
+              <p className="font-bold text-white">コンテンツタイプの推奨</p>
               <p>ターゲットオーディエンスに響くコンテンツの種類</p>
             </div>
           </div>
           <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#4ECDC4] text-[#1A1A1A] flex items-center justify-center font-bold text-xs border-2 border-[#1A1A1A]">
+            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#4ECDC4] text-white flex items-center justify-center font-bold text-xs border border-white/[0.06]">
               ✓
             </div>
             <div>
-              <p className="font-bold text-[#1A1A1A]">ハッシュタグ戦略</p>
+              <p className="font-bold text-white">ハッシュタグ戦略</p>
               <p>リーチとエンゲージメントを最大化する関連ハッシュタグ</p>
             </div>
           </div>
           <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#FFD700] text-[#1A1A1A] flex items-center justify-center font-bold text-xs border-2 border-[#1A1A1A]">
+            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-bold text-xs border border-white/[0.06]">
               ✓
             </div>
             <div>
-              <p className="font-bold text-[#1A1A1A]">投稿スケジュール</p>
+              <p className="font-bold text-white">投稿スケジュール</p>
               <p>コンテンツ投稿の最適な時間と頻度</p>
             </div>
           </div>
           <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#FF6B6B] text-[#1A1A1A] flex items-center justify-center font-bold text-xs border-2 border-[#1A1A1A]">
+            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#FF6B6B] text-white flex items-center justify-center font-bold text-xs border border-white/[0.06]">
               ✓
             </div>
             <div>
-              <p className="font-bold text-[#1A1A1A]">エンゲージメント戦術</p>
+              <p className="font-bold text-white">エンゲージメント戦術</p>
               <p>コミュニティを構築するためのオーディエンスとの交流方法</p>
             </div>
           </div>
           <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#DDA0DD] text-[#1A1A1A] flex items-center justify-center font-bold text-xs border-2 border-[#1A1A1A]">
+            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#3B82F6] text-white flex items-center justify-center font-bold text-xs border border-white/[0.06]">
               ✓
             </div>
             <div>
-              <p className="font-bold text-[#1A1A1A]">サンプルコンテンツアイデア</p>
+              <p className="font-bold text-white">サンプルコンテンツアイデア</p>
               <p>すぐに使える投稿テンプレートとコンテンツ提案</p>
             </div>
           </div>

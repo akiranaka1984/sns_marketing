@@ -23,7 +23,7 @@ const badgeVariants = cva(
         indigo:
           "border-indigo-200 bg-indigo-50 text-indigo-700",
         purple:
-          "border-purple-200 bg-purple-50 text-purple-700",
+          "border-blue-200 bg-blue-50 text-blue-700",
         cyan:
           "border-cyan-200 bg-cyan-50 text-cyan-700",
         orange:
