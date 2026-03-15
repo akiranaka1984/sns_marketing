@@ -501,7 +501,14 @@ export async function getSetting(key: string): Promise<string | null> {
   const [setting] = await db.select().from(schema.settings).where(eq(schema.settings.key, key));
   const value = setting?.value || null;
   if (value && SENSITIVE_SETTING_KEYS.has(key)) {
-    return decrypt(value);
+    try {
+      return decrypt(value);
+    } catch (err) {
+      // Decryption failure means the stored value is corrupt or was encrypted with a different key.
+      // Log a warning and return null rather than crashing the caller.
+      console.warn(`[db] Failed to decrypt setting "${key}": ${err instanceof Error ? err.message : String(err)}`);
+      return null;
+    }
   }
   return value;
 }
@@ -526,7 +533,14 @@ export async function getAllSettings(): Promise<Record<string, string>> {
     let value = setting.value || '';
     // Decrypt sensitive settings so callers receive plaintext
     if (value && SENSITIVE_SETTING_KEYS.has(setting.key)) {
-      value = decrypt(value);
+      try {
+        value = decrypt(value);
+      } catch (err) {
+        // Decryption failure: the value is corrupt or was encrypted with a different key.
+        // Exclude from the result rather than exposing ciphertext or crashing.
+        console.warn(`[db] Failed to decrypt setting "${setting.key}": ${err instanceof Error ? err.message : String(err)}`);
+        return acc;
+      }
     }
     acc[setting.key] = value;
     return acc;

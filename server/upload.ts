@@ -2,10 +2,11 @@
  * File Upload API
  */
 
-import { Router } from 'express';
+import { Router, type Request, type Response, type NextFunction } from 'express';
 import multer from 'multer';
 import { storagePut } from './storage';
 import { randomBytes } from 'crypto';
+import { sdk } from './_core/sdk';
 
 import { createLogger } from "./utils/logger";
 
@@ -30,10 +31,23 @@ const upload = multer({
 });
 
 /**
- * POST /api/upload
- * Upload a file to S3 storage
+ * Authentication middleware for upload endpoint.
+ * Validates the session cookie before allowing file uploads.
  */
-router.post('/upload', upload.single('file'), async (req, res) => {
+async function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    await sdk.authenticateRequest(req);
+    next();
+  } catch {
+    res.status(401).json({ error: 'Authentication required' });
+  }
+}
+
+/**
+ * POST /api/upload
+ * Upload a file to S3 storage (authentication required)
+ */
+router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file provided' });

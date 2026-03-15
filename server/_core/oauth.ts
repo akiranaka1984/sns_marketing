@@ -24,8 +24,20 @@ function getQueryParam(req: Request, key: string): string | undefined {
 
 export function registerOAuthRoutes(app: Express) {
   // Development mode: auto-login endpoint
-  // Also enabled when ENABLE_DEV_LOGIN=true for production debugging
-  if (process.env.NODE_ENV === "development" || process.env.ENABLE_DEV_LOGIN === "true") {
+  // ENABLE_DEV_LOGIN=true is accepted only in non-production environments.
+  // In production, this flag is intentionally ignored to prevent unauthorized access.
+  const isDevLoginEnabled =
+    process.env.NODE_ENV === "development" ||
+    (process.env.ENABLE_DEV_LOGIN === "true" && process.env.NODE_ENV !== "production");
+
+  if (process.env.NODE_ENV === "production" && process.env.ENABLE_DEV_LOGIN === "true") {
+    console.warn(
+      "[Dev Login] WARNING: ENABLE_DEV_LOGIN=true is set but ignored in production (NODE_ENV=production). " +
+      "Remove this environment variable to suppress this warning."
+    );
+  }
+
+  if (isDevLoginEnabled) {
     app.get("/api/dev-login", async (req: Request, res: Response) => {
       try {
         const testOpenId = "dev-test-user";
