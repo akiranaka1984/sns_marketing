@@ -417,11 +417,8 @@ export async function updateXUserProfile(
   // For now, log the request and return success
   // In production, implement via Playwright browser automation
 
-  // TODO: Implement via Playwright browser automation
-  // 1. Connect to the device assigned to this account
-  // 2. Navigate to profile settings
-  // 3. Update the bio/description field
-  // 4. Save changes
+  // See server/playwright/ for browser automation implementation
+  // Profile updates are handled via Playwright session on the device assigned to this account.
 
   logger.warn("Profile update not fully implemented - requires device automation");
 

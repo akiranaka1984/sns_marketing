@@ -1,6 +1,8 @@
-import { getAnalyticsByAccount, getAccountById } from './db';
+import { getAnalyticsByAccount, getAccountById, db } from './db';
 import { notifyOwner } from './_core/notification';
 import { createLogger } from "./utils/logger";
+import { eq, and, gte } from "drizzle-orm";
+import * as schema from "../drizzle/schema";
 
 const logger = createLogger("alert-system");
 
@@ -114,11 +116,28 @@ async function checkAccountSuspension(accountId: number): Promise<boolean> {
       return false;
     }
 
-    // TODO: Implement actual suspension detection
-    // This could be done by:
-    // 1. Attempting to login and checking for suspension messages
-    // 2. Checking if posts can be made
-    // 3. Monitoring API responses for suspension indicators
+    // Check freeze_detections table for recent freeze events (within last 24 hours)
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 19).replace("T", " ");
+    const recentFreezes = await db
+      .select()
+      .from(schema.freezeDetections)
+      .where(
+        and(
+          eq(schema.freezeDetections.accountId, accountId),
+          eq(schema.freezeDetections.freezeType, "account_freeze"),
+          gte(schema.freezeDetections.createdAt, since)
+        )
+      );
+
+    if (recentFreezes.length > 0) {
+      const latestFreeze = recentFreezes[recentFreezes.length - 1];
+      await notifyOwner({
+        title: '🚨 Account Freeze Detected',
+        content: `Account @${account.username} (${account.platform}) was flagged as frozen.\n\nFreeze type: ${latestFreeze.freezeType}\nStatus: ${latestFreeze.status}\nDetected at: ${latestFreeze.createdAt}\n${latestFreeze.errorMessage ? `Error: ${latestFreeze.errorMessage}` : ''}`,
+      });
+      logger.info({ accountId, freezeId: latestFreeze.id }, "Account freeze alert sent");
+      return true;
+    }
 
     if (account.status === 'suspended') {
       await notifyOwner({
@@ -160,11 +179,40 @@ export async function checkAllAccountsAlerts(thresholds?: AlertThresholds): Prom
   try {
     logger.info("Starting alert check for all accounts");
 
-    // TODO: Implement batch alert checking
-    // Get all active accounts
-    // For each account, check all alert conditions
+    // Fetch all active accounts from the database
+    const activeAccounts = await db
+      .select()
+      .from(schema.accounts)
+      .where(eq(schema.accounts.status, "active"));
 
-    logger.info("Batch alert checking not yet implemented");
+    logger.info({ count: activeAccounts.length }, "Starting batch alert check for active accounts");
+
+    const results = await Promise.allSettled(
+      activeAccounts.map(async (account) => {
+        await checkAccountAlerts(account.id, thresholds);
+
+        // Record a check entry in alertHistory for audit trail
+        await db.insert(schema.alertHistory).values({
+          userId: account.userId,
+          alertType: "account_issue",
+          accountId: account.id,
+          title: "Scheduled alert check",
+          message: `Routine alert check completed for account @${account.username} (${account.platform}).`,
+          severity: "low",
+          status: "resolved",
+          notificationSent: 0,
+          triggeredAt: new Date().toISOString().slice(0, 19).replace("T", " "),
+          createdAt: new Date().toISOString().slice(0, 19).replace("T", " "),
+        });
+      })
+    );
+
+    const failed = results.filter((r) => r.status === "rejected");
+    if (failed.length > 0) {
+      logger.warn({ failedCount: failed.length }, "Some accounts failed during batch alert check");
+    }
+
+    logger.info({ total: activeAccounts.length, failed: failed.length }, "Batch alert check complete");
   } catch (error) {
     logger.error({ err: error }, "Error in batch alert checking");
   }
