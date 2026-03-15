@@ -71,6 +71,28 @@ async function startServer() {
   }
 
   const app = express();
+
+  // -----------------------------------------------------------------------
+  // Security hardening
+  // -----------------------------------------------------------------------
+
+  // Remove X-Powered-By header to avoid exposing Express
+  app.disable('x-powered-by');
+
+  // Security headers (complement Nginx – avoid duplicating headers already set there)
+  // Nginx already sets: X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy
+  // We add HSTS and CSP at the application level for defense-in-depth
+  app.use((_req, res, next) => {
+    // HSTS – enforce HTTPS for 1 year including subdomains
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    // Basic CSP – allow self-origin resources; inline styles needed for UI libraries
+    res.setHeader(
+      'Content-Security-Policy',
+      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' wss: ws:;"
+    );
+    next();
+  });
+
   const server = createServer(app);
 
   // Attach WebSocket server for Playwright live preview
@@ -97,6 +119,7 @@ async function startServer() {
   app.use('/api/trpc', generalLimiter);
   app.use('/api/oauth', authLimiter);
   app.use('/api/dev-login', authLimiter);
+  app.use('/api/admin-login', authLimiter);
 
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
