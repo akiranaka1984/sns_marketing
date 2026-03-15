@@ -36,41 +36,33 @@ type ContentCalendarProps = {
 
 const STATUS_CONFIG: Record<
   PostStatus,
-  { color: string; bgColor: string; darkBgColor: string; borderColor: string; darkBorderColor: string; label: string; icon: React.ReactNode }
+  { color: string; bgColor: string; borderColor: string; label: string; icon: React.ReactNode }
 > = {
   scheduled: {
-    color: "text-blue-700 dark:text-blue-300",
-    bgColor: "bg-blue-50 dark:bg-blue-900/30",
-    darkBgColor: "bg-blue-900/30",
-    borderColor: "border-blue-200",
-    darkBorderColor: "dark:border-blue-800",
+    color: "text-blue-300",
+    bgColor: "bg-blue-900/30",
+    borderColor: "border-blue-800",
     label: "予定",
     icon: <Clock className="h-3 w-3" />,
   },
   published: {
-    color: "text-green-700 dark:text-green-300",
-    bgColor: "bg-green-50 dark:bg-green-900/30",
-    darkBgColor: "bg-green-900/30",
-    borderColor: "border-green-200",
-    darkBorderColor: "dark:border-green-800",
+    color: "text-green-300",
+    bgColor: "bg-green-900/30",
+    borderColor: "border-green-800",
     label: "公開済み",
     icon: <CheckCircle2 className="h-3 w-3" />,
   },
   failed: {
-    color: "text-red-700 dark:text-red-300",
-    bgColor: "bg-red-50 dark:bg-red-900/30",
-    darkBgColor: "bg-red-900/30",
-    borderColor: "border-red-200",
-    darkBorderColor: "dark:border-red-800",
+    color: "text-red-300",
+    bgColor: "bg-red-900/30",
+    borderColor: "border-red-800",
     label: "失敗",
     icon: <XCircle className="h-3 w-3" />,
   },
   draft: {
-    color: "text-gray-700 dark:text-gray-300",
-    bgColor: "bg-gray-50 dark:bg-gray-800/50",
-    darkBgColor: "bg-gray-800/50",
-    borderColor: "border-gray-200",
-    darkBorderColor: "dark:border-gray-700",
+    color: "text-neutral-400",
+    bgColor: "bg-neutral-800/50",
+    borderColor: "border-neutral-700",
     label: "下書き",
     icon: <FileEdit className="h-3 w-3" />,
   },
@@ -242,7 +234,7 @@ export default function ContentCalendar({
     return (
       <div
         key={post.id}
-        className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium truncate ${config.bgColor} ${config.color} border ${config.borderColor} ${config.darkBorderColor}`}
+        className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium truncate ${config.bgColor} ${config.color} border ${config.borderColor}`}
       >
         {config.icon}
         {!compact && (
@@ -258,20 +250,19 @@ export default function ContentCalendar({
   const renderMonthView = () => (
     <div className="grid grid-cols-7">
       {/* Weekday headers */}
-      {WEEKDAY_LABELS.map((label, i) => (
-        <div
-          key={label}
-          className={`py-2.5 text-center text-[11px] font-semibold uppercase tracking-wider border-b border-[#E2E8F0] dark:border-[#2D3748] ${
-            i === 0
-              ? "text-red-400 dark:text-red-500"
-              : i === 6
-                ? "text-blue-400 dark:text-blue-500"
-                : "text-[#64748B] dark:text-[#9CA3AF]"
-          }`}
-        >
-          {label}
-        </div>
-      ))}
+      {WEEKDAY_LABELS.map((label, i) => {
+        let weekdayColor = "text-neutral-500";
+        if (i === 0) weekdayColor = "text-red-400";
+        else if (i === 6) weekdayColor = "text-blue-400";
+        return (
+          <div
+            key={label}
+            className={`py-2.5 text-center text-[11px] font-semibold uppercase tracking-wider border-b border-white/[0.08] ${weekdayColor}`}
+          >
+            {label}
+          </div>
+        );
+      })}
 
       {/* Day cells */}
       {monthDays.map((date, i) => {
@@ -280,33 +271,29 @@ export default function ContentCalendar({
         const dayPosts = getPostsForDate(date);
         const dayOfWeek = date.getDay();
 
+        let dayNumberColor = "text-neutral-200";
+        if (isToday) dayNumberColor = "bg-emerald-500 text-white font-bold";
+        else if (!isCurrentMonth) dayNumberColor = "text-neutral-600";
+        else if (dayOfWeek === 0) dayNumberColor = "text-red-400";
+        else if (dayOfWeek === 6) dayNumberColor = "text-blue-400";
+
         return (
           <button
             key={i}
             onClick={() => handleDayClick(date)}
             className={`
-              relative min-h-[90px] sm:min-h-[110px] p-1.5 border-b border-r border-[#E2E8F0] dark:border-[#2D3748]
+              relative min-h-[90px] sm:min-h-[110px] p-1.5 border-b border-r border-white/[0.08]
               text-left transition-colors duration-150
-              hover:bg-[#F1F5F9] dark:hover:bg-[#1F2937]
-              focus:outline-none focus:ring-2 focus:ring-[#5C5CFF]/40 focus:ring-inset
-              ${!isCurrentMonth ? "bg-[#F8FAFC] dark:bg-[#111318]" : "bg-white dark:bg-[#1A1D24]"}
+              hover:bg-white/[0.04]
+              focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:ring-inset
+              ${!isCurrentMonth ? "bg-neutral-950" : "bg-neutral-900"}
               ${i % 7 === 0 ? "border-l" : ""}
             `}
           >
             <span
               className={`
                 inline-flex items-center justify-center w-6 h-6 rounded-full text-[12px] font-medium
-                ${
-                  isToday
-                    ? "bg-[#5C5CFF] text-white font-bold"
-                    : !isCurrentMonth
-                      ? "text-[#CBD5E1] dark:text-[#4B5563]"
-                      : dayOfWeek === 0
-                        ? "text-red-500 dark:text-red-400"
-                        : dayOfWeek === 6
-                          ? "text-blue-500 dark:text-blue-400"
-                          : "text-[#1A1D21] dark:text-[#E5E7EB]"
-                }
+                ${dayNumberColor}
               `}
             >
               {date.getDate()}
@@ -315,7 +302,7 @@ export default function ContentCalendar({
               <div className="mt-1 space-y-0.5">
                 {dayPosts.slice(0, 3).map((post) => renderPostChip(post))}
                 {dayPosts.length > 3 && (
-                  <span className="text-[10px] font-medium text-[#64748B] dark:text-[#9CA3AF] pl-1">
+                  <span className="text-[10px] font-medium text-neutral-500 pl-1">
                     +{dayPosts.length - 3}
                   </span>
                 )}
@@ -333,29 +320,26 @@ export default function ContentCalendar({
       {/* Weekday headers with dates */}
       {weekDays.map((date, i) => {
         const isToday = isSameDay(date, today);
+        let weekHeaderColor = "text-neutral-500";
+        if (i === 0) weekHeaderColor = "text-red-400";
+        else if (i === 6) weekHeaderColor = "text-blue-400";
         return (
           <div
             key={i}
-            className={`py-3 text-center border-b border-[#E2E8F0] dark:border-[#2D3748] ${
-              isToday ? "bg-[#5C5CFF]/5 dark:bg-[#5C5CFF]/10" : ""
+            className={`py-3 text-center border-b border-white/[0.08] ${
+              isToday ? "bg-emerald-500/10" : ""
             }`}
           >
             <div
-              className={`text-[11px] font-semibold uppercase tracking-wider mb-1 ${
-                i === 0
-                  ? "text-red-400 dark:text-red-500"
-                  : i === 6
-                    ? "text-blue-400 dark:text-blue-500"
-                    : "text-[#64748B] dark:text-[#9CA3AF]"
-              }`}
+              className={`text-[11px] font-semibold uppercase tracking-wider mb-1 ${weekHeaderColor}`}
             >
               {WEEKDAY_LABELS[i]}
             </div>
             <span
               className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-[14px] font-semibold ${
                 isToday
-                  ? "bg-[#5C5CFF] text-white"
-                  : "text-[#1A1D21] dark:text-[#E5E7EB]"
+                  ? "bg-emerald-500 text-white"
+                  : "text-neutral-200"
               }`}
             >
               {date.getDate()}
@@ -373,11 +357,11 @@ export default function ContentCalendar({
             key={`content-${i}`}
             onClick={() => handleDayClick(date)}
             className={`
-              min-h-[200px] p-2 border-b border-r border-[#E2E8F0] dark:border-[#2D3748]
+              min-h-[200px] p-2 border-b border-r border-white/[0.08]
               text-left transition-colors duration-150
-              hover:bg-[#F1F5F9] dark:hover:bg-[#1F2937]
-              focus:outline-none focus:ring-2 focus:ring-[#5C5CFF]/40 focus:ring-inset
-              ${isToday ? "bg-[#5C5CFF]/5 dark:bg-[#5C5CFF]/10" : "bg-white dark:bg-[#1A1D24]"}
+              hover:bg-white/[0.04]
+              focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:ring-inset
+              ${isToday ? "bg-emerald-500/10" : "bg-neutral-900"}
               ${i === 0 ? "border-l" : ""}
             `}
           >
@@ -387,7 +371,7 @@ export default function ContentCalendar({
                 return (
                   <div
                     key={post.id}
-                    className={`p-2 rounded-lg text-[11px] ${config.bgColor} ${config.color} border ${config.borderColor} ${config.darkBorderColor}`}
+                    className={`p-2 rounded-lg text-[11px] ${config.bgColor} ${config.color} border ${config.borderColor}`}
                   >
                     <div className="flex items-center gap-1 font-semibold mb-0.5">
                       {config.icon}
@@ -415,15 +399,15 @@ export default function ContentCalendar({
     });
 
     return (
-      <div className="divide-y divide-[#E2E8F0] dark:divide-[#2D3748]">
+      <div className="divide-y divide-white/[0.08]">
         {dayHours.map((hour) => {
           const hourPosts = postsByHour.get(hour) || [];
           return (
             <div
               key={hour}
-              className="grid grid-cols-[60px_1fr] min-h-[60px] hover:bg-[#F1F5F9] dark:hover:bg-[#1F2937] transition-colors"
+              className="grid grid-cols-[60px_1fr] min-h-[60px] hover:bg-white/[0.04] transition-colors"
             >
-              <div className="px-3 py-2 text-right text-[12px] font-medium text-[#64748B] dark:text-[#9CA3AF] border-r border-[#E2E8F0] dark:border-[#2D3748]">
+              <div className="px-3 py-2 text-right text-[12px] font-medium text-neutral-500 border-r border-white/[0.08]">
                 {String(hour).padStart(2, "0")}:00
               </div>
               <div className="p-2 space-y-1">
@@ -432,7 +416,7 @@ export default function ContentCalendar({
                   return (
                     <div
                       key={post.id}
-                      className={`p-2.5 rounded-lg ${config.bgColor} ${config.color} border ${config.borderColor} ${config.darkBorderColor}`}
+                      className={`p-2.5 rounded-lg ${config.bgColor} ${config.color} border ${config.borderColor}`}
                     >
                       <div className="flex items-center gap-1.5 font-semibold text-[12px] mb-1">
                         {config.icon}
@@ -440,7 +424,7 @@ export default function ContentCalendar({
                           {formatTime(new Date(post.scheduledAt))}
                         </span>
                         <Badge
-                          className={`ml-auto text-[10px] ${config.bgColor} ${config.color} border ${config.borderColor} ${config.darkBorderColor}`}
+                          className={`ml-auto text-[10px] ${config.bgColor} ${config.color} border ${config.borderColor}`}
                         >
                           {config.label}
                         </Badge>
@@ -467,7 +451,7 @@ export default function ContentCalendar({
             variant="outline"
             size="sm"
             onClick={goToToday}
-            className="h-8 px-3 text-[12px] font-medium border-[#E2E8F0] dark:border-[#2D3748] text-[#1A1D21] dark:text-[#E5E7EB] hover:bg-[#F1F5F9] dark:hover:bg-[#1F2937]"
+            className="h-8 px-3 text-[12px] font-medium border-white/[0.08] text-neutral-200 hover:bg-white/[0.04]"
           >
             今日
           </Button>
@@ -476,7 +460,7 @@ export default function ContentCalendar({
               variant="ghost"
               size="sm"
               onClick={() => navigate(-1)}
-              className="h-8 w-8 p-0 text-[#64748B] dark:text-[#9CA3AF] hover:text-[#1A1D21] dark:hover:text-[#E5E7EB] hover:bg-[#F1F5F9] dark:hover:bg-[#1F2937]"
+              className="h-8 w-8 p-0 text-neutral-500 hover:text-neutral-200 hover:bg-white/[0.04]"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -484,34 +468,37 @@ export default function ContentCalendar({
               variant="ghost"
               size="sm"
               onClick={() => navigate(1)}
-              className="h-8 w-8 p-0 text-[#64748B] dark:text-[#9CA3AF] hover:text-[#1A1D21] dark:hover:text-[#E5E7EB] hover:bg-[#F1F5F9] dark:hover:bg-[#1F2937]"
+              className="h-8 w-8 p-0 text-neutral-500 hover:text-neutral-200 hover:bg-white/[0.04]"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
-          <h2 className="text-[15px] font-semibold text-[#1A1D21] dark:text-[#E5E7EB]">
+          <h2 className="text-[15px] font-semibold text-neutral-200">
             {headerTitle}
           </h2>
         </div>
 
         {/* Right: View mode toggle */}
-        <div className="flex items-center bg-[#F1F5F9] dark:bg-[#1F2937] rounded-lg p-0.5 border border-[#E2E8F0] dark:border-[#2D3748]">
-          {(["month", "week", "day"] as ViewMode[]).map((mode) => (
-            <button
-              key={mode}
-              onClick={() => setViewMode(mode)}
-              className={`
-                px-3 py-1.5 rounded-md text-[12px] font-medium transition-all duration-150
-                ${
-                  viewMode === mode
-                    ? "bg-white dark:bg-[#2D3748] text-[#1A1D21] dark:text-[#E5E7EB] shadow-sm"
-                    : "text-[#64748B] dark:text-[#9CA3AF] hover:text-[#1A1D21] dark:hover:text-[#E5E7EB]"
-                }
-              `}
-            >
-              {mode === "month" ? "月" : mode === "week" ? "週" : "日"}
-            </button>
-          ))}
+        <div className="flex items-center bg-white/[0.04] rounded-lg p-0.5 border border-white/[0.08]">
+          {(["month", "week", "day"] as ViewMode[]).map((mode) => {
+            const VIEW_LABELS: Record<ViewMode, string> = { month: "月", week: "週", day: "日" };
+            return (
+              <button
+                key={mode}
+                onClick={() => setViewMode(mode)}
+                className={`
+                  px-3 py-1.5 rounded-md text-[12px] font-medium transition-all duration-150
+                  ${
+                    viewMode === mode
+                      ? "bg-white/[0.08] text-neutral-200"
+                      : "text-neutral-500 hover:text-neutral-200"
+                  }
+                `}
+              >
+                {VIEW_LABELS[mode]}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -521,7 +508,7 @@ export default function ContentCalendar({
           ([status, config]) => (
             <div key={status} className="flex items-center gap-1.5">
               <span
-                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md ${config.bgColor} ${config.color} border ${config.borderColor} ${config.darkBorderColor}`}
+                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md ${config.bgColor} ${config.color} border ${config.borderColor}`}
               >
                 {config.icon}
                 {config.label}
@@ -532,12 +519,12 @@ export default function ContentCalendar({
       </div>
 
       {/* Calendar body */}
-      <div className="bg-white dark:bg-[#1A1D24] rounded-xl border border-[#E2E8F0] dark:border-[#2D3748] shadow-sm overflow-hidden">
+      <div className="bg-neutral-900 rounded-xl border border-white/[0.08] overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <Calendar className="h-8 w-8 text-[#CBD5E1] dark:text-[#4B5563] mx-auto mb-3 animate-pulse" />
-              <p className="text-[13px] text-[#64748B] dark:text-[#9CA3AF]">
+              <Calendar className="h-8 w-8 text-neutral-600 mx-auto mb-3 animate-pulse" />
+              <p className="text-[13px] text-neutral-500">
                 読み込み中...
               </p>
             </div>
@@ -553,18 +540,18 @@ export default function ContentCalendar({
 
       {/* Day detail dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-lg bg-white dark:bg-[#1A1D24] border-[#E2E8F0] dark:border-[#2D3748]">
+        <DialogContent className="max-w-lg bg-neutral-900 border-white/[0.08]">
           <DialogHeader>
-            <DialogTitle className="text-[#1A1D21] dark:text-[#E5E7EB] flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-[#5C5CFF]" />
+            <DialogTitle className="text-neutral-200 flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-emerald-400" />
               {selectedDate && formatDate(selectedDate)}
             </DialogTitle>
           </DialogHeader>
           <div className="mt-2">
             {selectedDatePosts.length === 0 ? (
               <div className="text-center py-8">
-                <Calendar className="h-10 w-10 text-[#CBD5E1] dark:text-[#4B5563] mx-auto mb-3" />
-                <p className="text-[13px] text-[#64748B] dark:text-[#9CA3AF]">
+                <Calendar className="h-10 w-10 text-neutral-600 mx-auto mb-3" />
+                <p className="text-[13px] text-neutral-500">
                   この日の投稿はありません
                 </p>
               </div>
@@ -575,7 +562,7 @@ export default function ContentCalendar({
                   return (
                     <div
                       key={post.id}
-                      className={`p-3 rounded-lg border ${config.borderColor} ${config.darkBorderColor} ${config.bgColor}`}
+                      className={`p-3 rounded-lg border ${config.borderColor} ${config.bgColor}`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div className={`flex items-center gap-1.5 text-[12px] font-semibold ${config.color}`}>
@@ -583,15 +570,15 @@ export default function ContentCalendar({
                           {formatTime(new Date(post.scheduledAt))}
                         </div>
                         <Badge
-                          className={`text-[10px] ${config.bgColor} ${config.color} border ${config.borderColor} ${config.darkBorderColor}`}
+                          className={`text-[10px] ${config.bgColor} ${config.color} border ${config.borderColor}`}
                         >
                           {config.label}
                         </Badge>
                       </div>
-                      <p className="text-[13px] text-[#1A1D21] dark:text-[#E5E7EB] leading-relaxed">
+                      <p className="text-[13px] text-neutral-200 leading-relaxed">
                         {post.content}
                       </p>
-                      <div className="mt-2 text-[11px] text-[#64748B] dark:text-[#9CA3AF]">
+                      <div className="mt-2 text-[11px] text-neutral-500">
                         ID: {post.id} | Account: {post.accountId}
                       </div>
                     </div>
