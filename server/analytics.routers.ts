@@ -279,25 +279,27 @@ export const analyticsRouter = router({
           .limit(input.limit);
       }
 
-      // Get post content from scheduled_posts
-      const postsWithContent = await Promise.all(
-        topPosts.map(async (post) => {
-          const postContent = await db
-            .select()
-            .from(scheduledPosts)
-            .where(eq(scheduledPosts.id, post.postId))
-            .limit(1);
+      // Fetch all post content in a single query (avoids N+1 pattern)
+      const postIds = topPosts.map((p) => p.postId).filter(Boolean);
+      const postContents =
+        postIds.length > 0
+          ? await db
+              .select({ id: scheduledPosts.id, content: scheduledPosts.content })
+              .from(scheduledPosts)
+              .where(inArray(scheduledPosts.id, postIds))
+          : [];
 
-          const account = userAccounts.find((acc) => acc.id === post.accountId);
+      const contentMap = new Map(postContents.map((p) => [p.id, p.content]));
 
-          return {
-            ...post,
-            content: postContent[0]?.content || "",
-            accountName: account?.username || "Unknown",
-            engagementRate: post.engagementRate / 100,
-          };
-        })
-      );
+      const postsWithContent = topPosts.map((post) => {
+        const account = userAccounts.find((acc) => acc.id === post.accountId);
+        return {
+          ...post,
+          content: contentMap.get(post.postId) || "",
+          accountName: account?.username || "Unknown",
+          engagementRate: post.engagementRate / 100,
+        };
+      });
 
       return postsWithContent;
     }),

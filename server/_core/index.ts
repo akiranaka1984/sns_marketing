@@ -2,6 +2,8 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
+import zlib from "zlib";
+import { pipeline } from "stream";
 import rateLimit from "express-rate-limit";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
@@ -73,6 +75,56 @@ async function startServer() {
   const app = express();
 
   // -----------------------------------------------------------------------
+  // Gzip compression for API and static responses
+  // Compressible content types: JSON, HTML, JS, CSS, SVG, plain text
+  // -----------------------------------------------------------------------
+  const COMPRESSIBLE_RE = /json|text|javascript|css|svg|xml/i;
+  const COMPRESS_THRESHOLD = 1024; // skip compression for tiny responses (<1KB)
+
+  app.use((req, res, next) => {
+    const acceptEncoding = req.headers["accept-encoding"] || "";
+    if (!acceptEncoding.includes("gzip")) {
+      return next();
+    }
+
+    const originalWrite = res.write.bind(res);
+    const originalEnd = res.end.bind(res);
+    let gz: zlib.Gzip | null = null;
+
+    const tryInit = () => {
+      const ct = res.getHeader("content-type") as string | undefined;
+      const cl = Number(res.getHeader("content-length") || 0);
+      if (!ct || !COMPRESSIBLE_RE.test(ct)) return false;
+      if (cl > 0 && cl < COMPRESS_THRESHOLD) return false;
+      res.removeHeader("content-length");
+      res.setHeader("content-encoding", "gzip");
+      res.setHeader("vary", "accept-encoding");
+      gz = zlib.createGzip({ level: zlib.constants.Z_DEFAULT_COMPRESSION });
+      pipeline(gz, res as any, () => {});
+      return true;
+    };
+
+    res.write = (chunk: any, ...args: any[]) => {
+      if (!gz && !tryInit()) return originalWrite(chunk, ...args);
+      return gz!.write(chunk);
+    };
+
+    res.end = (chunk?: any, ...args: any[]) => {
+      if (!gz && chunk) {
+        if (!tryInit()) return originalEnd(chunk, ...args);
+      }
+      if (gz) {
+        if (chunk) gz.write(chunk);
+        gz.end();
+        return res as any;
+      }
+      return originalEnd(chunk, ...args);
+    };
+
+    next();
+  });
+
+  // -----------------------------------------------------------------------
   // Security hardening
   // -----------------------------------------------------------------------
 
@@ -111,7 +163,7 @@ async function startServer() {
   });
   const authLimiter = rateLimit({
     windowMs: 60 * 1000, // 1 minute
-    max: 10, // 10 requests per minute
+    max: 5, // 5 requests per minute (stricter for auth endpoints)
     standardHeaders: true,
     legacyHeaders: false,
     message: { error: 'Too many login attempts, please try again later.' },
@@ -120,6 +172,7 @@ async function startServer() {
   app.use('/api/oauth', authLimiter);
   app.use('/api/dev-login', authLimiter);
   app.use('/api/admin-login', authLimiter);
+  app.use('/api/admin/set-password', authLimiter);
 
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));

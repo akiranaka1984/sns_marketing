@@ -5,7 +5,16 @@ import * as schema from "../drizzle/schema";
 import type { BuzzLearningInput, ModelPatternInput } from "./aiEngine";
 import { encrypt, decrypt, ensureEncrypted } from "./utils/encryption";
 
-const connection = mysql.createPool(process.env.DATABASE_URL!);
+const connection = mysql.createPool({
+  uri: process.env.DATABASE_URL!,
+  // Connection pool tuning
+  connectionLimit: 20,        // max concurrent connections (default: 10)
+  waitForConnections: true,   // queue requests when pool is exhausted
+  queueLimit: 50,             // max queued requests before rejecting (0 = unlimited)
+  idleTimeout: 60000,         // release idle connections after 60s
+  enableKeepAlive: true,      // send TCP keep-alive packets
+  keepAliveInitialDelay: 10000, // delay before first keep-alive probe (10s)
+});
 export const db = drizzle(connection, { schema, mode: "default" });
 
 /** Format Date to MySQL-compatible datetime string */
@@ -514,7 +523,12 @@ export async function setSetting(key: string, value: string, description?: strin
 export async function getAllSettings(): Promise<Record<string, string>> {
   const settings = await db.select().from(schema.settings);
   return settings.reduce((acc, setting) => {
-    acc[setting.key] = setting.value || '';
+    let value = setting.value || '';
+    // Decrypt sensitive settings so callers receive plaintext
+    if (value && SENSITIVE_SETTING_KEYS.has(setting.key)) {
+      value = decrypt(value);
+    }
+    acc[setting.key] = value;
     return acc;
   }, {} as Record<string, string>);
 }

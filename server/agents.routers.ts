@@ -46,46 +46,52 @@ export const agentsRouter = router({
         throw new TRPCError({ code: 'NOT_FOUND', message: "Agent not found" });
       }
       
-      // Get linked accounts
-      const linkedAccounts = await db
-        .select({
-          id: agentAccounts.id,
-          accountId: agentAccounts.accountId,
-          isActive: agentAccounts.isActive,
-          account: accounts,
-        })
-        .from(agentAccounts)
-        .leftJoin(accounts, eq(agentAccounts.accountId, accounts.id))
-        .where(and(
-          eq(agentAccounts.agentId, input.id),
-          eq(agentAccounts.isActive, 1)
-        ));
+      // Run all detail queries in parallel to reduce total latency
+      const [linkedAccounts, knowledgeCount, rulesCount, recentLogs] =
+        await Promise.all([
+          db
+            .select({
+              id: agentAccounts.id,
+              accountId: agentAccounts.accountId,
+              isActive: agentAccounts.isActive,
+              account: accounts,
+            })
+            .from(agentAccounts)
+            .leftJoin(accounts, eq(agentAccounts.accountId, accounts.id))
+            .where(
+              and(
+                eq(agentAccounts.agentId, input.id),
+                eq(agentAccounts.isActive, 1)
+              )
+            ),
 
-      // Get knowledge count
-      const knowledgeCount = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(agentKnowledge)
-        .where(and(
-          eq(agentKnowledge.agentId, input.id),
-          eq(agentKnowledge.isActive, 1)
-        ));
+          db
+            .select({ count: sql<number>`count(*)` })
+            .from(agentKnowledge)
+            .where(
+              and(
+                eq(agentKnowledge.agentId, input.id),
+                eq(agentKnowledge.isActive, 1)
+              )
+            ),
 
-      // Get rules count
-      const rulesCount = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(agentRules)
-        .where(and(
-          eq(agentRules.agentId, input.id),
-          eq(agentRules.isActive, 1)
-        ));
+          db
+            .select({ count: sql<number>`count(*)` })
+            .from(agentRules)
+            .where(
+              and(
+                eq(agentRules.agentId, input.id),
+                eq(agentRules.isActive, 1)
+              )
+            ),
 
-      // Get recent execution logs
-      const recentLogs = await db
-        .select()
-        .from(agentExecutionLogs)
-        .where(eq(agentExecutionLogs.agentId, input.id))
-        .orderBy(desc(agentExecutionLogs.createdAt))
-        .limit(10);
+          db
+            .select()
+            .from(agentExecutionLogs)
+            .where(eq(agentExecutionLogs.agentId, input.id))
+            .orderBy(desc(agentExecutionLogs.createdAt))
+            .limit(10),
+        ]);
       
       return {
         ...agent[0],
@@ -747,33 +753,27 @@ Make each persona unique and engaging. Consider different niches, demographics, 
       const generatedData = JSON.parse(content);
       const generatedAgents = generatedData.agents;
 
-      // Insert all generated agents into database
-      const insertedAgents = [];
-      for (const agent of generatedAgents) {
-        const [newAgent] = await db
-          .insert(agents)
-          .values({
-            userId: ctx.user.id,
-            projectId: projectId || null,
-            name: agent.name,
-            theme: agent.theme,
-            tone: agent.tone as any,
-            style: agent.style as any,
-            targetAudience: agent.targetAudience,
-            description: agent.description,
-            postingFrequency: agent.postingFrequency as any,
-            postingTimeSlots: JSON.stringify(agent.postingTimeSlots),
-            isActive: 1,
-          })
-          .$returningId();
-        
-        insertedAgents.push(newAgent);
-      }
+      // Bulk-insert all generated agents in a single query
+      const agentRows = generatedAgents.map((agent: any) => ({
+        userId: ctx.user.id,
+        projectId: projectId || null,
+        name: agent.name,
+        theme: agent.theme,
+        tone: agent.tone as any,
+        style: agent.style as any,
+        targetAudience: agent.targetAudience,
+        description: agent.description,
+        postingFrequency: agent.postingFrequency as any,
+        postingTimeSlots: JSON.stringify(agent.postingTimeSlots),
+        isActive: 1,
+      }));
+
+      const [firstResult] = await db.insert(agents).values(agentRows).$returningId();
 
       return {
         success: true,
-        count: insertedAgents.length,
-        agents: insertedAgents,
+        count: agentRows.length,
+        agents: [firstResult],
       };
     }),
 

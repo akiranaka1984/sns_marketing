@@ -62,7 +62,20 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use(express.static(distPath));
+  app.use(
+    express.static(distPath, {
+      // Hashed assets (e.g. main.abc123.js) can be cached indefinitely
+      setHeaders(res, filePath) {
+        if (/\.[0-9a-f]{8,}\.(js|css|woff2?|png|jpg|svg|ico)$/i.test(filePath)) {
+          // Immutable: content-addressable files never change
+          res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        } else {
+          // HTML and other non-hashed files: validate on each request
+          res.setHeader("Cache-Control", "no-cache");
+        }
+      },
+    })
+  );
 
   // fall through to index.html if the file doesn't exist
   app.use("*", (_req, res) => {
