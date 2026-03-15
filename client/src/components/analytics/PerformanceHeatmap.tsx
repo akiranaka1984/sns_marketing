@@ -26,20 +26,20 @@ function getCellColor(
   engagementRate: number | undefined,
   percentiles: { p25: number; p50: number; p75: number }
 ): string {
-  if (engagementRate === undefined) return "#F1F5F9";
-  if (engagementRate <= percentiles.p25) return "#DBEAFE";
-  if (engagementRate <= percentiles.p50) return "#93C5FD";
-  if (engagementRate <= percentiles.p75) return "#3B82F6";
-  return "#1D4ED8";
+  if (engagementRate === undefined) return "#262626";
+  if (engagementRate <= percentiles.p25) return "#064E3B";
+  if (engagementRate <= percentiles.p50) return "#059669";
+  if (engagementRate <= percentiles.p75) return "#10B981";
+  return "#34D399";
 }
 
 function getTextColor(
   engagementRate: number | undefined,
   percentiles: { p25: number; p50: number; p75: number }
 ): string {
-  if (engagementRate === undefined) return "#64748B";
-  if (engagementRate <= percentiles.p50) return "#1A1D21";
-  return "#EEF2FF";
+  if (engagementRate === undefined) return "#525252";
+  if (engagementRate <= percentiles.p25) return "#6EE7B7";
+  return "#ffffff";
 }
 
 function computePercentiles(values: number[]): {
@@ -77,11 +77,11 @@ function LoadingSkeleton() {
     <div className="space-y-2">
       {DAY_LABELS.map((_, dayIndex) => (
         <div key={dayIndex} className="flex items-center gap-1">
-          <div className="w-8 h-6 rounded bg-gray-200 animate-pulse" />
+          <div className="w-8 h-6 rounded bg-neutral-800 animate-pulse" />
           {HOURS.map((hour) => (
             <div
               key={hour}
-              className="w-6 h-6 rounded-sm bg-gray-200 animate-pulse"
+              className="w-6 h-6 rounded-sm bg-neutral-800 animate-pulse"
               style={{ animationDelay: `${(dayIndex * 24 + hour) * 15}ms` }}
             />
           ))}
@@ -188,8 +188,8 @@ export function PerformanceHeatmap({ data, isLoading }: HeatmapProps) {
                 <div
                   className="absolute z-10 px-3 py-2 rounded-lg shadow-lg text-xs pointer-events-none whitespace-nowrap"
                   style={{
-                    backgroundColor: "#1A1D21",
-                    color: "#EEF2FF",
+                    backgroundColor: "#171717",
+                    color: "#e5e5e5",
                     left: tooltip.x,
                     top: tooltip.y - 8,
                     transform: "translate(-50%, -100%)",
@@ -210,7 +210,7 @@ export function PerformanceHeatmap({ data, isLoading }: HeatmapProps) {
                     style={{
                       borderLeft: "4px solid transparent",
                       borderRight: "4px solid transparent",
-                      borderTop: "4px solid #1A1D21",
+                      borderTop: "4px solid #171717",
                     }}
                   />
                 </div>
@@ -277,7 +277,7 @@ export function PerformanceHeatmap({ data, isLoading }: HeatmapProps) {
                 >
                   低
                 </span>
-                {["#F1F5F9", "#DBEAFE", "#93C5FD", "#3B82F6", "#1D4ED8"].map(
+                {["#262626", "#064E3B", "#059669", "#10B981", "#34D399"].map(
                   (color) => (
                     <div
                       key={color}
@@ -298,8 +298,7 @@ export function PerformanceHeatmap({ data, isLoading }: HeatmapProps) {
             {/* AI Recommendation */}
             {topSlot && (
               <div
-                className="flex items-start gap-2 rounded-lg px-3 py-2.5 text-sm"
-                style={{ backgroundColor: "#EEF2FF", color: "#5C5CFF" }}
+                className="flex items-start gap-2 rounded-lg px-3 py-2.5 text-sm bg-emerald-500/10 text-emerald-400"
               >
                 <svg
                   className="w-4 h-4 mt-0.5 shrink-0"

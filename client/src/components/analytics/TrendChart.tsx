@@ -26,7 +26,7 @@ type TimeSeriesPoint = {
 type MetricKey = "engagementRate" | "posts" | "views" | "likes" | "comments" | "shares";
 
 const METRICS: { key: MetricKey; label: string; color: string; icon: React.ReactNode }[] = [
-  { key: "engagementRate", label: "エンゲージメント率", color: "#5C5CFF", icon: <TrendingUp className="w-3.5 h-3.5" /> },
+  { key: "engagementRate", label: "エンゲージメント率", color: "#10B981", icon: <TrendingUp className="w-3.5 h-3.5" /> },
   { key: "posts", label: "投稿数", color: "#06B6D4", icon: <TrendingUp className="w-3.5 h-3.5" /> },
   { key: "views", label: "視聴回数", color: "#2563EB", icon: <Eye className="w-3.5 h-3.5" /> },
   { key: "likes", label: "いいね", color: "#10B981", icon: <Heart className="w-3.5 h-3.5" /> },
@@ -71,17 +71,17 @@ export function TrendChart({
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-[#1A1D24] rounded-xl border border-[#E2E8F0] dark:border-[#2D3748] p-4 shadow-sm">
-        <div className="h-4 w-32 bg-[#F1F5F9] dark:bg-[#1F2937] rounded shimmer mb-2" />
-        <div className="h-3 w-48 bg-[#F1F5F9] dark:bg-[#1F2937] rounded shimmer mb-4" />
-        <div className="h-[300px] bg-[#F8FAFC] dark:bg-[#111318] rounded-lg shimmer" />
+      <div className="bg-neutral-900 border border-white/[0.08] rounded-xl p-4 shadow-sm">
+        <div className="h-4 w-32 bg-neutral-800 rounded shimmer mb-2" />
+        <div className="h-3 w-48 bg-neutral-800 rounded shimmer mb-4" />
+        <div className="h-[300px] bg-neutral-800 rounded-lg shimmer" />
       </div>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white dark:bg-[#1A1D24] rounded-xl border border-[#E2E8F0] dark:border-[#2D3748] p-4 shadow-sm">
+      <div className="bg-neutral-900 border border-white/[0.08] rounded-xl p-4 shadow-sm">
         <h3 className="font-semibold text-sm text-[#1E293B] dark:text-[#E5E7EB] mb-1">パフォーマンストレンド</h3>
         <div className="text-center py-12">
           <TrendingUp className="h-12 w-12 text-[#94A3B8] mx-auto mb-4" />
@@ -102,7 +102,7 @@ export function TrendChart({
   const hasCountMetrics = [...activeMetrics].some((m) => m !== "engagementRate");
 
   return (
-    <div className="bg-white dark:bg-[#1A1D24] rounded-xl border border-[#E2E8F0] dark:border-[#2D3748] p-4 shadow-sm">
+    <div className="bg-neutral-900 border border-white/[0.08] rounded-xl p-4 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div>
           <h3 className="font-semibold text-sm text-[#1E293B] dark:text-[#E5E7EB]">パフォーマンストレンド</h3>
@@ -140,16 +140,16 @@ export function TrendChart({
                 </linearGradient>
               ))}
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" strokeOpacity={0.5} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#262626" strokeOpacity={1} />
             <XAxis
               dataKey="dateLabel"
-              tick={{ fontSize: 11, fill: "#94A3B8" }}
+              tick={{ fontSize: 11, fill: "#737373" }}
               tickLine={false}
-              axisLine={{ stroke: "#E5E7EB" }}
+              axisLine={{ stroke: "#262626" }}
             />
             <YAxis
               yAxisId="left"
-              tick={{ fontSize: 11, fill: "#94A3B8" }}
+              tick={{ fontSize: 11, fill: "#737373" }}
               tickLine={false}
               axisLine={false}
               tickFormatter={(v) => {
@@ -162,7 +162,7 @@ export function TrendChart({
               <YAxis
                 yAxisId="right"
                 orientation="right"
-                tick={{ fontSize: 11, fill: "#94A3B8" }}
+                tick={{ fontSize: 11, fill: "#737373" }}
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(v) => `${v}%`}
@@ -170,10 +170,10 @@ export function TrendChart({
             )}
             <Tooltip
               contentStyle={{
-                background: "white",
-                border: "1px solid #E2E8F0",
+                backgroundColor: "#171717",
+                border: "1px solid #262626",
                 borderRadius: "10px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                color: "#e5e5e5",
                 fontSize: "12px",
               }}
               formatter={(value: number, name: string) => {

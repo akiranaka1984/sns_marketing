@@ -18,11 +18,11 @@ const STAGE_LABELS: Record<string, string> = {
 };
 
 const STAGE_COLORS: Record<string, string> = {
-  impression: "#93C5FD",
-  engagement: "#60A5FA",
-  profile_visit: "#3B82F6",
-  follow: "#2563EB",
-  conversion: "#1D4ED8",
+  impression: "#6EE7B7",
+  engagement: "#34D399",
+  profile_visit: "#10B981",
+  follow: "#059669",
+  conversion: "#047857",
 };
 
 function SkeletonBar({ width }: { width: string }) {
@@ -30,10 +30,10 @@ function SkeletonBar({ width }: { width: string }) {
     <div className="flex flex-col items-center gap-2">
       <div className="flex w-full items-center gap-4">
         <div
-          className="h-10 animate-pulse rounded bg-gray-200"
+          className="h-10 animate-pulse rounded bg-neutral-800"
           style={{ width }}
         />
-        <div className="h-4 w-20 animate-pulse rounded bg-gray-200" />
+        <div className="h-4 w-20 animate-pulse rounded bg-neutral-800" />
       </div>
     </div>
   );

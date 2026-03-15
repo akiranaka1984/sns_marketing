@@ -248,10 +248,10 @@ export default function GrowthDashboard() {
       title: "Avg Comments",
       value: kpiSummary?.recentStats.avgComments ?? 0,
       icon: MessageCircle,
-      gradient: "from-[#8b5cf6] to-[#8b5cf6]/60",
-      iconBg: "bg-violet-500/10",
-      iconColor: "text-violet-400",
-      sparkColor: "#8b5cf6",
+      gradient: "from-[#10B981] to-[#10B981]/60",
+      iconBg: "bg-emerald-500/10",
+      iconColor: "text-emerald-400",
+      sparkColor: "#10B981",
     },
     {
       title: "Pending Posts",
@@ -324,7 +324,7 @@ export default function GrowthDashboard() {
       {!selectedProjectId && (
         <div className="fade-in-up animation-delay-200">
           <div className="bg-card rounded-2xl p-12 shadow-sm border border-border text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[#3db9cf]/20 to-[#8b5cf6]/20 flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[#3db9cf]/20 to-[#10B981]/20 flex items-center justify-center">
               <BarChart3 className="w-8 h-8 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">Select a Project</h3>
@@ -381,8 +381,8 @@ export default function GrowthDashboard() {
             <div className="fade-in-up animation-delay-300 lg:col-span-1">
               <div className="bg-card rounded-2xl p-6 h-full shadow-sm border border-border">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-[#3db9cf]/10 to-[#8b5cf6]/10">
-                    <Zap className="w-5 h-5 text-violet-400" />
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-[#3db9cf]/10 to-[#10B981]/10">
+                    <Zap className="w-5 h-5 text-emerald-400" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg text-foreground">Growth Loop</h3>
@@ -622,7 +622,7 @@ export default function GrowthDashboard() {
                       >
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#3db9cf]/20 to-[#8b5cf6]/20 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#3db9cf]/20 to-[#10B981]/20 flex items-center justify-center">
                               <span className="text-xs font-bold gradient-text">
                                 {account.username.charAt(0).toUpperCase()}
                               </span>
