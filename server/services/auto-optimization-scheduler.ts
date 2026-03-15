@@ -11,6 +11,9 @@ import { agents, aiOptimizations } from "../../drizzle/schema";
 import { eq, and, gte, desc, lt, isNotNull } from "drizzle-orm";
 import { analyzeAgentPerformance, saveInsightsToKnowledge } from "./engagement-analyzer";
 import { generateOptimizationSuggestions, applyOptimization, OptimizationSuggestion } from "./strategy-optimizer";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger("auto-optimization-scheduler");
 
 /** Convert Date to MySQL-compatible timestamp string */
 function toMySQLTimestamp(date: Date): string {
@@ -45,21 +48,21 @@ const CHECK_INTERVAL_MS = 60 * 60 * 1000; // Check every hour for agents needing
  */
 export function startAutoOptimizationScheduler() {
   if (schedulerInterval) {
-    console.log('[AutoOptimization] Scheduler already running');
+    logger.info('Scheduler already running');
     return;
   }
 
-  console.log('[AutoOptimization] Starting scheduler...');
+  logger.info('Starting scheduler...');
 
   // Run immediately on start
-  runOptimizationCheck().catch(console.error);
+  runOptimizationCheck().catch((err) => logger.error("Optimization check failed:", err));
 
   // Then run periodically
   schedulerInterval = setInterval(() => {
-    runOptimizationCheck().catch(console.error);
+    runOptimizationCheck().catch((err) => logger.error("Optimization check failed:", err));
   }, CHECK_INTERVAL_MS);
 
-  console.log('[AutoOptimization] Scheduler started (checking every hour)');
+  logger.info('Scheduler started (checking every hour)');
 }
 
 /**
@@ -69,7 +72,7 @@ export function stopAutoOptimizationScheduler() {
   if (schedulerInterval) {
     clearInterval(schedulerInterval);
     schedulerInterval = null;
-    console.log('[AutoOptimization] Scheduler stopped');
+    logger.info('Scheduler stopped');
   }
 }
 
@@ -77,7 +80,7 @@ export function stopAutoOptimizationScheduler() {
  * Main optimization check function
  */
 async function runOptimizationCheck(): Promise<void> {
-  console.log('[AutoOptimization] Running optimization check...');
+  logger.info('Running optimization check...');
 
   try {
     // Get all active agents with auto-optimization enabled
@@ -89,13 +92,13 @@ async function runOptimizationCheck(): Promise<void> {
       try {
         await checkAndOptimizeAgent(agent);
       } catch (error) {
-        console.error(`[AutoOptimization] Error processing agent ${agent.id}:`, error);
+        logger.error(`Error processing agent ${agent.id}:`, error);
       }
     }
 
-    console.log(`[AutoOptimization] Check completed for ${activeAgents.length} agents`);
+    logger.info(`Check completed for ${activeAgents.length} agents`);
   } catch (error) {
-    console.error('[AutoOptimization] Error in optimization check:', error);
+    logger.error('Error in optimization check:', error);
   }
 }
 
@@ -111,7 +114,7 @@ function getAutoOptimizationSettings(agent: any): AutoOptimizationSettings {
       return { ...DEFAULT_AUTO_OPTIMIZATION_SETTINGS, ...parsed };
     }
   } catch (e) {
-    console.warn(`[AutoOptimization] Failed to parse settings for agent ${agent.id}`);
+    logger.warn(`Failed to parse settings for agent ${agent.id}`);
   }
   return DEFAULT_AUTO_OPTIMIZATION_SETTINGS;
 }
@@ -154,26 +157,26 @@ async function checkAndOptimizeAgent(agent: any): Promise<void> {
   });
 
   if (recentOptimizations.length >= settings.maxAutoOptimizationsPerWeek) {
-    console.log(`[AutoOptimization] Agent ${agent.id} reached weekly limit (${recentOptimizations.length}/${settings.maxAutoOptimizationsPerWeek})`);
+    logger.info(`Agent ${agent.id} reached weekly limit (${recentOptimizations.length}/${settings.maxAutoOptimizationsPerWeek})`);
     return;
   }
 
   // Analyze agent performance
-  console.log(`[AutoOptimization] Analyzing performance for agent ${agent.id}...`);
+  logger.info(`Analyzing performance for agent ${agent.id}...`);
   const performance = await analyzeAgentPerformance(agent.id, 7);
 
   // Check if optimization is needed
   if (performance.totalPosts < 3) {
-    console.log(`[AutoOptimization] Agent ${agent.id} has insufficient posts (${performance.totalPosts}) for analysis`);
+    logger.info(`Agent ${agent.id} has insufficient posts (${performance.totalPosts}) for analysis`);
     return;
   }
 
   if (performance.avgEngagementRate >= settings.minEngagementRateThreshold) {
-    console.log(`[AutoOptimization] Agent ${agent.id} engagement (${performance.avgEngagementRate.toFixed(2)}%) is above threshold (${settings.minEngagementRateThreshold}%)`);
+    logger.info(`Agent ${agent.id} engagement (${performance.avgEngagementRate.toFixed(2)}%) is above threshold (${settings.minEngagementRateThreshold}%)`);
     return;
   }
 
-  console.log(`[AutoOptimization] Agent ${agent.id} engagement (${performance.avgEngagementRate.toFixed(2)}%) is below threshold (${settings.minEngagementRateThreshold}%). Generating suggestions...`);
+  logger.info(`Agent ${agent.id} engagement (${performance.avgEngagementRate.toFixed(2)}%) is below threshold (${settings.minEngagementRateThreshold}%). Generating suggestions...`);
 
   // Save insights to knowledge base
   await saveInsightsToKnowledge(agent.id, performance.insights);
@@ -187,7 +190,7 @@ async function checkAndOptimizeAgent(agent: any): Promise<void> {
   );
 
   if (filteredSuggestions.length === 0) {
-    console.log(`[AutoOptimization] No applicable suggestions for agent ${agent.id}`);
+    logger.info(`No applicable suggestions for agent ${agent.id}`);
     return;
   }
 
@@ -202,11 +205,11 @@ async function checkAndOptimizeAgent(agent: any): Promise<void> {
   if (settings.requireConfirmation) {
     // Create pending optimization for user review
     await createPendingOptimization(agent, bestSuggestion, performance.avgEngagementRate);
-    console.log(`[AutoOptimization] Created pending optimization for agent ${agent.id}: "${bestSuggestion.title}"`);
+    logger.info(`Created pending optimization for agent ${agent.id}: "${bestSuggestion.title}"`);
   } else {
     // Apply automatically
     await applyOptimization(agent.id, bestSuggestion);
-    console.log(`[AutoOptimization] Applied optimization for agent ${agent.id}: "${bestSuggestion.title}"`);
+    logger.info(`Applied optimization for agent ${agent.id}: "${bestSuggestion.title}"`);
   }
 }
 

@@ -23,6 +23,9 @@ import {
 import { eq, and, gte, lte, desc, sql, count, between, inArray } from "drizzle-orm";
 import { invokeLLM } from "../_core/llm";
 import { generateContent, buildAgentContext } from "../agent-engine";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger("content-calendar-engine");
 
 /** Convert Date to MySQL-compatible timestamp string */
 function toMySQLTimestamp(date: Date): string {
@@ -101,7 +104,7 @@ export async function generateWeeklyCalendar(
   projectId: number,
   weekStartDate: Date
 ): Promise<typeof contentCalendar.$inferSelect[]> {
-  console.log(`[ContentCalendar] Generating weekly calendar for project ${projectId}, week starting ${weekStartDate.toISOString()}`);
+  logger.info(`Generating weekly calendar for project ${projectId}, week starting ${weekStartDate.toISOString()}`);
 
   // Get project and strategy
   const project = await db.query.projects.findFirst({
@@ -235,7 +238,7 @@ export async function generateWeeklyCalendar(
     orderBy: [contentCalendar.scheduledDate, contentCalendar.timeSlot],
   });
 
-  console.log(`[ContentCalendar] Generated ${generated.length} calendar slots for project ${projectId}`);
+  logger.info(`Generated ${generated.length} calendar slots for project ${projectId}`);
   return generated;
 }
 
@@ -374,7 +377,7 @@ Return JSON: {"topics": ["topic1", "topic2", ...]}`,
     const result = JSON.parse(typeof messageContent === "string" ? messageContent : "{}");
     return result.topics || [];
   } catch (error) {
-    console.error("[ContentCalendar] Failed to generate topic suggestions:", error);
+    logger.error("Failed to generate topic suggestions:", error);
     // Return empty topics on failure; slots will have null topics
     return [];
   }
@@ -392,7 +395,7 @@ export async function getNextContentType(
   projectId: number,
   accountId?: number
 ): Promise<string> {
-  console.log(`[ContentCalendar] Getting next content type for project ${projectId}${accountId ? `, account ${accountId}` : ""}`);
+  logger.info(`Getting next content type for project ${projectId}${accountId ? `, account ${accountId}` : ""}`);
 
   // Get recent calendar slots
   const conditions = [eq(contentCalendar.projectId, projectId)];
@@ -441,7 +444,7 @@ export async function getNextContentType(
     for (const t of available) {
       rand -= CONTENT_TYPE_WEIGHTS[t];
       if (rand <= 0) {
-        console.log(`[ContentCalendar] Recommended next type: ${t} (avoiding consecutive ${lastType})`);
+        logger.info(`Recommended next type: ${t} (avoiding consecutive ${lastType})`);
         return t;
       }
     }
@@ -456,7 +459,7 @@ export async function getNextContentType(
   for (const t of nonReserved) {
     rand -= CONTENT_TYPE_WEIGHTS[t];
     if (rand <= 0) {
-      console.log(`[ContentCalendar] Recommended next type: ${t}`);
+      logger.info(`Recommended next type: ${t}`);
       return t;
     }
   }
@@ -472,7 +475,7 @@ export async function ensureDiversity(
   projectId: number,
   weekStartDate: Date
 ): Promise<DiversityReport> {
-  console.log(`[ContentCalendar] Checking diversity for project ${projectId}, week ${weekStartDate.toISOString()}`);
+  logger.info(`Checking diversity for project ${projectId}, week ${weekStartDate.toISOString()}`);
 
   const weekEndDate = new Date(weekStartDate);
   weekEndDate.setDate(weekEndDate.getDate() + 7);
@@ -551,9 +554,9 @@ export async function ensureDiversity(
 
   const adjusted = changes.length > 0;
   if (adjusted) {
-    console.log(`[ContentCalendar] Rebalanced ${changes.length} slots for diversity`);
+    logger.info(`Rebalanced ${changes.length} slots for diversity`);
   } else {
-    console.log(`[ContentCalendar] Content distribution is balanced`);
+    logger.info(`Content distribution is balanced`);
   }
 
   return { adjusted, changes, distribution };
@@ -572,7 +575,7 @@ export async function fillCalendarSlot(
   calendarId: number,
   agentId: number
 ): Promise<{ success: boolean; scheduledPostId?: number; error?: string }> {
-  console.log(`[ContentCalendar] Filling calendar slot ${calendarId} with agent ${agentId}`);
+  logger.info(`Filling calendar slot ${calendarId} with agent ${agentId}`);
 
   // Get the calendar entry
   const calendarEntry = await db.query.contentCalendar.findFirst({
@@ -660,11 +663,11 @@ export async function fillCalendarSlot(
       })
       .where(eq(contentCalendar.id, calendarId));
 
-    console.log(`[ContentCalendar] Filled slot ${calendarId} with scheduledPost ${scheduledPostId}`);
+    logger.info(`Filled slot ${calendarId} with scheduledPost ${scheduledPostId}`);
     return { success: true, scheduledPostId };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    console.error(`[ContentCalendar] Failed to fill slot ${calendarId}:`, error);
+    logger.error(`Failed to fill slot ${calendarId}:`, error);
     return { success: false, error: errorMessage };
   }
 }
@@ -676,7 +679,7 @@ export async function fillCalendarSlot(
 export async function fillPendingSlots(
   projectId: number
 ): Promise<{ filled: number; failed: number; skipped: number }> {
-  console.log(`[ContentCalendar] Filling pending slots for project ${projectId}`);
+  logger.info(`Filling pending slots for project ${projectId}`);
 
   const now = new Date();
   const cutoff = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours from now
@@ -700,7 +703,7 @@ export async function fillPendingSlots(
     // Skip reserved slots
     if (slot.contentType === "reserved") {
       skipped++;
-      console.log(`[ContentCalendar] Skipping reserved slot ${slot.id}`);
+      logger.info(`Skipping reserved slot ${slot.id}`);
       continue;
     }
 
@@ -716,7 +719,7 @@ export async function fillPendingSlots(
       });
 
       if (!projectAgent) {
-        console.error(`[ContentCalendar] No agent available for slot ${slot.id}`);
+        logger.error(`No agent available for slot ${slot.id}`);
         failed++;
         continue;
       }
@@ -737,7 +740,7 @@ export async function fillPendingSlots(
     }
   }
 
-  console.log(`[ContentCalendar] Fill results: ${filled} filled, ${failed} failed, ${skipped} skipped (reserved)`);
+  logger.info(`Fill results: ${filled} filled, ${failed} failed, ${skipped} skipped (reserved)`);
   return { filled, failed, skipped };
 }
 
@@ -775,7 +778,7 @@ export async function analyzeContentGaps(
   projectId: number,
   days: number = 14
 ): Promise<GapAnalysisResult> {
-  console.log(`[ContentCalendar] Analyzing content gaps for project ${projectId} over ${days} days`);
+  logger.info(`Analyzing content gaps for project ${projectId} over ${days} days`);
 
   const now = new Date();
   const endDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
@@ -883,7 +886,7 @@ export async function analyzeContentGaps(
     recommendations,
   };
 
-  console.log(`[ContentCalendar] Gap analysis: ${result.daysWithContent}/${result.totalDays} days covered, ${typeImbalances.length} type imbalances`);
+  logger.info(`Gap analysis: ${result.daysWithContent}/${result.totalDays} days covered, ${typeImbalances.length} type imbalances`);
   return result;
 }
 
@@ -899,7 +902,7 @@ export async function getCalendar(
   startDate: Date,
   endDate: Date
 ): Promise<typeof contentCalendar.$inferSelect[]> {
-  console.log(`[ContentCalendar] Fetching calendar for project ${projectId} from ${startDate.toISOString()} to ${endDate.toISOString()}`);
+  logger.info(`Fetching calendar for project ${projectId} from ${startDate.toISOString()} to ${endDate.toISOString()}`);
 
   const entries = await db.query.contentCalendar.findMany({
     where: and(
@@ -910,7 +913,7 @@ export async function getCalendar(
     orderBy: [contentCalendar.scheduledDate, contentCalendar.timeSlot],
   });
 
-  console.log(`[ContentCalendar] Found ${entries.length} calendar entries`);
+  logger.info(`Found ${entries.length} calendar entries`);
   return entries;
 }
 
@@ -930,7 +933,7 @@ export async function updateSlot(
     campaignId: number | null;
   }>
 ): Promise<typeof contentCalendar.$inferSelect | null> {
-  console.log(`[ContentCalendar] Updating calendar slot ${calendarId}`);
+  logger.info(`Updating calendar slot ${calendarId}`);
 
   await db
     .update(contentCalendar)
@@ -952,7 +955,7 @@ export async function markSlotAsTrendResponse(
   calendarId: number,
   trendId: number
 ): Promise<{ success: boolean; error?: string }> {
-  console.log(`[ContentCalendar] Marking slot ${calendarId} as trend response for trend ${trendId}`);
+  logger.info(`Marking slot ${calendarId} as trend response for trend ${trendId}`);
 
   // Get the calendar entry
   const calendarEntry = await db.query.contentCalendar.findFirst({
@@ -964,7 +967,7 @@ export async function markSlotAsTrendResponse(
   }
 
   if (calendarEntry.contentType !== "reserved" && calendarEntry.status !== "planned") {
-    console.log(`[ContentCalendar] Slot ${calendarId} is not reserved/planned (type: ${calendarEntry.contentType}, status: ${calendarEntry.status}), converting anyway`);
+    logger.info(`Slot ${calendarId} is not reserved/planned (type: ${calendarEntry.contentType}, status: ${calendarEntry.status}), converting anyway`);
   }
 
   // Get the trend
@@ -997,6 +1000,6 @@ export async function markSlotAsTrendResponse(
     .set({ status: "responding" })
     .where(eq(trackedTrends.id, trendId));
 
-  console.log(`[ContentCalendar] Slot ${calendarId} marked for trend "${trend.trendName}"`);
+  logger.info(`Slot ${calendarId} marked for trend "${trend.trendName}"`);
   return { success: true };
 }

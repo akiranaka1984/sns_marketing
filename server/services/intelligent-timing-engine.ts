@@ -19,6 +19,9 @@ import {
   scheduledPosts,
 } from "../../drizzle/schema";
 import { eq, and, gte, desc, sql, avg } from "drizzle-orm";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger("intelligent-timing-engine");
 
 /** Convert Date to MySQL-compatible timestamp string */
 function toMySQLTimestamp(date: Date): string {
@@ -84,11 +87,9 @@ export async function analyzeOptimalTimes(
   accountId: number,
   projectId?: number
 ): Promise<OptimalTimeSlot[]> {
-  const LOG_PREFIX = "[TimingEngine]";
-
   try {
-    console.log(
-      `${LOG_PREFIX} Analyzing optimal times for account ${accountId}${projectId ? ` (project ${projectId})` : ""}`
+    logger.info(
+      `Analyzing optimal times for account ${accountId}${projectId ? ` (project ${projectId})` : ""}`
     );
 
     // Query post analytics for this account, joined with posts to get publishedAt
@@ -127,9 +128,7 @@ export async function analyzeOptimalTimes(
       : analyticsRows;
 
     if (filteredRows.length === 0) {
-      console.log(
-        `${LOG_PREFIX} No analytics data found for account ${accountId}`
-      );
+      logger.info(`No analytics data found for account ${accountId}`);
       return [];
     }
 
@@ -201,16 +200,11 @@ export async function analyzeOptimalTimes(
     scoredSlots.sort((a, b) => b.score - a.score);
     const topSlots = scoredSlots.slice(0, 5);
 
-    console.log(
-      `${LOG_PREFIX} Top hours for account ${accountId}: ${topSlots.map((s) => s.timeLabel).join(", ")}`
-    );
+    logger.info(`Top hours for account ${accountId}: ${topSlots.map((s) => s.timeLabel).join(", ")}`);
 
     return topSlots;
   } catch (error) {
-    console.error(
-      `[TimingEngine] Error analyzing optimal times for account ${accountId}:`,
-      error
-    );
+    logger.error(`Error analyzing optimal times for account ${accountId}:`, error);
     return [];
   }
 }
@@ -223,12 +217,8 @@ export async function analyzeOptimalTimes(
 export async function crossAnalyzeWithModelAccounts(
   userId: number
 ): Promise<OptimalTimeSlot[]> {
-  const LOG_PREFIX = "[TimingEngine]";
-
   try {
-    console.log(
-      `${LOG_PREFIX} Cross-analyzing model account timing for user ${userId}`
-    );
+    logger.info(`Cross-analyzing model account timing for user ${userId}`);
 
     // Two-step approach: first find model account IDs linked to user's accounts,
     // then fetch their behavior patterns.
@@ -246,9 +236,7 @@ export async function crossAnalyzeWithModelAccounts(
       );
 
     if (modelLinks.length === 0) {
-      console.log(
-        `${LOG_PREFIX} No model accounts linked for user ${userId}`
-      );
+      logger.info(`No model accounts linked for user ${userId}`);
       return [];
     }
 
@@ -272,9 +260,7 @@ export async function crossAnalyzeWithModelAccounts(
       );
 
     if (behaviorPatterns.length === 0) {
-      console.log(
-        `${LOG_PREFIX} No behavior patterns found for model accounts of user ${userId}`
-      );
+      logger.info(`No behavior patterns found for model accounts of user ${userId}`);
       return [];
     }
 
@@ -333,16 +319,11 @@ export async function crossAnalyzeWithModelAccounts(
     scoredSlots.sort((a, b) => b.score - a.score);
     const topSlots = scoredSlots.slice(0, 5);
 
-    console.log(
-      `${LOG_PREFIX} Model account top hours for user ${userId}: ${topSlots.map((s) => s.timeLabel).join(", ")}`
-    );
+    logger.info(`Model account top hours for user ${userId}: ${topSlots.map((s) => s.timeLabel).join(", ")}`);
 
     return topSlots;
   } catch (error) {
-    console.error(
-      `[TimingEngine] Error cross-analyzing model accounts for user ${userId}:`,
-      error
-    );
+    logger.error(`Error cross-analyzing model accounts for user ${userId}:`, error);
     return [];
   }
 }
@@ -355,10 +336,8 @@ export async function crossAnalyzeWithModelAccounts(
 export async function optimizeAgentTimingSlots(
   agentId: number
 ): Promise<TimingOptimizationResult | null> {
-  const LOG_PREFIX = "[TimingEngine]";
-
   try {
-    console.log(`${LOG_PREFIX} Optimizing timing slots for agent ${agentId}`);
+    logger.info(`Optimizing timing slots for agent ${agentId}`);
 
     // 1. Get the agent
     const [agent] = await db
@@ -367,7 +346,7 @@ export async function optimizeAgentTimingSlots(
       .where(eq(agents.id, agentId));
 
     if (!agent) {
-      console.error(`${LOG_PREFIX} Agent not found: ${agentId}`);
+      logger.error(`Agent not found: ${agentId}`);
       return null;
     }
 
@@ -448,9 +427,7 @@ export async function optimizeAgentTimingSlots(
 
     // If no data available, keep existing slots
     if (newTimeSlots.length === 0) {
-      console.log(
-        `${LOG_PREFIX} No timing data available for agent ${agentId}, keeping existing slots`
-      );
+      logger.info(`No timing data available for agent ${agentId}, keeping existing slots`);
       return {
         agentId,
         previousTimeSlots,
@@ -476,9 +453,7 @@ export async function optimizeAgentTimingSlots(
       })
       .where(eq(agents.id, agentId));
 
-    console.log(
-      `${LOG_PREFIX} Updated agent ${agentId} time slots: [${previousTimeSlots.join(", ")}] -> [${newTimeSlots.join(", ")}]`
-    );
+    logger.info(`Updated agent ${agentId} time slots: [${previousTimeSlots.join(", ")}] -> [${newTimeSlots.join(", ")}]`);
 
     return {
       agentId,
@@ -492,10 +467,7 @@ export async function optimizeAgentTimingSlots(
       updatedAt: new Date().toISOString(),
     };
   } catch (error) {
-    console.error(
-      `[TimingEngine] Error optimizing timing for agent ${agentId}:`,
-      error
-    );
+    logger.error(`Error optimizing timing for agent ${agentId}:`, error);
     return null;
   }
 }
@@ -508,12 +480,8 @@ export async function optimizeAgentTimingSlots(
 export async function getTimingReport(
   accountId: number
 ): Promise<TimingReport> {
-  const LOG_PREFIX = "[TimingEngine]";
-
   try {
-    console.log(
-      `${LOG_PREFIX} Generating timing report for account ${accountId}`
-    );
+    logger.info(`Generating timing report for account ${accountId}`);
 
     const analysisPeriodDays = 30;
     const cutoffDate = new Date();
@@ -625,16 +593,11 @@ export async function getTimingReport(
       generatedAt: new Date().toISOString(),
     };
 
-    console.log(
-      `${LOG_PREFIX} Timing report generated for account ${accountId}: ${analyticsRows.length} posts analyzed`
-    );
+    logger.info(`Timing report generated for account ${accountId}: ${analyticsRows.length} posts analyzed`);
 
     return report;
   } catch (error) {
-    console.error(
-      `[TimingEngine] Error generating timing report for account ${accountId}:`,
-      error
-    );
+    logger.error(`Error generating timing report for account ${accountId}:`, error);
 
     // Return an empty report on error
     return {

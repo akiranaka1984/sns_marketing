@@ -186,9 +186,9 @@ export async function registerBuzzPosts(detectedPosts: DetectedBuzzPost[]): Prom
         isAnalyzed: 0
       });
       registered++;
-      console.log(`[BuzzDetection] Registered buzz post ${post.postId} with score ${post.viralityScore}`);
+      logger.info(`Registered buzz post ${post.postId} with score ${post.viralityScore}`);
     } catch (error) {
-      console.error(`[BuzzDetection] Error registering post ${post.postId}:`, error);
+      logger.error(`Error registering post ${post.postId}:`, error);
     }
   }
 
@@ -200,7 +200,7 @@ export async function registerBuzzPosts(detectedPosts: DetectedBuzzPost[]): Prom
  */
 export async function runDetectionCycle(): Promise<DetectionResult> {
   if (isRunning) {
-    console.log("[BuzzDetection] Detection cycle already running, skipping");
+    logger.info("Detection cycle already running, skipping");
     return {
       scannedPosts: 0,
       detectedBuzz: 0,
@@ -210,7 +210,7 @@ export async function runDetectionCycle(): Promise<DetectionResult> {
   }
 
   isRunning = true;
-  console.log("[BuzzDetection] Starting detection cycle");
+  logger.info("Starting detection cycle");
 
   try {
     // Scan own accounts
@@ -225,7 +225,7 @@ export async function runDetectionCycle(): Promise<DetectionResult> {
     // Register to database
     const registered = await registerBuzzPosts(allDetected);
 
-    console.log(`[BuzzDetection] Cycle complete: ${allDetected.length} detected, ${registered} registered`);
+    logger.info(`Cycle complete: ${allDetected.length} detected, ${registered} registered`);
 
     return {
       scannedPosts: MAX_POSTS_PER_SCAN,
@@ -234,7 +234,7 @@ export async function runDetectionCycle(): Promise<DetectionResult> {
       posts: allDetected
     };
   } catch (error) {
-    console.error("[BuzzDetection] Error in detection cycle:", error);
+    logger.error("Error in detection cycle:", error);
     return {
       scannedPosts: 0,
       detectedBuzz: 0,
@@ -255,11 +255,11 @@ export async function runDetectionCycle(): Promise<DetectionResult> {
  */
 export function startBuzzDetectionScheduler(): void {
   if (schedulerInterval) {
-    console.log("[BuzzDetection] Scheduler already running");
+    logger.info("Scheduler already running");
     return;
   }
 
-  console.log(`[BuzzDetection] Starting scheduler (interval: ${SCAN_INTERVAL_MS / 1000 / 60} minutes)`);
+  logger.info(`Starting scheduler (interval: ${SCAN_INTERVAL_MS / 1000 / 60} minutes)`);
 
   // Run immediately
   runDetectionCycle();
@@ -277,7 +277,7 @@ export function stopBuzzDetectionScheduler(): void {
   if (schedulerInterval) {
     clearInterval(schedulerInterval);
     schedulerInterval = null;
-    console.log("[BuzzDetection] Scheduler stopped");
+    logger.info("Scheduler stopped");
   }
 }
 
@@ -349,7 +349,7 @@ export async function detectBuzzForAccount(accountId: number): Promise<DetectedB
       }
     }
   } catch (error) {
-    console.error(`[BuzzDetection] Error detecting buzz for account ${accountId}:`, error);
+    logger.error(`Error detecting buzz for account ${accountId}:`, error);
   }
 
   return detectedPosts;
