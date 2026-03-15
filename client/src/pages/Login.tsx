@@ -1,9 +1,55 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { KeyRound, Loader2, LogIn, ArrowRight } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type Mode = "loading" | "setup" | "login";
+
+// Shared input class following the design spec
+const inputClass = [
+  "w-full h-12 px-4",
+  "bg-white/[0.04] border border-white/[0.08] rounded-xl",
+  "text-white text-[14px] placeholder:text-neutral-500",
+  "outline-none transition-all duration-150",
+  "focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20",
+].join(" ");
+
+// Shared submit button class
+const buttonBase = [
+  "w-full h-12 rounded-xl font-medium text-[14px] text-white",
+  "bg-emerald-500 hover:bg-emerald-400",
+  "transition-colors duration-150",
+  "disabled:opacity-40 disabled:cursor-not-allowed",
+  "flex items-center justify-center gap-2",
+].join(" ");
+
+// Shared page wrapper
+function PageWrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-neutral-950 relative overflow-hidden">
+      {/* Subtle emerald radial glow at center */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(16,185,129,0.03) 0%, transparent 70%)",
+        }}
+      />
+      <div className="relative z-10 w-full flex justify-center px-4">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// Logo mark
+function Logo() {
+  return (
+    <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0">
+      <span className="text-white text-[18px] font-semibold tracking-tight">
+        S
+      </span>
+    </div>
+  );
+}
 
 export default function Login({ onSuccess }: { onSuccess: () => void }) {
   const [mode, setMode] = useState<Mode>("loading");
@@ -110,60 +156,40 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
     }
   };
 
-  const inputClass =
-    "h-12 bg-transparent border-0 border-b border-white/10 rounded-none text-white placeholder:text-neutral-600 text-[15px] focus:ring-0 focus:border-white/30 transition-colors px-0";
-
   // Loading state
   if (mode === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-950">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-5 h-5 text-neutral-600 animate-spin" />
-        </div>
-      </div>
+      <PageWrapper>
+        <Loader2 className="w-5 h-5 text-neutral-600 animate-spin" />
+      </PageWrapper>
     );
   }
 
   // Password setup mode
   if (mode === "setup") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-950 relative">
-        {/* Subtle grid pattern */}
+      <PageWrapper>
         <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-          }}
-        />
-
-        <div className="w-full max-w-[360px] relative z-10 px-6">
+          className="w-full max-w-[380px] bg-neutral-900/50 border border-white/[0.08] rounded-2xl backdrop-blur p-8"
+          style={{ backdropFilter: "blur(12px)" }}
+        >
           <form onSubmit={handleSetupSubmit}>
             {/* Header */}
-            <div className="mb-12">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center">
-                  <KeyRound className="w-4.5 h-4.5 text-neutral-950" />
-                </div>
-                <span className="text-[13px] font-medium text-neutral-500 tracking-wide uppercase">
-                  Initial Setup
-                </span>
-              </div>
-              <h1 className="text-[32px] font-light text-white tracking-tight leading-tight">
-                パスワードを
-                <br />
-                設定してください
-              </h1>
-              <p className="text-[14px] text-neutral-500 mt-3 leading-relaxed">
-                管理パネルへのアクセスに使用します
-              </p>
+            <div className="flex items-center gap-3 mb-8">
+              <Logo />
+              <span className="text-xl font-medium text-white tracking-tight">
+                SNS Marketing
+              </span>
             </div>
 
-            <div className="space-y-6">
-              <Input
+            <h2 className="text-[15px] font-medium text-white mb-6">
+              パスワードを設定
+            </h2>
+
+            <div className="space-y-3">
+              <input
                 type="password"
-                placeholder="新しいパスワード"
+                placeholder="新しいパスワード（6文字以上）"
                 value={newPassword}
                 onChange={(e) => {
                   setNewPassword(e.target.value);
@@ -173,7 +199,7 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
                 autoFocus
               />
 
-              <Input
+              <input
                 type="password"
                 placeholder="パスワードを確認"
                 value={confirmPassword}
@@ -185,69 +211,55 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
               />
 
               {setupError && (
-                <p className="text-[13px] text-red-400">{setupError}</p>
+                <p className="text-rose-400 text-[13px] pt-1">{setupError}</p>
               )}
 
               {setupSuccess && (
-                <p className="text-[13px] text-emerald-400">{setupSuccess}</p>
+                <p className="text-emerald-400 text-[13px] pt-1">
+                  {setupSuccess}
+                </p>
               )}
 
-              <Button
+              <button
                 type="submit"
                 disabled={setupLoading || !newPassword || !confirmPassword}
-                className="w-full h-12 text-[14px] font-medium bg-white hover:bg-neutral-200 text-neutral-950 rounded-lg border-0 transition-colors duration-150 disabled:opacity-30 disabled:bg-white mt-2"
+                className={`${buttonBase} mt-2`}
               >
                 {setupLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <>
-                    設定する
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </>
+                  "設定する"
                 )}
-              </Button>
+              </button>
             </div>
           </form>
         </div>
-      </div>
+      </PageWrapper>
     );
   }
 
   // Login mode
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-950 relative">
-      {/* Subtle grid pattern */}
+    <PageWrapper>
       <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
-      />
-
-      <div className="w-full max-w-[360px] relative z-10 px-6">
+        className="w-full max-w-[380px] bg-neutral-900/50 border border-white/[0.08] rounded-2xl backdrop-blur p-8"
+        style={{ backdropFilter: "blur(12px)" }}
+      >
         <form onSubmit={handleSubmit}>
           {/* Header */}
-          <div className="mb-12">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center">
-                <LogIn className="w-4.5 h-4.5 text-neutral-950" />
-              </div>
-              <span className="text-[13px] font-medium text-neutral-500 tracking-wide uppercase">
-                SNS Marketing
-              </span>
-            </div>
-            <h1 className="text-[32px] font-light text-white tracking-tight">
-              ログイン
-            </h1>
-            <p className="text-[14px] text-neutral-500 mt-3">
-              管理パネルにアクセス
-            </p>
+          <div className="flex items-center gap-3 mb-8">
+            <Logo />
+            <span className="text-xl font-medium text-white tracking-tight">
+              SNS Marketing
+            </span>
           </div>
 
-          <div className="space-y-6">
-            <Input
+          <h2 className="text-[15px] font-medium text-white mb-6">
+            サインイン
+          </h2>
+
+          <div className="space-y-3">
+            <input
               type="password"
               placeholder="パスワード"
               value={password}
@@ -259,31 +271,28 @@ export default function Login({ onSuccess }: { onSuccess: () => void }) {
               autoFocus
             />
 
-            {error && <p className="text-[13px] text-red-400">{error}</p>}
+            {error && (
+              <p className="text-rose-400 text-[13px] pt-1">{error}</p>
+            )}
 
-            <Button
+            <button
               type="submit"
               disabled={loading || !password}
-              className="w-full h-12 text-[14px] font-medium bg-white hover:bg-neutral-200 text-neutral-950 rounded-lg border-0 transition-colors duration-150 disabled:opacity-30 disabled:bg-white mt-2"
+              className={`${buttonBase} mt-2`}
             >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <>
-                  ログイン
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </>
+                "続ける"
               )}
-            </Button>
+            </button>
           </div>
 
-          <div className="mt-12 pt-6 border-t border-white/[0.04]">
-            <p className="text-[11px] text-neutral-700 text-center">
-              Authorized personnel only
-            </p>
-          </div>
+          <p className="text-[11px] text-neutral-700 text-center mt-6">
+            Authorized personnel only
+          </p>
         </form>
       </div>
-    </div>
+    </PageWrapper>
   );
 }

@@ -16,6 +16,7 @@ import {
   Send,
 } from "lucide-react";
 import { Link } from "wouter";
+import type { LucideIcon } from "lucide-react";
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -39,28 +40,18 @@ function relativeTime(dateStr: string): string {
   return `${months}ヶ月前`;
 }
 
-function StatusDot({ status }: { status: string }) {
-  const color =
-    status === "success" || status === "active"
-      ? "bg-emerald-500"
-      : status === "failed"
-        ? "bg-rose-500"
-        : "bg-amber-500";
-  return <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${color}`} />;
-}
-
 function StatusTag({ status }: { status: string }) {
-  const config: Record<string, { bg: string; text: string }> = {
-    active: { bg: "bg-emerald-500/10", text: "text-emerald-600" },
-    success: { bg: "bg-emerald-500/10", text: "text-emerald-600" },
-    pending: { bg: "bg-amber-500/10", text: "text-amber-600" },
-    failed: { bg: "bg-rose-500/10", text: "text-rose-600" },
+  const config: Record<string, { dot: string; text: string; label: string }> = {
+    active:  { dot: "bg-emerald-500", text: "text-emerald-400", label: "active" },
+    success: { dot: "bg-emerald-500", text: "text-emerald-400", label: "success" },
+    pending: { dot: "bg-amber-400",   text: "text-amber-400",   label: "pending" },
+    failed:  { dot: "bg-rose-500",    text: "text-rose-400",    label: "failed" },
   };
-  const { bg, text } = config[status] || config.pending;
+  const c = config[status] ?? config.pending;
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium ${bg} ${text}`}>
-      <StatusDot status={status} />
-      {status}
+    <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium tracking-wide ${c.text}`}>
+      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${c.dot}`} />
+      {c.label}
     </span>
   );
 }
@@ -74,30 +65,30 @@ function DashboardSkeleton() {
           <Skeleton className="h-8 w-64 mb-2" />
           <Skeleton className="h-4 w-48" />
         </div>
-        <Skeleton className="h-8 w-32 rounded-full" />
+        <Skeleton className="h-6 w-28 rounded-full" />
       </div>
 
       {/* Metric cards skeleton */}
-      <div className="grid grid-cols-4 gap-4 mb-7">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-7">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="metric-card px-4 py-4">
-            <Skeleton className="h-3 w-20 mb-3" />
-            <Skeleton className="h-7 w-12 mb-1.5" />
+          <div key={i} className="rounded-xl border border-white/[0.06] bg-gradient-to-br from-white/[0.03] to-transparent px-5 py-4">
+            <Skeleton className="h-3 w-20 mb-4" />
+            <Skeleton className="h-8 w-12 mb-1.5" />
             <Skeleton className="h-3 w-28" />
           </div>
         ))}
       </div>
 
       {/* Two-column skeleton */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-5">
         <div>
           <Skeleton className="h-4 w-32 mb-3" />
-          <div className="border border-border rounded-lg overflow-hidden">
+          <div className="border border-white/[0.06] rounded-xl overflow-hidden">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-3 px-4 py-3 border-b border-border/50 last:border-b-0">
-                <Skeleton className="w-7 h-7 rounded-md" />
+              <div key={i} className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.04] last:border-b-0">
+                <Skeleton className="w-6 h-6 rounded-md" />
                 <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-4 w-16 ml-auto" />
+                <Skeleton className="h-3 w-16 ml-auto" />
               </div>
             ))}
           </div>
@@ -105,17 +96,17 @@ function DashboardSkeleton() {
         <div className="space-y-5">
           <div>
             <Skeleton className="h-4 w-40 mb-3" />
-            <div className="space-y-3">
+            <div className="space-y-px border border-white/[0.06] rounded-xl overflow-hidden">
               {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full rounded-lg" />
+                <Skeleton key={i} className="h-11 w-full rounded-none" />
               ))}
             </div>
           </div>
           <div>
             <Skeleton className="h-4 w-36 mb-3" />
-            <div className="space-y-2">
+            <div className="space-y-px border border-white/[0.06] rounded-xl overflow-hidden">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-14 w-full rounded-lg" />
+                <Skeleton key={i} className="h-11 w-full rounded-none" />
               ))}
             </div>
           </div>
@@ -150,55 +141,53 @@ export default function Dashboard() {
   const totalAccounts = accounts?.length || 0;
   const scheduledTotal = postStats?.total || 0;
 
-  const metrics = [
+  const metrics: Array<{
+    label: string;
+    value: number;
+    sub: string;
+    icon: LucideIcon;
+    iconColor: string;
+  }> = [
     {
       label: "アカウント総数",
       value: totalAccounts,
       sub: "登録済みアカウント",
       icon: Users,
-      barColor: "#3B82F6",
-      iconColor: "text-blue-500",
-      iconBg: "bg-blue-500/10",
+      iconColor: "text-neutral-400",
     },
     {
       label: "アクティブ",
       value: activeAccounts,
       sub: "稼働中のアカウント",
       icon: Activity,
-      barColor: "#10B981",
-      iconColor: "text-emerald-500",
-      iconBg: "bg-emerald-500/10",
+      iconColor: "text-emerald-400",
     },
     {
       label: "保留中",
       value: pendingAccounts,
       sub: "認証待ちアカウント",
       icon: Clock,
-      barColor: "#F59E0B",
-      iconColor: "text-amber-500",
-      iconBg: "bg-amber-500/10",
+      iconColor: "text-amber-400",
     },
     {
       label: "スケジュール投稿",
       value: scheduledTotal,
-      sub: `成功率 ${postStats?.successRate || 0}%（30日間）`,
+      sub: `成功率 ${postStats?.successRate ?? 0}%（30日間）`,
       icon: CalendarCheck,
-      barColor: "#4ECDC4",
-      iconColor: "text-teal-400",
-      iconBg: "bg-teal-400/10",
+      iconColor: "text-cyan-400",
     },
   ];
 
-  const quickActions = [
-    { href: "/automation", icon: Zap, label: "自動化設定", sub: "ワークフロー管理", iconColor: "text-amber-500", iconBg: "bg-amber-500/10" },
-    { href: "/strategies/new", icon: Lightbulb, label: "AI戦略を生成", sub: "AI戦略アシスト", iconColor: "text-teal-400", iconBg: "bg-teal-400/10" },
-    { href: "/analytics", icon: BarChart3, label: "分析を見る", sub: "パフォーマンス分析", iconColor: "text-blue-500", iconBg: "bg-blue-500/10" },
-    { href: "/scheduled-posts", icon: Send, label: "スケジュール投稿", sub: "投稿管理", iconColor: "text-emerald-500", iconBg: "bg-emerald-500/10" },
+  const quickActions: Array<{ href: string; icon: LucideIcon; label: string }> = [
+    { href: "/automation",      icon: Zap,        label: "自動化設定"     },
+    { href: "/strategies/new",  icon: Lightbulb,  label: "AI戦略を生成"  },
+    { href: "/analytics",       icon: BarChart3,  label: "分析を見る"    },
+    { href: "/scheduled-posts", icon: Send,       label: "スケジュール投稿" },
   ];
 
   return (
     <div className="min-h-full max-w-[1100px]">
-      {/* Page Header */}
+      {/* ── Page Header ── */}
       <div className="page-header fade-in-up">
         <div>
           <h1 className="page-title">
@@ -215,123 +204,118 @@ export default function Dashboard() {
           </p>
         </div>
         {activeAccounts > 0 && (
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/[0.07]">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
             </span>
-            <span className="text-[12px] font-medium text-emerald-600">
-              {activeAccounts}件 稼働中
+            <span className="text-[12px] font-medium text-emerald-400 tabular-nums">
+              {activeAccounts} 件稼働中
             </span>
           </div>
         )}
       </div>
 
-      {/* Metric Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-7">
+      {/* ── Metric Cards ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-7">
         {metrics.map((m, i) => {
           const Icon = m.icon;
           return (
             <div
               key={m.label}
-              className={`metric-card px-4 py-4 fade-in-up animation-delay-${(i + 1) * 100}`}
-              style={{ "--metric-color": m.barColor } as React.CSSProperties}
+              className={`relative rounded-xl border border-white/[0.06] bg-gradient-to-br from-white/[0.04] to-transparent px-5 py-4 hover:border-white/[0.12] transition-colors fade-in-up animation-delay-${(i + 1) * 100}`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs text-neutral-500 uppercase tracking-wider">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[11px] font-medium text-neutral-500 uppercase tracking-widest leading-none">
                   {m.label}
                 </p>
-                <div className={`w-7 h-7 rounded-md ${m.iconBg} flex items-center justify-center`}>
-                  <Icon className={`w-3.5 h-3.5 ${m.iconColor}`} strokeWidth={1.5} />
-                </div>
+                <Icon className={`w-3.5 h-3.5 ${m.iconColor}`} strokeWidth={1.5} />
               </div>
-              <p className="text-2xl font-semibold text-white tabular-nums tracking-tight leading-none mb-1">
+              <p className="text-[28px] font-bold text-white tabular-nums tracking-tight leading-none mb-1.5">
                 {m.value}
               </p>
-              <p className="text-xs text-neutral-500">{m.sub}</p>
+              <p className="text-[11px] text-neutral-600 leading-none">{m.sub}</p>
             </div>
           );
         })}
       </div>
 
-      {/* Two-column layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-5 fade-in-up animation-delay-300">
+      {/* ── Two-column layout ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-5 fade-in-up animation-delay-300">
+
         {/* Left: Accounts Table */}
         <div>
-          <div className="flex items-center justify-between mb-2.5">
+          <div className="flex items-center justify-between mb-3">
             <h2 className="text-[13px] font-semibold text-white flex items-center gap-2 tracking-[-0.01em]">
               アカウント
               {totalAccounts > 0 && (
-                <span className="text-[11px] font-medium text-neutral-500 bg-white/[0.06] px-1.5 py-0.5 rounded-md">
+                <span className="text-[11px] font-medium text-neutral-600 bg-white/[0.05] px-1.5 py-0.5 rounded">
                   {totalAccounts}
                 </span>
               )}
             </h2>
             <Link
               href="/accounts"
-              className="flex items-center gap-1 px-2 py-1 text-[12px] text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.04] rounded-md transition-colors font-medium"
+              className="flex items-center gap-1 px-2 py-1 text-[12px] text-neutral-500 hover:text-neutral-300 hover:bg-white/[0.04] rounded-md transition-colors"
             >
               すべて表示
               <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
 
-          <div className="border border-white/[0.06] rounded-xl overflow-hidden bg-neutral-900">
-            <div className="grid grid-cols-[1fr_100px_100px] border-b border-white/[0.06] bg-white/[0.02]">
-              <div className="px-4 py-2 text-[11px] font-medium text-neutral-500 uppercase tracking-wider">
-                名前
-              </div>
-              <div className="px-4 py-2 text-[11px] font-medium text-neutral-500 uppercase tracking-wider">
-                ステータス
-              </div>
-              <div className="px-4 py-2 text-[11px] font-medium text-neutral-500 uppercase tracking-wider">
-                作成日
-              </div>
+          <div className="border border-white/[0.06] rounded-xl overflow-hidden">
+            {/* Table header */}
+            <div className="grid grid-cols-[1fr_90px_90px] border-b border-white/[0.06] bg-white/[0.015]">
+              <div className="px-4 py-2.5 text-[11px] font-medium text-neutral-600 uppercase tracking-widest">名前</div>
+              <div className="px-3 py-2.5 text-[11px] font-medium text-neutral-600 uppercase tracking-widest">状態</div>
+              <div className="px-3 py-2.5 text-[11px] font-medium text-neutral-600 uppercase tracking-widest">作成日</div>
             </div>
 
             {accountsLoading ? (
-              <div className="p-4 space-y-3">
+              <div className="divide-y divide-white/[0.04]">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <Skeleton className="w-7 h-7 rounded-md" />
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-4 w-16 ml-auto" />
+                  <div key={i} className="flex items-center gap-3 px-4 py-3">
+                    <Skeleton className="w-6 h-6 rounded" />
+                    <Skeleton className="h-3.5 w-32" />
+                    <Skeleton className="h-3 w-14 ml-auto" />
                   </div>
                 ))}
               </div>
             ) : accounts && accounts.length > 0 ? (
-              accounts.slice(0, 5).map((account) => (
-                <Link
-                  key={account.id}
-                  href={`/accounts/${account.id}`}
-                  className="grid grid-cols-[1fr_100px_100px] border-b border-white/[0.04] last:border-b-0 hover:bg-white/[0.02] transition-colors group"
-                >
-                  <div className="px-4 py-2.5 flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-md bg-white/[0.06] flex items-center justify-center flex-shrink-0">
-                      <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 text-neutral-300" fill="currentColor">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                      </svg>
+              <div className="divide-y divide-white/[0.04]">
+                {accounts.slice(0, 6).map((account) => (
+                  <Link
+                    key={account.id}
+                    href={`/accounts/${account.id}`}
+                    className="grid grid-cols-[1fr_90px_90px] hover:bg-white/[0.02] transition-colors group"
+                  >
+                    <div className="px-4 py-3 flex items-center gap-2.5 min-w-0">
+                      <div className="w-6 h-6 rounded bg-white/[0.05] border border-white/[0.06] flex items-center justify-center flex-shrink-0">
+                        <svg viewBox="0 0 24 24" className="w-3 h-3 text-neutral-400" fill="currentColor">
+                          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                        </svg>
+                      </div>
+                      <span className="text-[13px] font-medium text-neutral-200 group-hover:text-white transition-colors truncate">
+                        {account.username}
+                      </span>
                     </div>
-                    <span className="text-[13px] font-medium text-white group-hover:text-neutral-200 transition-colors truncate">
-                      {account.username}
-                    </span>
-                  </div>
-                  <div className="px-4 py-2.5 flex items-center">
-                    <StatusTag status={account.status} />
-                  </div>
-                  <div className="px-4 py-2.5 text-[12px] text-neutral-500 tabular-nums flex items-center font-mono">
-                    {new Date(account.createdAt).toLocaleDateString("ja-JP")}
-                  </div>
-                </Link>
-              ))
+                    <div className="px-3 py-3 flex items-center">
+                      <StatusTag status={account.status} />
+                    </div>
+                    <div className="px-3 py-3 text-[11px] text-neutral-600 tabular-nums flex items-center font-mono">
+                      {new Date(account.createdAt).toLocaleDateString("ja-JP", { month: "2-digit", day: "2-digit", year: "2-digit" })}
+                    </div>
+                  </Link>
+                ))}
+              </div>
             ) : (
-              <div className="p-10 text-center">
-                <p className="text-[13px] text-neutral-500 mb-3">アカウントがありません</p>
+              <div className="py-12 text-center">
+                <p className="text-[13px] text-neutral-600 mb-4">アカウントがありません</p>
                 <Link
                   href="/accounts/new"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground text-[13px] font-medium rounded-md transition-colors hover:opacity-90"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white/[0.06] hover:bg-white/[0.09] border border-white/[0.08] text-neutral-200 text-[13px] font-medium rounded-lg transition-colors"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-3.5 h-3.5" />
                   新規作成
                 </Link>
               </div>
@@ -340,7 +324,7 @@ export default function Dashboard() {
             {accounts && accounts.length > 0 && (
               <Link
                 href="/accounts/new"
-                className="flex items-center gap-2 px-4 py-2 text-[12px] text-neutral-500 hover:text-neutral-300 hover:bg-white/[0.02] transition-colors border-t border-white/[0.04]"
+                className="flex items-center gap-1.5 px-4 py-2.5 text-[12px] text-neutral-600 hover:text-neutral-300 hover:bg-white/[0.02] transition-colors border-t border-white/[0.04]"
               >
                 <Plus className="w-3 h-3" />
                 新規追加
@@ -351,65 +335,56 @@ export default function Dashboard() {
 
         {/* Right: Activity + Quick Actions */}
         <div className="space-y-5">
-          {/* Recent Activity — Timeline */}
+
+          {/* Recent Activity */}
           <div>
-            <div className="flex items-center justify-between mb-2.5">
-              <h2 className="text-[13px] font-semibold text-white flex items-center gap-2 tracking-[-0.01em]">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-[13px] font-semibold text-white tracking-[-0.01em]">
                 最近のアクティビティ
               </h2>
               <Link
                 href="/logs"
-                className="flex items-center gap-1 px-2 py-1 text-[12px] text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.04] rounded-md transition-colors font-medium"
+                className="flex items-center gap-1 px-2 py-1 text-[12px] text-neutral-500 hover:text-neutral-300 hover:bg-white/[0.04] rounded-md transition-colors"
               >
                 すべて表示
                 <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
 
-            <div className="bg-neutral-900 rounded-xl border border-white/[0.06] overflow-hidden">
+            <div className="border border-white/[0.06] rounded-xl overflow-hidden">
               {logsLoading ? (
-                <div className="p-4 space-y-3">
+                <div className="divide-y divide-white/[0.04]">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <Skeleton className="w-1.5 h-1.5 rounded-full" />
-                      <Skeleton className="h-4 flex-1" />
+                    <div key={i} className="flex items-center gap-3 px-4 py-3">
+                      <Skeleton className="w-3 h-3 rounded-full" />
+                      <Skeleton className="h-3.5 flex-1" />
                       <Skeleton className="h-3 w-12" />
                     </div>
                   ))}
                 </div>
               ) : recentLogs && recentLogs.length > 0 ? (
-                <div className="relative">
-                  {/* Timeline line */}
-                  <div className="absolute left-[19px] top-3 bottom-3 w-px bg-white/[0.06]" />
-
+                <div className="divide-y divide-white/[0.04]">
                   {recentLogs.slice(0, 5).map((log) => {
-                    const icon =
-                      log.status === "success"
-                        ? CheckCircle2
-                        : log.status === "failed"
-                          ? XCircle
-                          : Clock;
+                    const LogIcon =
+                      log.status === "success" ? CheckCircle2
+                      : log.status === "failed"  ? XCircle
+                      : Clock;
                     const iconColor =
-                      log.status === "success"
-                        ? "text-emerald-500"
-                        : log.status === "failed"
-                          ? "text-rose-500"
-                          : "text-amber-500";
-                    const Icon = icon;
+                      log.status === "success" ? "text-emerald-400"
+                      : log.status === "failed"  ? "text-rose-400"
+                      : "text-amber-400";
                     return (
                       <div
                         key={log.id}
-                        className="flex items-start gap-3 px-4 py-2.5 hover:bg-white/[0.02] transition-colors relative"
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-white/[0.02] transition-colors"
                       >
-                        <div className="relative z-10 mt-0.5 w-3 h-3 flex items-center justify-center bg-neutral-900">
-                          <Icon className={`w-3 h-3 ${iconColor}`} strokeWidth={2} />
-                        </div>
+                        <LogIcon className={`w-3.5 h-3.5 mt-0.5 flex-shrink-0 ${iconColor}`} strokeWidth={2} />
                         <div className="flex-1 min-w-0">
-                          <p className="text-[13px] text-neutral-200 truncate leading-tight">
+                          <p className="text-[12px] text-neutral-300 truncate leading-snug">
                             {log.action}
                           </p>
                           <p
-                            className="text-[11px] text-neutral-500 mt-0.5"
+                            className="text-[11px] text-neutral-600 mt-0.5"
                             title={new Date(log.createdAt).toLocaleString("ja-JP")}
                           >
                             {relativeTime(log.createdAt)}
@@ -420,7 +395,7 @@ export default function Dashboard() {
                   })}
                 </div>
               ) : (
-                <div className="text-center py-8 text-[13px] text-neutral-500">
+                <div className="py-10 text-center text-[13px] text-neutral-600">
                   アクティビティがありません
                 </div>
               )}
@@ -429,33 +404,29 @@ export default function Dashboard() {
 
           {/* Quick Actions */}
           <div>
-            <h2 className="text-[13px] font-semibold text-white flex items-center gap-2 mb-2.5 tracking-[-0.01em]">
+            <h2 className="text-[13px] font-semibold text-white mb-3 tracking-[-0.01em]">
               クイックアクション
             </h2>
-            <div className="space-y-2">
+            <div className="border border-white/[0.06] rounded-xl overflow-hidden divide-y divide-white/[0.04]">
               {quickActions.map((action) => {
                 const ActionIcon = action.icon;
                 return (
                   <Link
                     key={action.href}
                     href={action.href}
-                    className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] bg-neutral-900 hover:border-white/[0.10] transition-all group"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.03] transition-colors group"
                   >
-                    <div className={`w-8 h-8 rounded-md ${action.iconBg} flex items-center justify-center flex-shrink-0`}>
-                      <ActionIcon className={`w-4 h-4 ${action.iconColor}`} strokeWidth={1.5} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <span className="text-[13px] font-medium text-white block tracking-[-0.01em]">
-                        {action.label}
-                      </span>
-                      <span className="text-[11px] text-neutral-500">{action.sub}</span>
-                    </div>
-                    <ArrowRight className="w-3.5 h-3.5 text-neutral-600 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                    <ActionIcon className="w-3.5 h-3.5 text-neutral-500 flex-shrink-0 group-hover:text-neutral-300 transition-colors" strokeWidth={1.5} />
+                    <span className="text-[13px] font-medium text-neutral-300 group-hover:text-white transition-colors flex-1 tracking-[-0.01em]">
+                      {action.label}
+                    </span>
+                    <ArrowRight className="w-3 h-3 text-neutral-700 group-hover:text-neutral-500 transition-colors flex-shrink-0" />
                   </Link>
                 );
               })}
             </div>
           </div>
+
         </div>
       </div>
     </div>

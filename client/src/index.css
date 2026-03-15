@@ -618,27 +618,12 @@
     border-color: rgba(255, 255, 255, 0.1);
   }
 
-  /* Metric card — left edge accent preserved */
+  /* Metric card — gradient surface, no left-edge accent */
   .metric-card {
     position: relative;
-    background: var(--metric-bg, var(--card));
-    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 12px;
     overflow: hidden;
     transition: border-color 0.15s ease;
-  }
-  .metric-card:hover {
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-  .metric-card::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--metric-color, var(--primary));
-    border-radius: 12px 0 0 12px;
   }
 
   /* Page header pattern */

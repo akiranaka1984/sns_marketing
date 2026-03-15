@@ -14,11 +14,34 @@ import {
   Plus,
   Search,
   Settings,
-  MoreHorizontal,
   Moon,
   Sun,
   Menu,
   X,
+  Home,
+  Inbox,
+  Users,
+  FolderOpen,
+  Bot,
+  UserPlus,
+  Zap,
+  CheckSquare,
+  Calendar,
+  CalendarDays,
+  BarChart3,
+  TrendingUp,
+  Sparkles,
+  FlaskConical,
+  GraduationCap,
+  Flame,
+  Brain,
+  Hash,
+  Trophy,
+  AlertTriangle,
+  MessageCircle,
+  Lightbulb,
+  FileText,
+  type LucideIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation } from "wouter";
@@ -77,7 +100,7 @@ export default function DashboardLayout({
 type NavItem = {
   label: string;
   path: string;
-  emoji: string;
+  icon: LucideIcon;
 };
 
 type NavSection = {
@@ -114,8 +137,8 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
   }, [mobileOpen]);
 
   const privatePages: NavItem[] = [
-    { emoji: "🏠", label: "ホーム", path: "/" },
-    { emoji: "📥", label: "受信トレイ", path: "/inbox" },
+    { icon: Home, label: "ホーム", path: "/" },
+    { icon: Inbox, label: "受信トレイ", path: "/inbox" },
   ];
 
   const sections: NavSection[] = [
@@ -123,48 +146,48 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
       title: "管理",
       defaultOpen: true,
       items: [
-        { emoji: "👥", label: "アカウント", path: "/accounts" },
-        { emoji: "📁", label: "プラン検討", path: "/projects" },
-        { emoji: "🤖", label: "エージェント", path: "/agents" },
-        { emoji: "🤝", label: "チーム管理", path: "/team" },
+        { icon: Users, label: "アカウント", path: "/accounts" },
+        { icon: FolderOpen, label: "プラン検討", path: "/projects" },
+        { icon: Bot, label: "エージェント", path: "/agents" },
+        { icon: UserPlus, label: "チーム管理", path: "/team" },
       ],
     },
     {
       title: "自動化",
       items: [
-        { emoji: "⚡", label: "自動化設定", path: "/automation" },
-        { emoji: "✅", label: "投稿レビュー", path: "/post-review" },
-        { emoji: "📅", label: "スケジュール", path: "/scheduled-posts" },
-        { emoji: "🗓️", label: "カレンダー", path: "/content-calendar" },
+        { icon: Zap, label: "自動化設定", path: "/automation" },
+        { icon: CheckSquare, label: "投稿レビュー", path: "/post-review" },
+        { icon: Calendar, label: "スケジュール", path: "/scheduled-posts" },
+        { icon: CalendarDays, label: "カレンダー", path: "/content-calendar" },
       ],
     },
     {
       title: "分析",
       items: [
-        { emoji: "📊", label: "分析", path: "/analytics" },
-        { emoji: "📈", label: "週次レビュー", path: "/weekly-review" },
-        { emoji: "✨", label: "AI最適化", path: "/ai-optimization" },
-        { emoji: "🧪", label: "A/Bテスト", path: "/ab-testing" },
-        { emoji: "🎓", label: "モデル", path: "/model-accounts" },
-        { emoji: "🔥", label: "バズ分析", path: "/buzz-analysis" },
-        { emoji: "🧠", label: "学習インサイト", path: "/learning-insights" },
-        { emoji: "#️⃣", label: "ハッシュタグ", path: "/hashtag-analytics" },
-        { emoji: "🏆", label: "競合比較", path: "/competitor-benchmark" },
+        { icon: BarChart3, label: "分析", path: "/analytics" },
+        { icon: TrendingUp, label: "週次レビュー", path: "/weekly-review" },
+        { icon: Sparkles, label: "AI最適化", path: "/ai-optimization" },
+        { icon: FlaskConical, label: "A/Bテスト", path: "/ab-testing" },
+        { icon: GraduationCap, label: "モデル", path: "/model-accounts" },
+        { icon: Flame, label: "バズ分析", path: "/buzz-analysis" },
+        { icon: Brain, label: "学習インサイト", path: "/learning-insights" },
+        { icon: Hash, label: "ハッシュタグ", path: "/hashtag-analytics" },
+        { icon: Trophy, label: "競合比較", path: "/competitor-benchmark" },
       ],
     },
     {
       title: "監視",
       items: [
-        { emoji: "⚠️", label: "凍結検知", path: "/freeze-detection" },
-        { emoji: "💬", label: "エンゲージメント", path: "/engagement" },
+        { icon: AlertTriangle, label: "凍結検知", path: "/freeze-detection" },
+        { icon: MessageCircle, label: "エンゲージメント", path: "/engagement" },
       ],
     },
   ];
 
   const bottomItems: NavItem[] = [
-    { emoji: "💡", label: "戦略", path: "/strategies" },
-    { emoji: "📝", label: "ログ", path: "/logs" },
-    { emoji: "⚙️", label: "設定", path: "/settings" },
+    { icon: Lightbulb, label: "戦略", path: "/strategies" },
+    { icon: FileText, label: "ログ", path: "/logs" },
+    { icon: Settings, label: "設定", path: "/settings" },
   ];
 
   const handleNavigate = useCallback((path: string) => {
@@ -182,30 +205,30 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
 
   const NavItemRow = ({ item }: { item: NavItem }) => {
     const active = isActive(item.path);
+    const Icon = item.icon;
     return (
       <button
         onClick={() => handleNavigate(item.path)}
         aria-current={active ? 'page' : undefined}
         className={`
-          relative group w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-normal transition-all duration-150
+          group w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-normal transition-all duration-150
           ${active
             ? "bg-white/[0.08] text-white"
             : "text-neutral-400 hover:bg-white/[0.04] hover:text-neutral-200"
           }
         `}
       >
-        {active && (
-          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-emerald-500 rounded-full" />
-        )}
-        <span className="w-[22px] h-[22px] flex items-center justify-center text-[14px] flex-shrink-0">
-          {item.emoji}
-        </span>
+        <Icon
+          className={`w-4 h-4 flex-shrink-0 transition-colors duration-150 ${
+            active
+              ? "text-white"
+              : "text-neutral-500 group-hover:text-neutral-300"
+          }`}
+        />
         {!(isCollapsed && !isMobile) && (
-          <>
-            <span className="flex-1 text-left truncate">
-              {item.label}
-            </span>
-          </>
+          <span className="flex-1 text-left truncate">
+            {item.label}
+          </span>
         )}
       </button>
     );
@@ -219,16 +242,18 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
         <button
           onClick={() => toggleSection(section.title)}
           aria-expanded={isExpanded}
-          className="w-full flex items-center gap-1.5 px-2.5 py-[3px] text-[10px] font-normal text-neutral-600 hover:text-neutral-400 transition-colors group uppercase tracking-wider"
+          className="w-full flex items-center gap-1.5 px-2.5 py-[3px] group"
         >
-          <ChevronDown
-            className={`w-3 h-3 transition-transform duration-200 ${isExpanded ? '' : '-rotate-90'}`}
-          />
           {!(isCollapsed && !isMobile) && (
-            <span>{section.title}</span>
-          )}
-          {!(isCollapsed && !isMobile) && (
-            <Plus className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-40 transition-opacity" />
+            <>
+              <span className="text-[11px] font-medium text-neutral-600 uppercase tracking-widest group-hover:text-neutral-500 transition-colors">
+                {section.title}
+              </span>
+              <ChevronDown
+                className={`w-3 h-3 text-neutral-700 group-hover:text-neutral-500 transition-all duration-200 ml-0.5 ${isExpanded ? '' : '-rotate-90'}`}
+              />
+              <Plus className="w-3 h-3 ml-auto text-neutral-700 opacity-0 group-hover:opacity-100 group-hover:text-neutral-500 transition-all duration-150" />
+            </>
           )}
         </button>
         {isExpanded && (
@@ -389,21 +414,16 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
               </button>
             )}
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             <NotificationBell />
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 px-3 text-[13px] text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.06] font-normal rounded-lg border border-white/[0.06] transition-all duration-150"
+              onClick={() => setLocation("/settings")}
+              className="h-8 w-8 p-0 text-neutral-500 hover:text-neutral-200 hover:bg-white/[0.06] rounded-lg transition-all duration-150"
+              aria-label="設定"
             >
-              共有
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-neutral-400 hover:text-neutral-200 hover:bg-white/[0.06] rounded-lg border border-white/[0.06] transition-all duration-150"
-            >
-              <MoreHorizontal className="w-4 h-4" />
+              <Settings className="w-4 h-4" />
             </Button>
           </div>
         </header>
