@@ -412,7 +412,6 @@ async function runKpiCheck(
         .update(growthLoopState)
         .set({
           lastKpiCheckAt: toMySQLTimestamp(new Date()),
-          currentKpiSummary: JSON.stringify(kpiSummary),
           consecutiveDeclines: newConsecutiveDeclines,
           escalationNeeded: needsEscalation ? 1 : 0,
           escalationReason: needsEscalation
@@ -531,7 +530,6 @@ async function runPerformanceUpdate(
       await db
         .update(growthLoopState)
         .set({
-          lastPerformanceUpdateAt: toMySQLTimestamp(new Date()),
           updatedAt: toMySQLTimestamp(new Date()),
         })
         .where(eq(growthLoopState.id, loopState.id));
