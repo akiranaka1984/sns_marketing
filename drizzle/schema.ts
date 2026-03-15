@@ -1699,7 +1699,7 @@ export const growthLoopActions = mysqlTable("growth_loop_actions", {
 	projectId: int().notNull(),
 	actionType: varchar({ length: 100 }).notNull(),
 	description: text(),
-	status: mysqlEnum(['pending','approved','rejected','executed']).default('pending').notNull(),
+	status: mysqlEnum(['pending','approved','rejected','executed','failed']).default('pending').notNull(),
 	executionMode: varchar({ length: 50 }),
 	approvedAt: timestamp({ mode: 'string' }),
 	executedAt: timestamp({ mode: 'string' }),
@@ -1713,9 +1713,14 @@ export const growthLoopActions = mysqlTable("growth_loop_actions", {
 
 export const campaigns = mysqlTable("campaigns", {
 	id: int().autoincrement().notNull().primaryKey(),
+	userId: int().notNull(),
 	projectId: int().notNull(),
 	name: varchar({ length: 255 }).notNull(),
-	goal: text(),
+	goal: mysqlEnum(['awareness','traffic','leads','sales','engagement']),
+	targetUrl: text(),
+	utmSource: varchar({ length: 255 }),
+	utmMedium: varchar({ length: 255 }),
+	utmCampaign: varchar({ length: 255 }),
 	status: mysqlEnum(['draft','active','paused','completed']).default('draft').notNull(),
 	budget: decimal({ precision: 12, scale: 2 }).default('0'),
 	revenue: decimal({ precision: 12, scale: 2 }).default('0'),
@@ -1727,37 +1732,54 @@ export const campaigns = mysqlTable("campaigns", {
 },
 (table) => [
 	index("idx_campaigns_projectId").on(table.projectId),
+	index("idx_campaigns_userId").on(table.userId),
 ]);
 
 export const trackedTrends = mysqlTable("tracked_trends", {
 	id: int().autoincrement().notNull().primaryKey(),
+	userId: int().notNull(),
+	projectId: int(),
 	trendName: varchar({ length: 255 }).notNull(),
 	trendType: varchar({ length: 100 }),
-	platform: varchar({ length: 50 }),
+	platform: mysqlEnum(['twitter','tiktok','instagram','facebook']),
+	source: mysqlEnum(['buzz_analysis','model_account','manual']).default('buzz_analysis'),
 	relevanceScore: int().default(0),
 	trendingScore: int().default(0),
-	status: mysqlEnum(['active','expired','used']).default('active').notNull(),
+	volumeEstimate: int().default(0),
+	status: mysqlEnum(['detected','evaluating','responding','responded','expired','active','used']).default('detected').notNull(),
+	expiresAt: timestamp({ mode: 'string' }),
+	respondedAt: timestamp({ mode: 'string' }),
 	detectedAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 },
 (table) => [
+	index("idx_tracked_trends_userId").on(table.userId),
+	index("idx_tracked_trends_projectId").on(table.projectId),
 	index("idx_tracked_trends_detectedAt").on(table.detectedAt),
+	index("idx_tracked_trends_status").on(table.status),
 ]);
 
 export const contentCalendar = mysqlTable("content_calendar", {
 	id: int().autoincrement().notNull().primaryKey(),
 	projectId: int().notNull(),
+	accountId: int(),
+	agentId: int(),
+	scheduledPostId: int(),
 	scheduledDate: timestamp({ mode: 'string' }).notNull(),
 	timeSlot: varchar({ length: 50 }),
-	contentType: varchar({ length: 100 }),
+	contentType: mysqlEnum(['educational','engagement','promotional','story','reserved','trend_response','general']),
 	topic: text(),
-	status: mysqlEnum(['planned','drafted','scheduled','published']).default('planned').notNull(),
+	notes: text(),
+	status: mysqlEnum(['planned','drafted','scheduled','published','content_generated']).default('planned').notNull(),
 	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 },
 (table) => [
 	index("idx_content_calendar_projectId").on(table.projectId),
 	index("idx_content_calendar_scheduledDate").on(table.scheduledDate),
+	index("idx_content_calendar_accountId").on(table.accountId),
+	index("idx_content_calendar_agentId").on(table.agentId),
 ]);
 
 // Admin settings table: stores hashed admin password (0 or 1 row)
@@ -1770,3 +1792,189 @@ export const adminSettings = mysqlTable("admin_settings", {
 
 export type AdminSettings = typeof adminSettings.$inferSelect;
 export type NewAdminSettings = typeof adminSettings.$inferInsert;
+
+// ─── Account Roles ─────────────────────────────────────────────────────────
+// Assigns strategic roles to accounts within a project for network orchestration.
+
+export const accountRoles = mysqlTable("account_roles", {
+	id: int().autoincrement().notNull().primaryKey(),
+	projectId: int().notNull(),
+	accountId: int().notNull(),
+	role: mysqlEnum(['main','amplifier','engagement','support']).notNull(),
+	priority: int().default(50).notNull(),
+	isActive: tinyint().default(1).notNull(),
+	config: text(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("idx_account_roles_projectId").on(table.projectId),
+	index("idx_account_roles_accountId").on(table.accountId),
+	index("idx_account_roles_role").on(table.role),
+]);
+
+// ─── Account Health ────────────────────────────────────────────────────────
+// Tracks health score, rate limits, throttling state, and warming phase per account.
+
+export const accountHealth = mysqlTable("account_health", {
+	id: int().autoincrement().notNull().primaryKey(),
+	accountId: int().notNull(),
+	// Health scoring components (0-100)
+	healthScore: int().default(100).notNull(),
+	loginSuccessRate: int().default(100).notNull(),
+	postSuccessRate: int().default(100).notNull(),
+	engagementNaturalnessScore: int().default(100).notNull(),
+	freezeRiskScore: int().default(0).notNull(),
+	// Account phase (warming -> growing -> mature -> cooling | suspended)
+	accountPhase: mysqlEnum(['warming','growing','mature','cooling','suspended']).default('warming').notNull(),
+	warmingStartedAt: timestamp({ mode: 'string' }),
+	warmingCompletedAt: timestamp({ mode: 'string' }),
+	// Daily counters
+	postsToday: int().default(0).notNull(),
+	maxDailyPosts: int().default(1).notNull(),
+	actionsToday: int().default(0).notNull(),
+	maxDailyActions: int().default(10).notNull(),
+	// Hourly counters
+	postsThisHour: int().default(0).notNull(),
+	actionsThisHour: int().default(0).notNull(),
+	// Throttling state
+	isThrottled: tinyint().default(0).notNull(),
+	throttleReason: text(),
+	throttleUntil: timestamp({ mode: 'string' }),
+	// Suspension state
+	isSuspended: tinyint().default(0).notNull(),
+	suspendedReason: text(),
+	// Activity tracking
+	lastActionAt: timestamp({ mode: 'string' }),
+	lastPostAt: timestamp({ mode: 'string' }),
+	// Streak tracking
+	consecutiveSuccesses: int().default(0).notNull(),
+	consecutiveFailures: int().default(0).notNull(),
+	totalFreezeCount: int().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("idx_account_health_accountId").on(table.accountId),
+	index("idx_account_health_accountPhase").on(table.accountPhase),
+	index("idx_account_health_healthScore").on(table.healthScore),
+]);
+
+// ─── Conversion Events ─────────────────────────────────────────────────────
+// Records individual conversion funnel events linked to campaigns, accounts, posts, and tracked links.
+
+export const conversionEvents = mysqlTable("conversion_events", {
+	id: int().autoincrement().notNull().primaryKey(),
+	campaignId: int(),
+	accountId: int(),
+	postId: int(),
+	trackedLinkId: int(),
+	eventType: mysqlEnum(['impression','engagement','profile_visit','follow','link_click','page_view','signup','purchase']).notNull(),
+	eventValue: decimal({ precision: 12, scale: 2 }),
+	metadata: text(),
+	occurredAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+},
+(table) => [
+	index("idx_conversion_events_campaignId").on(table.campaignId),
+	index("idx_conversion_events_accountId").on(table.accountId),
+	index("idx_conversion_events_postId").on(table.postId),
+	index("idx_conversion_events_trackedLinkId").on(table.trackedLinkId),
+	index("idx_conversion_events_eventType").on(table.eventType),
+	index("idx_conversion_events_occurredAt").on(table.occurredAt),
+]);
+
+// ─── Tracked Links ──────────────────────────────────────────────────────────
+// Stores UTM-tagged links generated for campaigns with click tracking.
+
+export const trackedLinks = mysqlTable("tracked_links", {
+	id: int().autoincrement().notNull().primaryKey(),
+	campaignId: int(),
+	accountId: int(),
+	postId: int(),
+	originalUrl: text().notNull(),
+	trackedUrl: text().notNull(),
+	clickCount: int().default(0).notNull(),
+	uniqueClickCount: int().default(0).notNull(),
+	lastClickedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("idx_tracked_links_campaignId").on(table.campaignId),
+	index("idx_tracked_links_accountId").on(table.accountId),
+	index("idx_tracked_links_postId").on(table.postId),
+]);
+
+// ─── Orchestration Plans ───────────────────────────────────────────────────
+// Stores cross-account amplification plans generated by the network orchestrator.
+
+export const orchestrationPlans = mysqlTable("orchestration_plans", {
+	id: int().autoincrement().notNull().primaryKey(),
+	projectId: int().notNull(),
+	triggerPostId: int(),
+	triggerPostUrl: text(),
+	planType: mysqlEnum(['amplification','conversation','support']).default('amplification').notNull(),
+	status: mysqlEnum(['planned','in_progress','completed','failed']).default('planned').notNull(),
+	// Serialized JSON array of PlannedAction objects
+	actions: text().notNull(),
+	totalActions: int().default(0).notNull(),
+	completedActions: int().default(0).notNull(),
+	failedActions: int().default(0).notNull(),
+	startedAt: timestamp({ mode: 'string' }),
+	completedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("idx_orchestration_plans_projectId").on(table.projectId),
+	index("idx_orchestration_plans_status").on(table.status),
+	index("idx_orchestration_plans_triggerPostId").on(table.triggerPostId),
+]);
+
+// ─── Trend Response Posts ──────────────────────────────────────────────────
+// Links a tracked trend to the scheduled post generated in response, and stores performance metrics.
+
+export const trendResponsePosts = mysqlTable("trend_response_posts", {
+	id: int().autoincrement().notNull().primaryKey(),
+	trendId: int().notNull(),
+	scheduledPostId: int(),
+	accountId: int(),
+	// Performance metrics (populated after the post is published and analytics collected)
+	trendPostEngagement: int().default(0),
+	normalAvgEngagement: int().default(0),
+	performanceLift: int().default(0),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("idx_trend_response_posts_trendId").on(table.trendId),
+	index("idx_trend_response_posts_scheduledPostId").on(table.scheduledPostId),
+	index("idx_trend_response_posts_accountId").on(table.accountId),
+]);
+
+// ─── Type exports for new tables ──────────────────────────────────────────
+
+// accountRoles
+export type InsertAccountRole = typeof accountRoles.$inferInsert;
+export type SelectAccountRole = typeof accountRoles.$inferSelect;
+
+// accountHealth
+export type InsertAccountHealth = typeof accountHealth.$inferInsert;
+export type SelectAccountHealth = typeof accountHealth.$inferSelect;
+
+// conversionEvents
+export type InsertConversionEvent = typeof conversionEvents.$inferInsert;
+export type SelectConversionEvent = typeof conversionEvents.$inferSelect;
+
+// trackedLinks
+export type InsertTrackedLink = typeof trackedLinks.$inferInsert;
+export type SelectTrackedLink = typeof trackedLinks.$inferSelect;
+
+// orchestrationPlans
+export type InsertOrchestrationPlan = typeof orchestrationPlans.$inferInsert;
+export type SelectOrchestrationPlan = typeof orchestrationPlans.$inferSelect;
+
+// trendResponsePosts
+export type InsertTrendResponsePost = typeof trendResponsePosts.$inferInsert;
+export type SelectTrendResponsePost = typeof trendResponsePosts.$inferSelect;
