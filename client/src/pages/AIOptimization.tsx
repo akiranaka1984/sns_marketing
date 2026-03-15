@@ -49,7 +49,7 @@ export default function AIOptimization() {
     }
 
     analyzeAgent.mutate({
-      agentId: parseInt(selectedAgentId),
+      agentId: Number.parseInt(selectedAgentId),
       daysBack: 30,
     });
   };
@@ -66,19 +66,19 @@ export default function AIOptimization() {
       </div>
 
       {/* Analysis Section */}
-      <div className="fade-in-up bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
-        <h3 className="font-bold text-sm text-[#1A1A1A] mb-1">エージェント分析</h3>
-        <p className="text-[11px] text-[#6B6B6B] mb-4 font-bold">エージェントのパフォーマンスを分析して最適化提案を生成します</p>
+      <div className="fade-in-up bg-neutral-900 rounded-lg border border-white/[0.06] p-4">
+        <h3 className="font-bold text-sm text-white mb-1">エージェント分析</h3>
+        <p className="text-[11px] text-neutral-500 mb-4 font-bold">エージェントのパフォーマンスを分析して最適化提案を生成します</p>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="agent" className="font-bold">エージェント選択</Label>
+            <Label htmlFor="agent" className="font-bold text-white">エージェント選択</Label>
             <Select value={selectedAgentId} onValueChange={setSelectedAgentId}>
-              <SelectTrigger className="border-2 border-[#1A1A1A] rounded-lg font-bold">
+              <SelectTrigger className="border border-white/[0.06] rounded-lg bg-neutral-950 font-bold text-white">
                 <SelectValue placeholder="エージェントを選択" />
               </SelectTrigger>
-              <SelectContent className="border-2 border-[#1A1A1A] rounded-lg">
+              <SelectContent className="border border-white/[0.06] rounded-lg bg-neutral-900">
                 {agents?.map((agent) => (
-                  <SelectItem key={agent.id} value={agent.id.toString()} className="font-bold">
+                  <SelectItem key={agent.id} value={agent.id.toString()} className="font-bold text-white">
                     {agent.name}
                   </SelectItem>
                 ))}
@@ -89,7 +89,7 @@ export default function AIOptimization() {
             <Button
               onClick={handleAnalyze}
               disabled={analyzeAgent.isPending}
-              className="w-full bg-[#FFD700] hover:bg-[#FFD700] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-[#1A1A1A] font-bold border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold border border-white/[0.06] rounded-lg transition-all"
             >
               <Sparkles className="mr-2 h-4 w-4" />
               {analyzeAgent.isPending ? "分析中..." : "分析開始"}
@@ -100,40 +100,40 @@ export default function AIOptimization() {
 
       {/* Optimizations List */}
       <div>
-        <h3 className="font-bold text-sm text-[#1A1A1A] mb-3">最適化提案</h3>
+        <h3 className="font-bold text-sm text-white mb-3">最適化提案</h3>
         <div className="grid gap-4">
           {optimizations?.map((opt: any) => (
-            <div key={opt.id} className="fade-in-up bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
+            <div key={opt.id} className="fade-in-up bg-neutral-900 rounded-lg border border-white/[0.06] p-4">
               <div className="flex items-center justify-between mb-1">
-                <h3 className="font-bold text-sm text-[#1A1A1A]">最適化 #{opt.id}</h3>
+                <h3 className="font-bold text-sm text-white">最適化 #{opt.id}</h3>
                 {opt.status === "applied" ? (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#4ECDC4] text-[#1A1A1A] border-2 border-[#1A1A1A]">適用済み</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-teal-500/20 text-teal-400 border border-teal-500/30">適用済み</span>
                 ) : opt.status === "reverted" ? (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#A8E6CF] text-[#1A1A1A] border-2 border-[#1A1A1A]">元に戻した</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">元に戻した</span>
                 ) : (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border-2 border-[#1A1A1A] text-[#1A1A1A] bg-white">未適用</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-neutral-400 bg-neutral-800">未適用</span>
                 )}
               </div>
-              <p className="text-[11px] text-[#6B6B6B] mb-4 font-bold">
+              <p className="text-[11px] text-neutral-500 mb-4 font-bold">
                 {new Date(opt.createdAt).toLocaleString("ja-JP")}
               </p>
               <div className="space-y-4">
                 {/* Before/After Comparison */}
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <h4 className="font-bold text-sm mb-2">変更前</h4>
-                    <div className="text-sm space-y-1 bg-[#FFF8DC] p-3 rounded-lg border-2 border-[#1A1A1A]">
-                      <p className="font-bold"><span className="font-bold">トーン:</span> {opt.beforeParams?.tone || "N/A"}</p>
-                      <p className="font-bold"><span className="font-bold">スタイル:</span> {opt.beforeParams?.style || "N/A"}</p>
-                      <p className="font-bold"><span className="font-bold">投稿頻度:</span> {opt.beforeParams?.postingFrequency || "N/A"}</p>
+                    <h4 className="font-bold text-sm text-white mb-2">変更前</h4>
+                    <div className="text-sm space-y-1 bg-neutral-950 p-3 rounded-lg border border-white/[0.06]">
+                      <p className="font-bold text-neutral-400"><span className="font-bold text-white">トーン:</span> {opt.beforeParams?.tone || "N/A"}</p>
+                      <p className="font-bold text-neutral-400"><span className="font-bold text-white">スタイル:</span> {opt.beforeParams?.style || "N/A"}</p>
+                      <p className="font-bold text-neutral-400"><span className="font-bold text-white">投稿頻度:</span> {opt.beforeParams?.postingFrequency || "N/A"}</p>
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm mb-2">変更後</h4>
-                    <div className="text-sm space-y-1 bg-[#FFD700] p-3 rounded-lg border-2 border-[#1A1A1A]">
-                      <p className="font-bold"><span className="font-bold">トーン:</span> {opt.afterParams?.tone || "N/A"}</p>
-                      <p className="font-bold"><span className="font-bold">スタイル:</span> {opt.afterParams?.style || "N/A"}</p>
-                      <p className="font-bold"><span className="font-bold">投稿頻度:</span> {opt.afterParams?.postingFrequency || "N/A"}</p>
+                    <h4 className="font-bold text-sm text-white mb-2">変更後</h4>
+                    <div className="text-sm space-y-1 bg-amber-500/10 p-3 rounded-lg border border-amber-500/20">
+                      <p className="font-bold text-neutral-300"><span className="font-bold text-amber-400">トーン:</span> {opt.afterParams?.tone || "N/A"}</p>
+                      <p className="font-bold text-neutral-300"><span className="font-bold text-amber-400">スタイル:</span> {opt.afterParams?.style || "N/A"}</p>
+                      <p className="font-bold text-neutral-300"><span className="font-bold text-amber-400">投稿頻度:</span> {opt.afterParams?.postingFrequency || "N/A"}</p>
                     </div>
                   </div>
                 </div>
@@ -141,7 +141,7 @@ export default function AIOptimization() {
                 {/* Expected Improvement */}
                 {opt.performanceImprovement > 0 && (
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#4ECDC4] text-[#1A1A1A] border-2 border-[#1A1A1A]">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-teal-500/20 text-teal-400 border border-teal-500/30">
                       期待される改善: +{opt.performanceImprovement}%
                     </span>
                   </div>
@@ -150,16 +150,16 @@ export default function AIOptimization() {
                 {/* Insights */}
                 {opt.insights && (
                   <div>
-                    <h4 className="font-bold text-sm mb-2">AI提案理由</h4>
+                    <h4 className="font-bold text-sm text-white mb-2">AI提案理由</h4>
                     <div className="text-sm space-y-2">
                       {opt.insights.toneAdjustment && (
-                        <p className="text-[#6B6B6B] font-bold">
-                          <span className="font-bold">トーン:</span> {opt.insights.toneAdjustment.reason}
+                        <p className="text-neutral-500 font-bold">
+                          <span className="font-bold text-white">トーン:</span> {opt.insights.toneAdjustment.reason}
                         </p>
                       )}
                       {opt.insights.styleAdjustment && (
-                        <p className="text-[#6B6B6B] font-bold">
-                          <span className="font-bold">スタイル:</span> {opt.insights.styleAdjustment.reason}
+                        <p className="text-neutral-500 font-bold">
+                          <span className="font-bold text-white">スタイル:</span> {opt.insights.styleAdjustment.reason}
                         </p>
                       )}
                     </div>
@@ -173,7 +173,7 @@ export default function AIOptimization() {
                       size="sm"
                       onClick={() => applyOptimization.mutate({ optimizationId: opt.id })}
                       disabled={applyOptimization.isPending}
-                      className="bg-[#FFD700] hover:bg-[#FFD700] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-[#1A1A1A] font-bold border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold border border-white/[0.06] rounded-lg transition-all"
                     >
                       <Check className="mr-2 h-4 w-4" />
                       適用
@@ -185,7 +185,7 @@ export default function AIOptimization() {
                       variant="outline"
                       onClick={() => revertOptimization.mutate({ optimizationId: opt.id })}
                       disabled={revertOptimization.isPending}
-                      className="bg-white hover:bg-[#FFF8DC] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-[#1A1A1A] font-bold border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+                      className="bg-neutral-800 hover:bg-neutral-700 text-white font-bold border border-white/[0.06] rounded-lg transition-all"
                     >
                       <RotateCcw className="mr-2 h-4 w-4" />
                       元に戻す
@@ -197,9 +197,9 @@ export default function AIOptimization() {
           ))}
 
           {(!optimizations || optimizations.length === 0) && (
-            <div className="fade-in-up bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
+            <div className="fade-in-up bg-neutral-900 rounded-lg border border-white/[0.06] p-4">
               <div className="flex items-center justify-center h-32">
-                <p className="text-[#6B6B6B] font-bold">最適化提案はありません</p>
+                <p className="text-neutral-500 font-bold">最適化提案はありません</p>
               </div>
             </div>
           )}

@@ -14,9 +14,9 @@ type NotificationItem = {
 
 const CATEGORY_CONFIG = {
   system: { label: "システム", color: "#6B7280", icon: <Bell className="w-4 h-4" /> },
-  engagement: { label: "エンゲージメント", color: "#4ECDC4", icon: <MessageSquare className="w-4 h-4" /> },
-  automation: { label: "自動化", color: "#A8E6CF", icon: <Bot className="w-4 h-4" /> },
-  analytics: { label: "分析", color: "#FFD700", icon: <TrendingUp className="w-4 h-4" /> },
+  engagement: { label: "エンゲージメント", color: "#0d9488", icon: <MessageSquare className="w-4 h-4" /> },
+  automation: { label: "自動化", color: "#059669", icon: <Bot className="w-4 h-4" /> },
+  analytics: { label: "分析", color: "#d97706", icon: <TrendingUp className="w-4 h-4" /> },
 };
 
 export default function Inbox() {
@@ -72,7 +72,7 @@ export default function Inbox() {
         {unreadCount > 0 && (
           <button
             onClick={markAllAsRead}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-bold text-[#1A1A1A] bg-[#FFF8DC] hover:bg-[#FFD700] rounded-lg transition-colors border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-bold text-white bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors border border-white/[0.06]"
           >
             <CheckCheck className="w-3.5 h-3.5" />
             すべて既読 ({unreadCount})
@@ -81,7 +81,7 @@ export default function Inbox() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2 bg-[#FFFDF7] rounded-lg p-1 w-fit border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]">
+      <div className="flex gap-2 bg-neutral-900 rounded-lg p-1 w-fit border border-white/[0.06]">
         {[
           { key: "all", label: "すべて" },
           { key: "unread", label: "未読" },
@@ -94,8 +94,8 @@ export default function Inbox() {
             onClick={() => setFilter(f.key)}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               filter === f.key
-                ? "bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]"
-                : "text-[#6B6B6B] hover:bg-[#FFF8DC]"
+                ? "bg-emerald-500/20 text-white border border-emerald-500/30"
+                : "text-neutral-400 hover:bg-neutral-800"
             }`}
           >
             {f.label}
@@ -104,12 +104,12 @@ export default function Inbox() {
       </div>
 
       {/* Notification List */}
-      <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] overflow-hidden">
+      <div className="bg-neutral-900 rounded-lg border border-white/[0.06] overflow-hidden">
         {filtered.length === 0 ? (
           <div className="py-16 text-center">
-            <Bell className="w-12 h-12 text-[#6B6B6B] mx-auto mb-4" />
-            <p className="text-[14px] text-[#1A1A1A] font-bold">通知はありません</p>
-            <p className="text-[12px] text-[#6B6B6B] font-bold mt-1">
+            <Bell className="w-12 h-12 text-neutral-500 mx-auto mb-4" />
+            <p className="text-[14px] text-white font-bold">通知はありません</p>
+            <p className="text-[12px] text-neutral-500 font-bold mt-1">
               システムイベントがここに表示されます
             </p>
           </div>
@@ -120,30 +120,30 @@ export default function Inbox() {
               <div
                 key={notification.id}
                 onClick={() => markAsRead(notification.id)}
-                className={`flex items-start gap-4 px-5 py-4 border-b-2 border-[#1A1A1A] last:border-b-0 hover:bg-[#FFF8DC] transition-colors cursor-pointer ${
-                  !notification.read ? "bg-[#FFD700]/20" : ""
+                className={`flex items-start gap-4 px-5 py-4 border-b border-white/[0.06] last:border-b-0 hover:bg-neutral-800 transition-colors cursor-pointer ${
+                  !notification.read ? "bg-amber-500/5" : ""
                 }`}
               >
                 <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border-2 border-[#1A1A1A]"
-                  style={{ backgroundColor: config.color }}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border border-white/[0.06]"
+                  style={{ backgroundColor: config.color + "33" }}
                 >
                   {config.icon}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className={`text-[13px] font-bold ${!notification.read ? "text-[#1A1A1A]" : "text-[#6B6B6B]"}`}>
+                    <p className={`text-[13px] font-bold ${!notification.read ? "text-white" : "text-neutral-400"}`}>
                       {notification.title}
                     </p>
                     {!notification.read && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#FFD700] flex-shrink-0 border border-[#1A1A1A]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
                     )}
                   </div>
-                  <p className="text-[12px] text-[#6B6B6B] font-bold mt-0.5 line-clamp-2">
+                  <p className="text-[12px] text-neutral-500 font-bold mt-0.5 line-clamp-2">
                     {notification.description}
                   </p>
                 </div>
-                <div className="flex items-center gap-1 text-[10px] text-[#6B6B6B] font-bold flex-shrink-0">
+                <div className="flex items-center gap-1 text-[10px] text-neutral-500 font-bold flex-shrink-0">
                   <Clock className="w-3 h-3" />
                   {formatTime(notification.timestamp)}
                 </div>

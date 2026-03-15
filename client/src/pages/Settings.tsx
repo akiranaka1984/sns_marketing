@@ -209,12 +209,12 @@ export default function Settings() {
       {/* Page Title - Neobrutalism */}
       <div className="mb-8">
         <div className="flex items-center gap-4 mb-2">
-          <div className="w-12 h-12 rounded-lg bg-emerald-500 border border-white/[0.06] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
             <span className="text-[28px]">{"\u2699\uFE0F"}</span>
           </div>
           <div>
             <h1 className="text-[26px] font-bold text-white tracking-tight">API{"\u8A2D\u5B9A"}</h1>
-            <p className="text-[13px] text-[#6B6B6B] font-bold">
+            <p className="text-[13px] text-neutral-500 font-bold">
               API{"\u30AD\u30FC\u306E\u8A2D\u5B9A\u3068\u63A5\u7D9A\u30C6\u30B9\u30C8"}
             </p>
           </div>
@@ -224,9 +224,9 @@ export default function Settings() {
       <div className="space-y-6 max-w-2xl">
         {/* LLM Provider Selection */}
         <div className="bg-neutral-950 border border-white/[0.06] rounded-lg overflow-hidden">
-          <div className="bg-emerald-500 px-5 py-4 border-b-2 border-white/[0.06]">
+          <div className="bg-emerald-500/10 px-5 py-4 border-b border-white/[0.06]">
             <h3 className="text-[14px] font-bold text-white">LLM{"\u30D7\u30ED\u30D0\u30A4\u30C0\u30FC\u9078\u629E"}</h3>
-            <p className="text-[12px] text-[#6B6B6B] font-bold mt-1">AI{"\u6A5F\u80FD\u3067\u4F7F\u7528\u3059\u308B\u30E2\u30C7\u30EB\u3092\u9078\u629E\u3057\u3066\u304F\u3060\u3055\u3044"}</p>
+            <p className="text-[12px] text-neutral-500 font-bold mt-1">AI{"\u6A5F\u80FD\u3067\u4F7F\u7528\u3059\u308B\u30E2\u30C7\u30EB\u3092\u9078\u629E\u3057\u3066\u304F\u3060\u3055\u3044"}</p>
           </div>
           <div className="p-5">
             <div className="flex gap-3">
@@ -235,7 +235,7 @@ export default function Settings() {
                 onClick={() => handleProviderChange("openai")}
                 className={`flex-1 p-4 rounded-lg border border-white/[0.06] transition-all text-left font-bold ${
                   llmProvider === "openai"
-                    ? "bg-[#4ECDC4] hover:hover:translate-x-[2px] hover:translate-y-[2px]"
+                    ? "bg-teal-500/20 border-teal-500/30 hover:hover:translate-x-[2px] hover:translate-y-[2px]"
                     : "bg-neutral-950 hover:bg-neutral-900 hover:hover:translate-x-[2px] hover:translate-y-[2px]"
                 }`}
               >
@@ -249,7 +249,7 @@ export default function Settings() {
                   </div>
                   <div>
                     <p className="text-[13px] font-bold text-white">OpenAI</p>
-                    <p className="text-[11px] text-[#6B6B6B] font-bold">GPT-4o-mini</p>
+                    <p className="text-[11px] text-neutral-500 font-bold">GPT-4o-mini</p>
                   </div>
                 </div>
               </button>
@@ -258,7 +258,7 @@ export default function Settings() {
                 onClick={() => handleProviderChange("anthropic")}
                 className={`flex-1 p-4 rounded-lg border border-white/[0.06] transition-all text-left font-bold ${
                   llmProvider === "anthropic"
-                    ? "bg-[#4ECDC4] hover:hover:translate-x-[2px] hover:translate-y-[2px]"
+                    ? "bg-teal-500/20 border-teal-500/30 hover:hover:translate-x-[2px] hover:translate-y-[2px]"
                     : "bg-neutral-950 hover:bg-neutral-900 hover:hover:translate-x-[2px] hover:translate-y-[2px]"
                 }`}
               >
@@ -272,13 +272,13 @@ export default function Settings() {
                   </div>
                   <div>
                     <p className="text-[13px] font-bold text-white">Anthropic</p>
-                    <p className="text-[11px] text-[#6B6B6B] font-bold">Claude Sonnet 4.5</p>
+                    <p className="text-[11px] text-neutral-500 font-bold">Claude Sonnet 4.5</p>
                   </div>
                 </div>
               </button>
             </div>
             {saveApiKeys.isPending && (
-              <div className="mt-3 flex items-center gap-2 text-[12px] text-[#6B6B6B] font-bold">
+              <div className="mt-3 flex items-center gap-2 text-[12px] text-neutral-500 font-bold">
                 <Loader2 className="h-3 w-3 animate-spin" />
                 {"\u4FDD\u5B58\u4E2D..."}
               </div>
@@ -288,7 +288,7 @@ export default function Settings() {
 
         {/* OpenAI API Settings */}
         <div className="bg-neutral-950 border border-white/[0.06] rounded-lg overflow-hidden">
-          <div className="bg-[#A8E6CF] px-5 py-4 border-b-2 border-white/[0.06]">
+          <div className="bg-teal-500/10 px-5 py-4 border-b border-white/[0.06]">
             <div className="flex items-center justify-between">
               <h3 className="text-[14px] font-bold text-white">OpenAI API</h3>
               <div className="flex items-center gap-2">
@@ -298,19 +298,19 @@ export default function Settings() {
                   </span>
                 )}
                 {apiStatus?.openai.configured ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#A8E6CF] text-white border border-white/[0.06]">
-                    <span className="w-[5px] h-[5px] rounded-lg bg-white/10" />
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    <span className="w-[5px] h-[5px] rounded-lg bg-emerald-400" />
                     {"\u8A2D\u5B9A\u6E08\u307F"}
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#FF6B6B] text-white border border-white/[0.06]">
-                    <span className="w-[5px] h-[5px] rounded-lg bg-white/10" />
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                    <span className="w-[5px] h-[5px] rounded-lg bg-rose-400" />
                     {"\u672A\u8A2D\u5B9A"}
                   </span>
                 )}
               </div>
             </div>
-            <p className="text-[12px] text-[#6B6B6B] font-bold mt-1">AI{"\u6295\u7A3F\u5185\u5BB9\u751F\u6210\u3068\u6226\u7565\u4F5C\u6210\u306B\u4F7F\u7528"}</p>
+            <p className="text-[12px] text-neutral-500 font-bold mt-1">AI{"\u6295\u7A3F\u5185\u5BB9\u751F\u6210\u3068\u6226\u7565\u4F5C\u6210\u306B\u4F7F\u7528"}</p>
           </div>
 
           <div className="p-5 space-y-4">
@@ -329,7 +329,7 @@ export default function Settings() {
                   <button
                     type="button"
                     onClick={() => setShowOpenaiKey(!showOpenaiKey)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6B6B] hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white transition-colors"
                   >
                     {showOpenaiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -377,7 +377,7 @@ export default function Settings() {
 
             {testOpenAI.data && (
               <div className={`p-4 rounded-lg text-[12px] flex items-center gap-2 font-bold border border-white/[0.06] ${
-                testOpenAI.data.success ? 'bg-[#A8E6CF] text-white' : 'bg-[#FF6B6B] text-white'
+                testOpenAI.data.success ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
               }`}>
                 {testOpenAI.data.success ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                 {testOpenAI.data.message}
@@ -388,7 +388,7 @@ export default function Settings() {
 
         {/* Anthropic API Settings */}
         <div className="bg-neutral-950 border border-white/[0.06] rounded-lg overflow-hidden">
-          <div className="bg-[#3B82F6] px-5 py-4 border-b-2 border-white/[0.06]">
+          <div className="bg-blue-500/10 px-5 py-4 border-b border-white/[0.06]">
             <div className="flex items-center justify-between">
               <h3 className="text-[14px] font-bold text-white">Anthropic API</h3>
               <div className="flex items-center gap-2">
@@ -398,19 +398,19 @@ export default function Settings() {
                   </span>
                 )}
                 {apiStatus?.anthropic?.configured ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#A8E6CF] text-white border border-white/[0.06]">
-                    <span className="w-[5px] h-[5px] rounded-lg bg-white/10" />
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    <span className="w-[5px] h-[5px] rounded-lg bg-emerald-400" />
                     {"\u8A2D\u5B9A\u6E08\u307F"}
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#FF6B6B] text-white border border-white/[0.06]">
-                    <span className="w-[5px] h-[5px] rounded-lg bg-white/10" />
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                    <span className="w-[5px] h-[5px] rounded-lg bg-rose-400" />
                     {"\u672A\u8A2D\u5B9A"}
                   </span>
                 )}
               </div>
             </div>
-            <p className="text-[12px] text-[#6B6B6B] font-bold mt-1">Claude Sonnet 4.5{"\u3092\u4F7F\u7528\u3057\u305FAI\u6A5F\u80FD"}</p>
+            <p className="text-[12px] text-neutral-500 font-bold mt-1">Claude Sonnet 4.5{"\u3092\u4F7F\u7528\u3057\u305FAI\u6A5F\u80FD"}</p>
           </div>
 
           <div className="p-5 space-y-4">
@@ -429,7 +429,7 @@ export default function Settings() {
                   <button
                     type="button"
                     onClick={() => setShowAnthropicKey(!showAnthropicKey)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6B6B] hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white transition-colors"
                   >
                     {showAnthropicKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -477,7 +477,7 @@ export default function Settings() {
 
             {testAnthropic.data && (
               <div className={`p-4 rounded-lg text-[12px] flex items-center gap-2 font-bold border border-white/[0.06] ${
-                testAnthropic.data.success ? 'bg-[#A8E6CF] text-white' : 'bg-[#FF6B6B] text-white'
+                testAnthropic.data.success ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
               }`}>
                 {testAnthropic.data.success ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                 {testAnthropic.data.message}
@@ -488,22 +488,22 @@ export default function Settings() {
 
         {/* X API Settings */}
         <div className="bg-neutral-950 border border-white/[0.06] rounded-lg overflow-hidden">
-          <div className="bg-[#87CEEB] px-5 py-4 border-b-2 border-white/[0.06]">
+          <div className="bg-sky-500/10 px-5 py-4 border-b border-white/[0.06]">
             <div className="flex items-center justify-between">
               <h3 className="text-[14px] font-bold text-white">X (Twitter) API</h3>
               {xApiSettings?.configured ? (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#A8E6CF] text-white border border-white/[0.06]">
-                  <span className="w-[5px] h-[5px] rounded-lg bg-white/10" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  <span className="w-[5px] h-[5px] rounded-lg bg-emerald-400" />
                   {"\u8A2D\u5B9A\u6E08\u307F"}
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#FF6B6B] text-white border border-white/[0.06]">
-                  <span className="w-[5px] h-[5px] rounded-lg bg-white/10" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                  <span className="w-[5px] h-[5px] rounded-lg bg-rose-400" />
                   {"\u672A\u8A2D\u5B9A"}
                 </span>
               )}
             </div>
-            <p className="text-[12px] text-[#6B6B6B] font-bold mt-1">{"\u30C4\u30A4\u30FC\u30C8\u53D6\u5F97\u3001\u30E6\u30FC\u30B6\u30FC\u30D7\u30ED\u30D5\u30A3\u30FC\u30EB\u53D6\u5F97\u306B\u4F7F\u7528"}</p>
+            <p className="text-[12px] text-neutral-500 font-bold mt-1">{"\u30C4\u30A4\u30FC\u30C8\u53D6\u5F97\u3001\u30E6\u30FC\u30B6\u30FC\u30D7\u30ED\u30D5\u30A3\u30FC\u30EB\u53D6\u5F97\u306B\u4F7F\u7528"}</p>
           </div>
 
           <div className="p-5 space-y-4">
@@ -522,13 +522,13 @@ export default function Settings() {
                   <button
                     type="button"
                     onClick={() => setShowXBearerToken(!showXBearerToken)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6B6B] hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white transition-colors"
                   >
                     {showXBearerToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
-              <p className="text-[11px] text-[#6B6B6B] font-bold">
+              <p className="text-[11px] text-neutral-500 font-bold">
                 X Developer Portal{"\u3067\u53D6\u5F97\u3067\u304D\u308BBearer Token\uFF08App-only\u8A8D\u8A3C\u7528\uFF09"}
               </p>
             </div>
@@ -572,7 +572,7 @@ export default function Settings() {
             </div>
 
             {xApiSettings?.lastTestedAt && (
-              <p className="text-[11px] text-[#6B6B6B] font-bold">
+              <p className="text-[11px] text-neutral-500 font-bold">
                 {"\u6700\u7D42\u30C6\u30B9\u30C8: "}{new Date(xApiSettings.lastTestedAt).toLocaleString('ja-JP')}
                 {xApiSettings.testResult && ` (${xApiSettings.testResult})`}
               </p>
@@ -582,24 +582,24 @@ export default function Settings() {
 
         {/* X API OAuth 1.0a Settings (for posting via API v2) */}
         <div className="bg-neutral-950 border border-white/[0.06] rounded-lg overflow-hidden">
-          <div className="bg-[#4ECDC4] px-5 py-4 border-b-2 border-white/[0.06]">
+          <div className="bg-teal-500/10 px-5 py-4 border-b border-white/[0.06]">
             <div className="flex items-center justify-between">
               <h3 className="text-[14px] font-bold text-white">X API v2 OAuth 1.0a</h3>
               <div className="flex items-center gap-2">
                 {xApiSettings?.oauthConfigured ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#A8E6CF] text-white border border-white/[0.06]">
-                    <span className="w-[5px] h-[5px] rounded-lg bg-white/10" />
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    <span className="w-[5px] h-[5px] rounded-lg bg-emerald-400" />
                     {"\u8A2D\u5B9A\u6E08\u307F"}
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#FF6B6B] text-white border border-white/[0.06]">
-                    <span className="w-[5px] h-[5px] rounded-lg bg-white/10" />
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                    <span className="w-[5px] h-[5px] rounded-lg bg-rose-400" />
                     {"\u672A\u8A2D\u5B9A"}
                   </span>
                 )}
               </div>
             </div>
-            <p className="text-[12px] text-[#6B6B6B] font-bold mt-1">{"API\u7D4C\u7531\u3067\u306E\u6295\u7A3F\u306B\u4F7F\u7528\uFF08Playwright\u4EE3\u66FF\uFF09"}</p>
+            <p className="text-[12px] text-neutral-500 font-bold mt-1">{"API\u7D4C\u7531\u3067\u306E\u6295\u7A3F\u306B\u4F7F\u7528\uFF08Playwright\u4EE3\u66FF\uFF09"}</p>
           </div>
 
           <div className="p-5 space-y-4">
@@ -671,7 +671,7 @@ export default function Settings() {
             <button
               type="button"
               onClick={() => setShowXOAuthFields(!showXOAuthFields)}
-              className="text-[12px] font-bold text-[#6B6B6B] hover:text-white flex items-center gap-1.5 transition-colors"
+              className="text-[12px] font-bold text-neutral-500 hover:text-white flex items-center gap-1.5 transition-colors"
             >
               {showXOAuthFields ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
               {showXOAuthFields ? "\u30AD\u30FC\u3092\u96A0\u3059" : "\u30AD\u30FC\u3092\u8868\u793A"}
@@ -688,7 +688,7 @@ export default function Settings() {
                     onClick={() => setXApiTier(tier)}
                     className={`px-3 py-1.5 rounded-lg border border-white/[0.06] text-[12px] font-bold transition-all ${
                       xApiTier === tier
-                        ? "bg-[#4ECDC4] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                        ? "bg-teal-500/20 border-teal-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                         : "bg-neutral-950 hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                     }`}
                   >
@@ -696,7 +696,7 @@ export default function Settings() {
                   </button>
                 ))}
               </div>
-              <p className="text-[11px] text-[#6B6B6B] font-bold">
+              <p className="text-[11px] text-neutral-500 font-bold">
                 Free: {"17\u6295\u7A3F/24h"} | Basic: {"100\u6295\u7A3F/24h"} | Pro: {"300K/\u6708"} | Enterprise: {"\u7121\u5236\u9650"}
               </p>
             </div>
@@ -728,12 +728,12 @@ export default function Settings() {
 
         {/* API Usage Dashboard */}
         <div className="bg-neutral-950 border border-white/[0.06] rounded-lg overflow-hidden">
-          <div className="bg-[#4ECDC4] px-5 py-4 border-b-2 border-white/[0.06]">
+          <div className="bg-teal-500/10 px-5 py-4 border-b border-white/[0.06]">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-white" />
               <h3 className="text-[14px] font-bold text-white">{"API使用量"}</h3>
             </div>
-            <p className="text-[12px] text-[#6B6B6B] font-bold mt-1">{"今月のX API v2投稿使用量"}</p>
+            <p className="text-[12px] text-neutral-500 font-bold mt-1">{"今月のX API v2投稿使用量"}</p>
           </div>
           <div className="p-5 space-y-5">
             {/* Monthly total progress bar */}
@@ -741,15 +741,15 @@ export default function Settings() {
               const used = apiUsage?.totalTweets ?? 0;
               const limit = monthlyLimit?.monthlyLimit ?? (xApiTier === 'free' ? 500 : xApiTier === 'basic' ? 3000 : xApiTier === 'pro' ? 300000 : 1000000);
               const percent = limit > 0 ? Math.min(Math.round((used / limit) * 100), 100) : 0;
-              const barColor = percent > 85 ? 'bg-[#FF6B6B]' : percent > 60 ? 'bg-[#FFDAB9]' : 'bg-[#A8E6CF]';
-              const labelColor = percent > 85 ? 'text-[#FF6B6B]' : percent > 60 ? 'text-[#6B6B6B]' : 'text-white';
+              const barColor = percent > 85 ? 'bg-rose-500' : percent > 60 ? 'bg-amber-500' : 'bg-emerald-500';
+              const labelColor = percent > 85 ? 'text-rose-400' : percent > 60 ? 'text-amber-400' : 'text-white';
               return (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#6B6B6B]">{"月間API使用量"}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">{"月間API使用量"}</p>
                     <span className={`text-[12px] font-bold ${labelColor}`}>{percent}%</span>
                   </div>
-                  <div className="h-4 w-full rounded-lg bg-[#E5E7EB] border border-white/[0.06] overflow-hidden">
+                  <div className="h-4 w-full rounded-lg bg-neutral-800 border border-white/[0.06] overflow-hidden">
                     <div
                       className={`h-full rounded-lg transition-all ${barColor}`}
                       style={{ width: `${percent}%` }}
@@ -760,13 +760,13 @@ export default function Settings() {
                       {used.toLocaleString()} / {limit.toLocaleString()} ツイート
                     </p>
                     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold border border-white/[0.06] ${
-                      percent > 85 ? 'bg-[#FF6B6B]' : percent > 60 ? 'bg-[#FFDAB9]' : 'bg-[#A8E6CF]'
-                    } text-white`}>
+                      percent > 85 ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : percent > 60 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                    }`}>
                       {percent > 85 ? "警告" : percent > 60 ? "注意" : "正常"}
                     </span>
                   </div>
                   {apiUsage?.month && (
-                    <p className="text-[11px] font-bold text-[#6B6B6B]">
+                    <p className="text-[11px] font-bold text-neutral-500">
                       {"対象月: "}{apiUsage.month}
                     </p>
                   )}
@@ -777,14 +777,14 @@ export default function Settings() {
             {/* Per-account breakdown table */}
             {apiUsage?.perAccount && apiUsage.perAccount.length > 0 && (
               <div className="space-y-2">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[#6B6B6B]">{"アカウント別使用量"}</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">{"アカウント別使用量"}</p>
                 <div className="rounded-lg border border-white/[0.06] overflow-hidden">
                   <table className="w-full text-[12px] font-bold">
                     <thead>
-                      <tr className="bg-neutral-900 border-b-2 border-white/[0.06]">
-                        <th className="text-left px-3 py-2 text-[10px] uppercase tracking-wider text-[#6B6B6B]">{"アカウント"}</th>
-                        <th className="text-right px-3 py-2 text-[10px] uppercase tracking-wider text-[#6B6B6B]">{"今月の投稿数"}</th>
-                        <th className="text-right px-3 py-2 text-[10px] uppercase tracking-wider text-[#6B6B6B]">{"割合"}</th>
+                      <tr className="bg-neutral-900 border-b border-white/[0.06]">
+                        <th className="text-left px-3 py-2 text-[10px] uppercase tracking-wider text-neutral-500">{"アカウント"}</th>
+                        <th className="text-right px-3 py-2 text-[10px] uppercase tracking-wider text-neutral-500">{"今月の投稿数"}</th>
+                        <th className="text-right px-3 py-2 text-[10px] uppercase tracking-wider text-neutral-500">{"割合"}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -805,8 +805,8 @@ export default function Settings() {
                             </td>
                             <td className="px-3 py-2 text-right">
                               <span className={`inline-flex items-center px-1.5 py-0.5 rounded-lg border border-white/[0.06] text-[10px] font-bold ${
-                                rowPercent > 50 ? 'bg-[#FFDAB9]' : 'bg-[#A8E6CF]'
-                              } text-white`}>
+                                rowPercent > 50 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                              }`}>
                                 {rowPercent}%
                               </span>
                             </td>
@@ -823,8 +823,8 @@ export default function Settings() {
             {(!apiUsage || (apiUsage.perAccount && apiUsage.perAccount.length === 0)) && (
               <div className="flex items-center justify-center py-6 rounded-lg bg-neutral-900 border border-white/[0.06]">
                 <div className="text-center">
-                  <BarChart3 className="w-8 h-8 text-[#6B6B6B] mx-auto mb-2" />
-                  <p className="text-[12px] font-bold text-[#6B6B6B]">{"今月のAPI投稿データがありません"}</p>
+                  <BarChart3 className="w-8 h-8 text-neutral-500 mx-auto mb-2" />
+                  <p className="text-[12px] font-bold text-neutral-500">{"今月のAPI投稿データがありません"}</p>
                 </div>
               </div>
             )}
@@ -833,49 +833,49 @@ export default function Settings() {
 
         {/* API Setup Guide */}
         <div className="bg-neutral-950 border border-white/[0.06] rounded-lg overflow-hidden">
-          <div className="bg-[#FFDAB9] px-5 py-4 border-b-2 border-white/[0.06]">
+          <div className="bg-amber-500/10 px-5 py-4 border-b border-white/[0.06]">
             <h3 className="text-[14px] font-bold text-white">API{"\u8A2D\u5B9A\u65B9\u6CD5"}</h3>
           </div>
           <div className="p-5 space-y-5 text-[13px]">
             <div>
               <h4 className="font-bold text-white mb-2 flex items-center gap-2">
-                <span className="w-5 h-5 rounded-lg bg-[#A8E6CF] border border-white/[0.06] flex items-center justify-center text-[10px] font-bold text-white">1</span>
+                <span className="w-5 h-5 rounded-lg bg-teal-500/20 border border-teal-500/30 flex items-center justify-center text-[10px] font-bold text-teal-400">1</span>
                 OpenAI API
               </h4>
-              <ol className="list-decimal list-inside text-[#6B6B6B] font-bold space-y-1.5 ml-7">
+              <ol className="list-decimal list-inside text-neutral-500 font-bold space-y-1.5 ml-7">
                 <li><a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-white hover:underline font-bold">OpenAI Platform</a>{"\u3067API\u30AD\u30FC\u3092\u4F5C\u6210"}</li>
                 <li>{"\u4E0A\u306E\u30D5\u30A9\u30FC\u30E0\u306B\u5165\u529B\u3057\u3066\u300C\u63A5\u7D9A\u30C6\u30B9\u30C8\u300D\u3067\u78BA\u8A8D"}</li>
                 <li>{"\u300C\u4FDD\u5B58\u300D\u30DC\u30BF\u30F3\u3067\u8A2D\u5B9A\u3092\u4FDD\u5B58"}</li>
               </ol>
             </div>
-            <div className="border-t-2 border-white/[0.06] pt-5">
+            <div className="border-t border-white/[0.06] pt-5">
               <h4 className="font-bold text-white mb-2 flex items-center gap-2">
-                <span className="w-5 h-5 rounded-lg bg-[#3B82F6] border border-white/[0.06] flex items-center justify-center text-[10px] font-bold text-white">2</span>
+                <span className="w-5 h-5 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-[10px] font-bold text-blue-400">2</span>
                 Anthropic API
               </h4>
-              <ol className="list-decimal list-inside text-[#6B6B6B] font-bold space-y-1.5 ml-7">
+              <ol className="list-decimal list-inside text-neutral-500 font-bold space-y-1.5 ml-7">
                 <li><a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer" className="text-white hover:underline font-bold">Anthropic Console</a>{"\u3067API\u30AD\u30FC\u3092\u4F5C\u6210"}</li>
                 <li>{"\u4E0A\u306E\u30D5\u30A9\u30FC\u30E0\u306B\u5165\u529B\u3057\u3066\u300C\u63A5\u7D9A\u30C6\u30B9\u30C8\u300D\u3067\u78BA\u8A8D"}</li>
                 <li>{"\u300C\u4FDD\u5B58\u300D\u30DC\u30BF\u30F3\u3067\u8A2D\u5B9A\u3092\u4FDD\u5B58"}</li>
               </ol>
             </div>
-            <div className="border-t-2 border-white/[0.06] pt-5">
+            <div className="border-t border-white/[0.06] pt-5">
               <h4 className="font-bold text-white mb-2 flex items-center gap-2">
-                <span className="w-5 h-5 rounded-lg bg-[#87CEEB] border border-white/[0.06] flex items-center justify-center text-[10px] font-bold text-white">3</span>
+                <span className="w-5 h-5 rounded-lg bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-[10px] font-bold text-sky-400">3</span>
                 X (Twitter) API Bearer Token
               </h4>
-              <ol className="list-decimal list-inside text-[#6B6B6B] font-bold space-y-1.5 ml-7">
+              <ol className="list-decimal list-inside text-neutral-500 font-bold space-y-1.5 ml-7">
                 <li><a href="https://developer.twitter.com/en/portal/dashboard" target="_blank" rel="noopener noreferrer" className="text-white hover:underline font-bold">X Developer Portal</a>{"\u3067\u30A2\u30D7\u30EA\u3092\u4F5C\u6210"}</li>
                 <li>{"\u300CKeys and tokens\u300D\u304B\u3089Bearer Token\u3092\u53D6\u5F97"}</li>
                 <li>{"\u4E0A\u306E\u30D5\u30A9\u30FC\u30E0\u306B\u5165\u529B\u3057\u3066\u300C\u63A5\u7D9A\u30C6\u30B9\u30C8\u300D\u3067\u78BA\u8A8D"}</li>
               </ol>
             </div>
-            <div className="border-t-2 border-white/[0.06] pt-5">
+            <div className="border-t border-white/[0.06] pt-5">
               <h4 className="font-bold text-white mb-2 flex items-center gap-2">
-                <span className="w-5 h-5 rounded-lg bg-[#4ECDC4] border border-white/[0.06] flex items-center justify-center text-[10px] font-bold text-white">4</span>
+                <span className="w-5 h-5 rounded-lg bg-teal-500/20 border border-teal-500/30 flex items-center justify-center text-[10px] font-bold text-teal-400">4</span>
                 X API v2 OAuth 1.0a{"\uFF08\u6295\u7A3F\u7528\uFF09"}
               </h4>
-              <ol className="list-decimal list-inside text-[#6B6B6B] font-bold space-y-1.5 ml-7">
+              <ol className="list-decimal list-inside text-neutral-500 font-bold space-y-1.5 ml-7">
                 <li>{"X Developer Portal\u3067\u300CUser authentication settings\u300D\u3092\u6709\u52B9\u5316"}</li>
                 <li>{"Read and write\u6A29\u9650\u3092\u8A2D\u5B9A"}</li>
                 <li>{"\u300CKeys and tokens\u300D\u304B\u3089API Key, API Secret, Access Token, Access Token Secret\u3092\u53D6\u5F97"}</li>

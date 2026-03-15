@@ -46,14 +46,13 @@ export function Analytics() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1A1A] mx-auto"></div>
-          <p className="mt-4 text-[#6B6B6B] font-bold">{t('common.loading')}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+          <p className="mt-4 text-neutral-500 font-bold">{t('common.loading')}</p>
         </div>
       </div>
     );
   }
 
-  // Prepare export data based on active tab
   const exportData = useMemo(() => {
     if (activeTab === "accounts" && overview?.accountPerformance) {
       return overview.accountPerformance.map((account) => ({
@@ -115,7 +114,6 @@ export function Analytics() {
         { header: "エンゲージメント率", dataKey: "engagementRate" },
       ];
     }
-    // trends
     return [
       { header: "日付", dataKey: "date" },
       { header: "投稿数", dataKey: "posts" },
@@ -171,21 +169,21 @@ export function Analytics() {
 
       {/* Overview Cards */}
       <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-        <div className="fade-in-up bg-[#FFD700] border-2 border-[#1A1A1A] rounded-lg p-4 shadow-[4px_4px_0_#1A1A1A]">
+        <div className="fade-in-up bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
           <div className="pl-3">
-            <p className="text-[11px] text-[#1A1A1A] font-bold uppercase tracking-wide">総投稿数</p>
-            <p className="text-2xl font-bold text-[#1A1A1A] mt-0.5">{overview?.totalPosts || 0}</p>
-            <p className="text-[10px] text-[#6B6B6B] font-bold mt-0.5">過去30日間</p>
+            <p className="text-[11px] text-amber-400 font-bold uppercase tracking-wide">総投稿数</p>
+            <p className="text-2xl font-bold text-white mt-0.5">{overview?.totalPosts || 0}</p>
+            <p className="text-[10px] text-neutral-500 font-bold mt-0.5">過去30日間</p>
           </div>
         </div>
 
-        <div className="fade-in-up bg-[#4ECDC4] border-2 border-[#1A1A1A] rounded-lg p-4 shadow-[4px_4px_0_#1A1A1A]">
+        <div className="fade-in-up bg-teal-500/10 border border-teal-500/20 rounded-lg p-4">
           <div className="pl-3">
-            <p className="text-[11px] text-[#1A1A1A] font-bold uppercase tracking-wide">総視聴回数</p>
-            <p className="text-2xl font-bold text-[#1A1A1A] mt-0.5">
+            <p className="text-[11px] text-teal-400 font-bold uppercase tracking-wide">総視聴回数</p>
+            <p className="text-2xl font-bold text-white mt-0.5">
               {overview?.totalViews?.toLocaleString() || 0}
             </p>
-            <p className="text-[10px] text-[#6B6B6B] font-bold mt-0.5">
+            <p className="text-[10px] text-neutral-500 font-bold mt-0.5">
               投稿あたり平均{" "}
               {overview?.totalPosts
                 ? Math.round(overview.totalViews / overview.totalPosts).toLocaleString()
@@ -194,13 +192,13 @@ export function Analytics() {
           </div>
         </div>
 
-        <div className="fade-in-up bg-[#A8E6CF] border-2 border-[#1A1A1A] rounded-lg p-4 shadow-[4px_4px_0_#1A1A1A]">
+        <div className="fade-in-up bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4">
           <div className="pl-3">
-            <p className="text-[11px] text-[#1A1A1A] font-bold uppercase tracking-wide">総いいね数</p>
-            <p className="text-2xl font-bold text-[#1A1A1A] mt-0.5">
+            <p className="text-[11px] text-emerald-400 font-bold uppercase tracking-wide">総いいね数</p>
+            <p className="text-2xl font-bold text-white mt-0.5">
               {overview?.totalLikes?.toLocaleString() || 0}
             </p>
-            <p className="text-[10px] text-[#6B6B6B] font-bold mt-0.5">
+            <p className="text-[10px] text-neutral-500 font-bold mt-0.5">
               投稿あたり平均{" "}
               {overview?.totalPosts
                 ? Math.round(overview.totalLikes / overview.totalPosts).toLocaleString()
@@ -209,71 +207,71 @@ export function Analytics() {
           </div>
         </div>
 
-        <div className="fade-in-up bg-[#FF6B6B] border-2 border-[#1A1A1A] rounded-lg p-4 shadow-[4px_4px_0_#1A1A1A]">
+        <div className="fade-in-up bg-rose-500/10 border border-rose-500/20 rounded-lg p-4">
           <div className="pl-3">
-            <p className="text-[11px] text-[#1A1A1A] font-bold uppercase tracking-wide">エンゲージメント率</p>
-            <p className="text-2xl font-bold text-[#1A1A1A] mt-0.5">
+            <p className="text-[11px] text-rose-400 font-bold uppercase tracking-wide">エンゲージメント率</p>
+            <p className="text-2xl font-bold text-white mt-0.5">
               {overview?.avgEngagementRate?.toFixed(2) || 0}%
             </p>
-            <p className="text-[10px] text-[#6B6B6B] font-bold mt-0.5">平均エンゲージメント率</p>
+            <p className="text-[10px] text-neutral-500 font-bold mt-0.5">平均エンゲージメント率</p>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg p-1 w-fit shadow-[4px_4px_0_#1A1A1A]">
+      <div className="flex gap-2 bg-neutral-900 border border-white/[0.06] rounded-lg p-1 w-fit">
         {(["accounts", "top-posts", "trends"] as const).map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all border-2 ${
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
               activeTab === tab
-                ? "bg-[#FFD700] text-[#1A1A1A] border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]"
-                : "bg-[#FFFDF7] text-[#6B6B6B] border-transparent hover:bg-[#FFF8DC] hover:border-[#1A1A1A]"
+                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                : "text-neutral-500 hover:bg-neutral-800"
             }`}>{tabLabels[tab]}</button>
         ))}
       </div>
 
       {activeTab === "accounts" && (
-        <div className="fade-in-up bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] p-4 shadow-[4px_4px_0_#1A1A1A]">
-          <h3 className="font-bold text-sm text-[#1A1A1A] mb-1">アカウント別パフォーマンス</h3>
-          <p className="text-xs text-[#6B6B6B] font-bold mb-3">各アカウントのエンゲージメント率と投稿数</p>
+        <div className="fade-in-up bg-neutral-900 rounded-lg border border-white/[0.06] p-4">
+          <h3 className="font-bold text-sm text-white mb-1">アカウント別パフォーマンス</h3>
+          <p className="text-xs text-neutral-500 font-bold mb-3">各アカウントのエンゲージメント率と投稿数</p>
           {overview?.accountPerformance && overview.accountPerformance.length > 0 ? (
             <div className="space-y-3">
               {overview.accountPerformance.map((account) => (
-                <div key={account.accountId} className="flex items-center justify-between p-3 border-2 border-[#1A1A1A] rounded-lg hover:shadow-[2px_2px_0_#1A1A1A] hover:translate-x-[2px] hover:translate-y-[2px] transition-all bg-[#FFFDF7]">
+                <div key={account.accountId} className="flex items-center justify-between p-3 border border-white/[0.06] rounded-lg hover:bg-neutral-800 transition-all bg-neutral-950">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="font-bold text-sm text-[#1A1A1A]">{account.accountName}</p>
-                      <span className="text-[10px] text-[#6B6B6B] font-bold capitalize">
+                      <p className="font-bold text-sm text-white">{account.accountName}</p>
+                      <span className="text-[10px] text-neutral-500 font-bold capitalize">
                         {account.platform}
                       </span>
                     </div>
-                    <div className="flex items-center gap-4 mt-2 text-xs text-[#6B6B6B] font-bold">
+                    <div className="flex items-center gap-4 mt-2 text-xs text-neutral-500 font-bold">
                       <span className="flex items-center gap-1">
-                        <BarChart3 className="h-3.5 w-3.5 text-[#1A1A1A]" />
+                        <BarChart3 className="h-3.5 w-3.5 text-neutral-400" />
                         {account.totalPosts} 投稿
                       </span>
                       <span className="flex items-center gap-1">
-                        <Eye className="h-3.5 w-3.5 text-[#1A1A1A]" />
+                        <Eye className="h-3.5 w-3.5 text-neutral-400" />
                         {account.totalViews.toLocaleString()} 視聴
                       </span>
                       <span className="flex items-center gap-1">
-                        <Heart className="h-3.5 w-3.5 text-[#1A1A1A]" />
+                        <Heart className="h-3.5 w-3.5 text-neutral-400" />
                         {account.totalLikes.toLocaleString()} いいね
                       </span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-[#1A1A1A]">{account.avgEngagementRate.toFixed(2)}%</p>
-                    <p className="text-[10px] text-[#6B6B6B] font-bold">エンゲージメント率</p>
+                    <p className="text-2xl font-bold text-white">{account.avgEngagementRate.toFixed(2)}%</p>
+                    <p className="text-[10px] text-neutral-500 font-bold">エンゲージメント率</p>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="text-center py-12">
-              <BarChart3 className="h-12 w-12 text-[#6B6B6B] mx-auto mb-4" />
-              <p className="text-[#6B6B6B] text-sm font-bold">まだデータがありません</p>
-              <p className="text-xs text-[#6B6B6B] font-bold mt-2">
+              <BarChart3 className="h-12 w-12 text-neutral-600 mx-auto mb-4" />
+              <p className="text-neutral-500 text-sm font-bold">まだデータがありません</p>
+              <p className="text-xs text-neutral-600 font-bold mt-2">
                 投稿を開始すると、ここにパフォーマンスデータが表示されます
               </p>
             </div>
@@ -282,27 +280,27 @@ export function Analytics() {
       )}
 
       {activeTab === "top-posts" && (
-        <div className="fade-in-up bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] p-4 shadow-[4px_4px_0_#1A1A1A]">
-          <h3 className="font-bold text-sm text-[#1A1A1A] mb-1">トップパフォーマンス投稿</h3>
-          <p className="text-xs text-[#6B6B6B] font-bold mb-3">エンゲージメント率が最も高い投稿</p>
+        <div className="fade-in-up bg-neutral-900 rounded-lg border border-white/[0.06] p-4">
+          <h3 className="font-bold text-sm text-white mb-1">トップパフォーマンス投稿</h3>
+          <p className="text-xs text-neutral-500 font-bold mb-3">エンゲージメント率が最も高い投稿</p>
           {topPosts && topPosts.length > 0 ? (
             <div className="space-y-3">
               {topPosts.map((post, index) => (
-                <div key={post.postId} className="flex items-start gap-4 p-3 border-2 border-[#1A1A1A] rounded-lg hover:shadow-[2px_2px_0_#1A1A1A] hover:translate-x-[2px] hover:translate-y-[2px] transition-all bg-[#FFFDF7]">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-[#FFD700] border-2 border-[#1A1A1A] text-[#1A1A1A] flex items-center justify-center font-bold text-sm shadow-[2px_2px_0_#1A1A1A]">
+                <div key={post.postId} className="flex items-start gap-4 p-3 border border-white/[0.06] rounded-lg hover:bg-neutral-800 transition-all bg-neutral-950">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 flex items-center justify-center font-bold text-sm">
                     {index + 1}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <p className="font-bold text-sm text-[#1A1A1A]">{post.accountName}</p>
-                      <span className="text-[10px] text-[#6B6B6B] font-bold capitalize">
+                      <p className="font-bold text-sm text-white">{post.accountName}</p>
+                      <span className="text-[10px] text-neutral-500 font-bold capitalize">
                         {post.platform}
                       </span>
                     </div>
-                    <p className="text-xs text-[#6B6B6B] font-bold line-clamp-2 mb-2">
+                    <p className="text-xs text-neutral-500 font-bold line-clamp-2 mb-2">
                       {post.content}
                     </p>
-                    <div className="flex items-center gap-4 text-xs text-[#6B6B6B] font-bold">
+                    <div className="flex items-center gap-4 text-xs text-neutral-500 font-bold">
                       <span className="flex items-center gap-1">
                         <Eye className="h-3.5 w-3.5" />
                         {post.views.toLocaleString()}
@@ -319,7 +317,7 @@ export function Analytics() {
                         <Share2 className="h-3.5 w-3.5" />
                         {post.shares.toLocaleString()}
                       </span>
-                      <span className="ml-auto font-bold text-[#1A1A1A]">
+                      <span className="ml-auto font-bold text-white">
                         {post.engagementRate.toFixed(2)}%
                       </span>
                     </div>
@@ -329,9 +327,9 @@ export function Analytics() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <TrendingUp className="h-12 w-12 text-[#6B6B6B] mx-auto mb-4" />
-              <p className="text-[#6B6B6B] text-sm font-bold">まだデータがありません</p>
-              <p className="text-xs text-[#6B6B6B] font-bold mt-2">
+              <TrendingUp className="h-12 w-12 text-neutral-600 mx-auto mb-4" />
+              <p className="text-neutral-500 text-sm font-bold">まだデータがありません</p>
+              <p className="text-xs text-neutral-600 font-bold mt-2">
                 投稿を開始すると、ここにトップパフォーマンス投稿が表示されます
               </p>
             </div>

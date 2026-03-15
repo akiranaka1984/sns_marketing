@@ -63,35 +63,35 @@ export default function NewAccount() {
     <div className="space-y-5 max-w-3xl">
       <div className="fade-in-up">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#1A1A1A]">新規アカウント追加</h1>
-          <p className="text-sm text-[#6B6B6B] font-bold mt-1">SNSアカウントの認証情報を入力して追加します</p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">新規アカウント追加</h1>
+          <p className="text-sm text-neutral-500 font-bold mt-1">SNSアカウントの認証情報を入力して追加します</p>
         </div>
       </div>
 
-      <div className="fade-in-up bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
-        <h3 className="text-sm font-bold text-[#1A1A1A] mb-1">アカウント情報</h3>
-        <p className="text-xs text-[#6B6B6B] font-bold mb-3">認証情報は安全に保存され、自動登録にのみ使用されます</p>
+      <div className="fade-in-up bg-neutral-900 rounded-lg border border-white/[0.06] p-4">
+        <h3 className="text-sm font-bold text-white mb-1">アカウント情報</h3>
+        <p className="text-xs text-neutral-500 font-bold mb-3">認証情報は安全に保存され、自動登録にのみ使用されます</p>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="platform" className="text-sm font-bold text-[#1A1A1A]">プラットフォーム</Label>
+            <Label htmlFor="platform" className="text-sm font-bold text-white">プラットフォーム</Label>
             <Select
               value={platform}
               onValueChange={(value) => setPlatform(value as typeof platform)}
             >
-              <SelectTrigger id="platform" className="border-2 border-[#1A1A1A] bg-[#FFFDF7] rounded-lg font-bold">
+              <SelectTrigger id="platform" className="border border-white/[0.06] bg-neutral-950 rounded-lg font-bold">
                 <SelectValue placeholder="プラットフォームを選択" />
               </SelectTrigger>
-              <SelectContent className="border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] bg-[#FFFDF7]">
-                <SelectItem value="twitter">𝕏 Twitter</SelectItem>
-                <SelectItem value="tiktok">🎵 TikTok</SelectItem>
-                <SelectItem value="instagram">📷 Instagram</SelectItem>
-                <SelectItem value="facebook">👥 Facebook</SelectItem>
+              <SelectContent className="border border-white/[0.06] bg-neutral-900">
+                <SelectItem value="twitter">X Twitter</SelectItem>
+                <SelectItem value="tiktok">TikTok</SelectItem>
+                <SelectItem value="instagram">Instagram</SelectItem>
+                <SelectItem value="facebook">Facebook</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="username" className="text-sm font-bold text-[#1A1A1A]">ユーザー名またはメールアドレス</Label>
+            <Label htmlFor="username" className="text-sm font-bold text-white">ユーザー名またはメールアドレス</Label>
             <Input
               id="username"
               type="text"
@@ -99,12 +99,12 @@ export default function NewAccount() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               disabled={isLoading}
-              className="border-2 border-[#1A1A1A] bg-[#FFFDF7] rounded-lg font-bold"
+              className="border border-white/[0.06] bg-neutral-950 rounded-lg font-bold"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-bold text-[#1A1A1A]">パスワード</Label>
+            <Label htmlFor="password" className="text-sm font-bold text-white">パスワード</Label>
             <Input
               id="password"
               type="password"
@@ -112,7 +112,7 @@ export default function NewAccount() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
-              className="border-2 border-[#1A1A1A] bg-[#FFFDF7] rounded-lg font-bold"
+              className="border border-white/[0.06] bg-neutral-950 rounded-lg font-bold"
             />
           </div>
 
@@ -120,7 +120,7 @@ export default function NewAccount() {
             <Button
               type="button"
               variant="outline"
-              className="flex-1 border-2 border-[#1A1A1A] text-[#1A1A1A] font-bold bg-[#FFFDF7] hover:bg-[#FFF8DC] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
+              className="flex-1 border border-white/[0.06] text-white font-bold bg-neutral-950 hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
               onClick={() => setLocation('/accounts')}
               disabled={isLoading}
             >
@@ -128,7 +128,7 @@ export default function NewAccount() {
             </Button>
             <Button
               type="submit"
-              className="flex-1 gap-2 bg-[#FFD700] hover:bg-[#FFD700] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-[#1A1A1A] font-bold border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] rounded-lg"
+              className="flex-1 gap-2 bg-emerald-500 hover:bg-emerald-600 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -144,33 +144,33 @@ export default function NewAccount() {
         </form>
       </div>
 
-      <div className="fade-in-up bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
-        <h3 className="text-sm font-bold text-[#1A1A1A] mb-1">ご利用の流れ</h3>
-        <div className="space-y-3 text-sm font-bold text-[#6B6B6B] mt-3">
+      <div className="fade-in-up bg-neutral-900 rounded-lg border border-white/[0.06] p-4">
+        <h3 className="text-sm font-bold text-white mb-1">ご利用の流れ</h3>
+        <div className="space-y-3 text-sm font-bold text-neutral-500 mt-3">
           <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#FFD700] text-[#1A1A1A] flex items-center justify-center font-bold border-2 border-[#1A1A1A]">
+            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold border border-amber-500/30">
               1
             </div>
             <div>
-              <p className="font-bold text-[#1A1A1A]">認証情報を入力</p>
+              <p className="font-bold text-white">認証情報を入力</p>
               <p>SNSプラットフォームのユーザー名/メールアドレスとパスワードを入力します</p>
             </div>
           </div>
           <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#4ECDC4] text-[#1A1A1A] flex items-center justify-center font-bold border-2 border-[#1A1A1A]">
+            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold border border-teal-500/30">
               2
             </div>
             <div>
-              <p className="font-bold text-[#1A1A1A]">デバイスを割り当て</p>
+              <p className="font-bold text-white">デバイスを割り当て</p>
               <p>アカウント詳細画面からクラウドデバイスを割り当て、手動でログインします</p>
             </div>
           </div>
           <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#A8E6CF] text-[#1A1A1A] flex items-center justify-center font-bold border-2 border-[#1A1A1A]">
+            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold border border-emerald-500/30">
               3
             </div>
             <div>
-              <p className="font-bold text-[#1A1A1A]">管理開始</p>
+              <p className="font-bold text-white">管理開始</p>
               <p>ログイン完了後、アカウントの管理やマーケティング戦略の生成が可能になります</p>
             </div>
           </div>

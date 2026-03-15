@@ -17,18 +17,18 @@ export default function Home() {
   // const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFDF7]">
+    <div className="min-h-screen flex flex-col bg-neutral-950">
       <main className="p-8">
         {/* Example: lucide-react for icons */}
-        <div className="mb-4 p-4 bg-[#FFD700] border-2 border-[#1A1A1A] rounded-lg shadow-[4px_4px_0_#1A1A1A] inline-block">
-          <Loader2 className="animate-spin text-[#1A1A1A]" />
+        <div className="mb-4 p-4 bg-emerald-500/20 border border-emerald-500/30 rounded-lg inline-block">
+          <Loader2 className="animate-spin text-emerald-400" />
         </div>
-        <h1 className="text-3xl font-bold text-[#1A1A1A] mb-4">Example Page</h1>
+        <h1 className="text-3xl font-bold text-white mb-4">Example Page</h1>
         {/* Example: Streamdown for markdown rendering */}
-        <div className="mb-4 p-4 bg-[#FFFDF7] border-2 border-[#1A1A1A] rounded-lg shadow-[4px_4px_0_#1A1A1A]">
+        <div className="mb-4 p-4 bg-neutral-900 border border-white/[0.06] rounded-lg">
           <Streamdown>Any **markdown** content</Streamdown>
         </div>
-        <Button variant="default" className="bg-[#FFD700] hover:bg-[#FFED4A] text-[#1A1A1A] border-2 border-[#1A1A1A] rounded-lg shadow-[4px_4px_0_#1A1A1A] hover:shadow-[2px_2px_0_#1A1A1A] hover:translate-x-[2px] hover:translate-y-[2px] font-bold">Example Button</Button>
+        <Button variant="default" className="bg-emerald-500 hover:bg-emerald-500 text-white border border-white/[0.06] rounded-lg hover:translate-x-[2px] hover:translate-y-[2px] font-bold">Example Button</Button>
       </main>
     </div>
   );

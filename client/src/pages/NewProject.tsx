@@ -100,7 +100,7 @@ export default function NewProject() {
             プロジェクト一覧に戻る
           </Button>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">新規プロジェクト作成</h1>
-          <p className="text-sm text-[#6B6B6B] font-bold mt-1">マーケティングキャンペーンの基本情報を入力してください</p>
+          <p className="text-sm text-neutral-500 font-bold mt-1">マーケティングキャンペーンの基本情報を入力してください</p>
         </div>
       </div>
 
@@ -113,7 +113,7 @@ export default function NewProject() {
               <Target className="h-5 w-5" />
               基本情報
             </h3>
-            <p className="text-xs text-[#6B6B6B] font-bold mb-3">プロジェクトの名前と目的を設定します</p>
+            <p className="text-xs text-neutral-500 font-bold mb-3">プロジェクトの名前と目的を設定します</p>
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-bold text-white">プロジェクト名 *</Label>
@@ -160,7 +160,7 @@ export default function NewProject() {
               <Calendar className="h-5 w-5" />
               実施期間
             </h3>
-            <p className="text-xs text-[#6B6B6B] font-bold mb-3">プロジェクトの開始日と終了日を設定します</p>
+            <p className="text-xs text-neutral-500 font-bold mb-3">プロジェクトの開始日と終了日を設定します</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="startDate" className="text-sm font-bold text-white">開始日</Label>
@@ -197,7 +197,7 @@ export default function NewProject() {
                 type="button"
                 variant="outline"
                 size="sm"
-                className="border border-white/[0.06] text-white font-bold bg-[#3B82F6] hover:bg-[#3B82F6] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
+                className="border border-blue-500/30 text-blue-400 font-bold bg-blue-500/20 hover:bg-blue-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
                 onClick={handleSuggestKPIs}
                 disabled={suggestKPIsMutation.isPending || !formData.objective.trim()}
               >
@@ -209,17 +209,17 @@ export default function NewProject() {
                 AIが提案
               </Button>
             </div>
-            <p className="text-xs text-[#6B6B6B] font-bold mb-3">達成したい数値目標を設定します</p>
+            <p className="text-xs text-neutral-500 font-bold mb-3">達成したい数値目標を設定します</p>
             <div className="space-y-4">
               {kpiRationale && (
-                <div className="bg-[#FFDAB9] border border-white/[0.06] rounded-lg p-3 flex gap-2">
-                  <Sparkles className="h-4 w-4 text-white mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-white font-bold">
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 flex gap-2">
+                  <Sparkles className="h-4 w-4 text-amber-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-neutral-300 font-bold">
                     <strong>AIの提案理由:</strong> {kpiRationale}
                   </p>
                 </div>
               )}
-              <p className="text-sm font-bold text-[#6B6B6B]">設定したいKPIだけを入力してください（任意）</p>
+              <p className="text-sm font-bold text-neutral-500">設定したいKPIだけを入力してください（任意）</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="targetFollowers" className="text-sm font-bold text-white">目標フォロワー数</Label>

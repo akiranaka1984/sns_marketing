@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Wand2, Copy, Check } from "lucide-react";
 
@@ -52,27 +50,36 @@ export default function ContentRewrite() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const getStatusBadge = (status: string) => {
+    if (status === "completed") return <span className="inline-flex items-center rounded-lg border border-emerald-500/30 bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-400">完了</span>;
+    if (status === "pending") return <span className="inline-flex items-center rounded-lg border border-amber-500/30 bg-amber-500/20 px-2 py-0.5 text-xs font-bold text-amber-400">処理中</span>;
+    if (status === "failed") return <span className="inline-flex items-center rounded-lg border border-rose-500/30 bg-rose-500/20 px-2 py-0.5 text-xs font-bold text-rose-400">失敗</span>;
+    return <span className="inline-flex items-center rounded-lg border border-white/[0.06] bg-neutral-800 px-2 py-0.5 text-xs font-bold text-neutral-400">{status}</span>;
+  };
+
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[#1A1A1A]">AIコンテンツリライト</h1>
-        <p className="text-[#6B6B6B] font-bold">
-          既存のコンテンツをエージェントのペルソナに合わせてリライトします
-        </p>
+    <div className="space-y-5 max-w-5xl">
+      <div className="fade-in-up page-header">
+        <div>
+          <h2 className="text-lg font-bold text-white">AIコンテンツリライト</h2>
+          <p className="text-xs text-neutral-500 mt-0.5 font-bold">
+            既存のコンテンツをエージェントのペルソナに合わせてリライトします
+          </p>
+        </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2 mb-8">
+      <div className="grid gap-4 lg:grid-cols-2">
         {/* Input Section */}
-        <Card className="border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] bg-[#FFFDF7]">
-          <CardHeader>
-            <CardTitle className="font-bold text-[#1A1A1A]">元のコンテンツ</CardTitle>
-            <CardDescription className="font-bold text-[#6B6B6B]">リライトしたいコンテンツを入力してください</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
+          <div className="mb-4">
+            <h3 className="text-sm font-bold text-white">元のコンテンツ</h3>
+            <p className="text-xs text-neutral-500 font-bold mt-0.5">リライトしたいコンテンツを入力してください</p>
+          </div>
+          <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="agent" className="font-bold text-[#1A1A1A]">エージェント選択</Label>
+              <Label htmlFor="agent" className="font-bold text-xs text-neutral-500">エージェント選択</Label>
               <Select value={selectedAgentId} onValueChange={setSelectedAgentId}>
-                <SelectTrigger className="border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] font-bold">
+                <SelectTrigger className="border border-white/[0.06] bg-neutral-900 font-bold">
                   <SelectValue placeholder="エージェントを選択" />
                 </SelectTrigger>
                 <SelectContent>
@@ -85,46 +92,46 @@ export default function ContentRewrite() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="content" className="font-bold text-[#1A1A1A]">コンテンツ</Label>
+              <Label htmlFor="content" className="font-bold text-xs text-neutral-500">コンテンツ</Label>
               <Textarea
                 id="content"
                 placeholder="リライトしたいコンテンツを入力..."
                 value={originalContent}
                 onChange={(e) => setOriginalContent(e.target.value)}
                 rows={10}
-                className="border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] font-bold"
+                className="border border-white/[0.06] bg-neutral-900 font-bold"
               />
             </div>
             <Button
               onClick={handleRewrite}
               disabled={rewriteContent.isPending}
-              className="w-full bg-[#FFD700] hover:bg-[#FFD700] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold"
+              className="w-full bg-emerald-500 hover:bg-emerald-500 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white border border-white/[0.06] font-bold"
             >
               <Wand2 className="mr-2 h-4 w-4" />
               {rewriteContent.isPending ? "リライト中..." : "リライト"}
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Output Section */}
-        <Card className="border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] bg-[#FFFDF7]">
-          <CardHeader>
-            <CardTitle className="font-bold text-[#1A1A1A]">リライト結果</CardTitle>
-            <CardDescription className="font-bold text-[#6B6B6B]">AIがリライトしたコンテンツ</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
+          <div className="mb-4">
+            <h3 className="text-sm font-bold text-white">リライト結果</h3>
+            <p className="text-xs text-neutral-500 font-bold mt-0.5">AIがリライトしたコンテンツ</p>
+          </div>
+          <div className="space-y-4">
             {rewrittenContent ? (
               <>
                 <div className="space-y-2">
-                  <Label className="font-bold text-[#1A1A1A]">リライト済みコンテンツ</Label>
+                  <Label className="font-bold text-xs text-neutral-500">リライト済みコンテンツ</Label>
                   <Textarea
                     value={rewrittenContent}
                     readOnly
                     rows={10}
-                    className="bg-white border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] font-bold"
+                    className="bg-neutral-900 border border-white/[0.06] font-bold"
                   />
                 </div>
-                <Button onClick={handleCopy} className="w-full bg-[#4ECDC4] hover:bg-[#4ECDC4] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] font-bold">
+                <Button onClick={handleCopy} className="w-full bg-teal-500/20 hover:bg-teal-500/30 text-teal-400 border border-teal-500/30 font-bold">
                   {copied ? (
                     <>
                       <Check className="mr-2 h-4 w-4" />
@@ -139,50 +146,44 @@ export default function ContentRewrite() {
                 </Button>
               </>
             ) : (
-              <div className="flex items-center justify-center h-64 text-[#6B6B6B] font-bold">
+              <div className="flex items-center justify-center h-64 text-neutral-500 font-bold">
                 <p>リライト結果がここに表示されます</p>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Rewrite History */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4 text-[#1A1A1A]">リライト履歴</h2>
-        <div className="grid gap-4">
+      <div className="fade-in-up">
+        <h3 className="text-sm font-bold text-white mb-3">リライト履歴</h3>
+        <div className="grid gap-3">
           {rewrites?.map((rewrite) => (
-            <Card key={rewrite.id} className="border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] bg-[#FFFDF7]">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span className="font-bold text-[#1A1A1A]">リライト #{rewrite.id}</span>
-                  <Badge variant={rewrite.status === "completed" ? "default" : "secondary"}>
-                    {rewrite.status === "completed" && "完了"}
-                    {rewrite.status === "pending" && "処理中"}
-                    {rewrite.status === "failed" && "失敗"}
-                  </Badge>
-                </CardTitle>
-                <CardDescription className="font-bold text-[#6B6B6B]">
-                  {new Date(rewrite.createdAt).toLocaleString("ja-JP")}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <p className="font-bold text-sm mb-2 text-[#1A1A1A]">元のコンテンツ:</p>
-                    <p className="text-sm text-[#6B6B6B] bg-white p-3 rounded-lg border-2 border-[#1A1A1A] font-bold">
-                      {rewrite.originalContent}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm mb-2 text-[#1A1A1A]">リライト結果:</p>
-                    <p className="text-sm text-[#6B6B6B] bg-white p-3 rounded-lg border-2 border-[#1A1A1A] font-bold">
-                      {rewrite.rewrittenContent || "処理中..."}
-                    </p>
-                  </div>
+            <div key={rewrite.id} className="bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-bold text-white">リライト #{rewrite.id}</span>
+                <div className="flex items-center gap-2">
+                  {getStatusBadge(rewrite.status)}
+                  <span className="text-xs text-neutral-500 font-bold">
+                    {new Date(rewrite.createdAt).toLocaleString("ja-JP")}
+                  </span>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div>
+                  <p className="font-bold text-xs mb-2 text-neutral-500">元のコンテンツ:</p>
+                  <p className="text-sm text-neutral-400 bg-neutral-900 p-3 rounded-lg border border-white/[0.06] font-bold">
+                    {rewrite.originalContent}
+                  </p>
+                </div>
+                <div>
+                  <p className="font-bold text-xs mb-2 text-neutral-500">リライト結果:</p>
+                  <p className="text-sm text-neutral-400 bg-neutral-900 p-3 rounded-lg border border-white/[0.06] font-bold">
+                    {rewrite.rewrittenContent || "処理中..."}
+                  </p>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       </div>

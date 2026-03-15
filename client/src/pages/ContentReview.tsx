@@ -1,12 +1,9 @@
 import { trpc } from "@/lib/trpc";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Check, X, MessageSquare } from "lucide-react";
+import { Check, X, MessageSquare, ClipboardList } from "lucide-react";
 import { useState } from "react";
 
 export default function ContentReview() {
@@ -73,52 +70,54 @@ export default function ContentReview() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
-        return <span className="inline-flex items-center rounded-lg border-2 border-[#1A1A1A] bg-[#FFD700] px-2 py-0.5 text-xs font-bold text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">審査待ち</span>;
+        return <span className="inline-flex items-center rounded-lg border border-amber-500/30 bg-amber-500/20 px-2 py-0.5 text-xs font-bold text-amber-400">審査待ち</span>;
       case "approved":
-        return <span className="inline-flex items-center rounded-lg border-2 border-[#1A1A1A] bg-[#A8E6CF] px-2 py-0.5 text-xs font-bold text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">承認済み</span>;
+        return <span className="inline-flex items-center rounded-lg border border-emerald-500/30 bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-400">承認済み</span>;
       case "rejected":
-        return <span className="inline-flex items-center rounded-lg border-2 border-[#1A1A1A] bg-[#FF6B6B] px-2 py-0.5 text-xs font-bold text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">却下</span>;
+        return <span className="inline-flex items-center rounded-lg border border-rose-500/30 bg-rose-500/20 px-2 py-0.5 text-xs font-bold text-rose-400">却下</span>;
       case "revision_requested":
-        return <span className="inline-flex items-center rounded-lg border-2 border-[#1A1A1A] bg-[#FFDAB9] px-2 py-0.5 text-xs font-bold text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">修正依頼</span>;
+        return <span className="inline-flex items-center rounded-lg border border-orange-500/30 bg-orange-500/20 px-2 py-0.5 text-xs font-bold text-orange-400">修正依頼</span>;
       default:
-        return <span className="inline-flex items-center rounded-lg border-2 border-[#1A1A1A] bg-[#FFFDF7] px-2 py-0.5 text-xs font-bold text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">{status}</span>;
+        return <span className="inline-flex items-center rounded-lg border border-white/[0.06] bg-neutral-800 px-2 py-0.5 text-xs font-bold text-neutral-400">{status}</span>;
     }
   };
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[#1A1A1A]">コンテンツ審査</h1>
-        <p className="text-[#6B6B6B] font-bold">
-          リライトされたコンテンツを審査し、承認・却下・修正依頼を行います
-        </p>
+    <div className="space-y-5 max-w-5xl">
+      <div className="fade-in-up page-header">
+        <div>
+          <h2 className="text-lg font-bold text-white">コンテンツ審査</h2>
+          <p className="text-xs text-neutral-500 mt-0.5 font-bold">
+            リライトされたコンテンツを審査し、承認・却下・修正依頼を行います
+          </p>
+        </div>
       </div>
 
       <div className="grid gap-4">
         {reviews?.map((review: any) => (
-          <div key={review.id} className="bg-white rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]">
-            <div className="p-6 border-b-2 border-[#1A1A1A] bg-[#4ECDC4]">
+          <div key={review.id} className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06]">
+            <div className="p-4 border-b border-white/[0.06] bg-teal-500/10 rounded-t-lg">
               <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-[#1A1A1A]">審査 #{review.id}</span>
+                <span className="text-sm font-bold text-white">審査 #{review.id}</span>
                 <div className="flex gap-2">
                   {getStatusBadge(review.status)}
                 </div>
               </div>
-              <p className="text-sm text-[#1A1A1A] font-bold mt-1">
+              <p className="text-xs text-neutral-500 font-bold mt-1">
                 {new Date(review.createdAt).toLocaleString("ja-JP")}
               </p>
             </div>
-            <div className="p-6">
+            <div className="p-4">
               <div className="space-y-4">
                 <div>
-                  <p className="font-bold text-sm mb-2 text-[#1A1A1A]">コンテンツ:</p>
-                  <p className="text-sm bg-[#FFFDF7] border-2 border-[#1A1A1A] p-4 rounded-lg shadow-[2px_2px_0_#1A1A1A] font-bold text-[#1A1A1A]">{review.rewrite?.rewrittenContent || "コンテンツなし"}</p>
+                  <p className="font-bold text-xs mb-2 text-neutral-500">コンテンツ:</p>
+                  <p className="text-sm bg-neutral-900 border border-white/[0.06] p-4 rounded-lg font-bold text-white">{review.rewrite?.rewrittenContent || "コンテンツなし"}</p>
                 </div>
 
                 {review.feedback && (
                   <div>
-                    <p className="font-bold text-sm mb-2 text-[#1A1A1A]">フィードバック:</p>
-                    <p className="text-sm text-[#6B6B6B] bg-[#FFF8DC] border-2 border-[#1A1A1A] p-4 rounded-lg shadow-[2px_2px_0_#1A1A1A] font-bold">
+                    <p className="font-bold text-xs mb-2 text-neutral-500">フィードバック:</p>
+                    <p className="text-sm text-neutral-400 bg-neutral-900 border border-white/[0.06] p-4 rounded-lg font-bold">
                       {review.feedback}
                     </p>
                   </div>
@@ -127,7 +126,7 @@ export default function ContentReview() {
                 {review.status === "pending" && (
                   <div className="flex gap-2">
                     <button
-                      className="inline-flex items-center gap-2 rounded-lg border-2 border-[#1A1A1A] bg-[#FFD700] px-3 py-2 text-sm font-bold text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                      className="inline-flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/20 px-3 py-2 text-sm font-bold text-emerald-400 hover:bg-emerald-500/30 transition-all"
                       onClick={() => approveReview.mutate({ reviewId: review.id })}
                       disabled={approveReview.isPending}
                     >
@@ -146,34 +145,34 @@ export default function ContentReview() {
                       }}
                     >
                       <DialogTrigger asChild>
-                        <button className="inline-flex items-center gap-2 rounded-lg border-2 border-[#1A1A1A] bg-white px-3 py-2 text-sm font-bold text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+                        <button className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-neutral-900 px-3 py-2 text-sm font-bold text-white hover:bg-neutral-800 transition-all">
                           <MessageSquare className="h-4 w-4" />
                           修正依頼
                         </button>
                       </DialogTrigger>
-                      <DialogContent className="border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]">
+                      <DialogContent className="border border-white/[0.06] bg-neutral-950">
                         <DialogHeader>
-                          <DialogTitle className="text-[#1A1A1A] font-bold">修正依頼</DialogTitle>
-                          <DialogDescription className="text-[#6B6B6B] font-bold">
+                          <DialogTitle className="text-white font-bold">修正依頼</DialogTitle>
+                          <DialogDescription className="text-neutral-500 font-bold">
                             修正内容を入力してください
                           </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4">
                           <div>
-                            <Label htmlFor="feedback" className="text-[#1A1A1A] font-bold">修正内容</Label>
+                            <Label htmlFor="feedback" className="text-white font-bold">修正内容</Label>
                             <Textarea
                               id="feedback"
                               placeholder="修正してほしい内容を入力..."
                               value={feedback}
                               onChange={(e) => setFeedback(e.target.value)}
                               rows={5}
-                              className="border-2 border-[#1A1A1A]"
+                              className="border border-white/[0.06] bg-neutral-900"
                             />
                           </div>
                         </div>
                         <DialogFooter>
                           <button
-                            className="rounded-lg border-2 border-[#1A1A1A] bg-white px-4 py-2 text-sm font-bold text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                            className="rounded-lg border border-white/[0.06] bg-neutral-900 px-4 py-2 text-sm font-bold text-white hover:bg-neutral-800 transition-all"
                             onClick={() => {
                               setIsDialogOpen(false);
                               setFeedback("");
@@ -182,7 +181,7 @@ export default function ContentReview() {
                             キャンセル
                           </button>
                           <button
-                            className="rounded-lg border-2 border-[#1A1A1A] bg-[#FFD700] px-4 py-2 text-sm font-bold text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                            className="rounded-lg border border-amber-500/30 bg-amber-500/20 px-4 py-2 text-sm font-bold text-amber-400 hover:bg-amber-500/30 transition-all"
                             onClick={handleRequestRevision}
                             disabled={requestRevision.isPending}
                           >
@@ -192,7 +191,7 @@ export default function ContentReview() {
                       </DialogContent>
                     </Dialog>
                     <button
-                      className="inline-flex items-center gap-2 rounded-lg border-2 border-[#1A1A1A] bg-[#FF6B6B] px-3 py-2 text-sm font-bold text-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                      className="inline-flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/20 px-3 py-2 text-sm font-bold text-rose-400 hover:bg-rose-500/30 transition-all"
                       onClick={() => {
                         setSelectedReview(review);
                         setIsDialogOpen(true);
@@ -205,7 +204,7 @@ export default function ContentReview() {
                 )}
 
                 {review.reviewedAt && (
-                  <p className="text-xs text-[#6B6B6B] font-bold">
+                  <p className="text-xs text-neutral-500 font-bold">
                     審査日時: {new Date(review.reviewedAt).toLocaleString("ja-JP")}
                   </p>
                 )}
@@ -215,9 +214,9 @@ export default function ContentReview() {
         ))}
 
         {(!reviews || reviews.length === 0) && (
-          <div className="bg-white rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]">
+          <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06]">
             <div className="flex items-center justify-center h-32">
-              <p className="text-[#6B6B6B] font-bold">審査待ちのコンテンツはありません</p>
+              <p className="text-neutral-500 font-bold">審査待ちのコンテンツはありません</p>
             </div>
           </div>
         )}

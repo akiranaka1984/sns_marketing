@@ -27,12 +27,10 @@ export default function PostReview() {
   const [rejectReason, setRejectReason] = useState("");
   const [rejectingPostId, setRejectingPostId] = useState<number | null>(null);
 
-  // レビュー待ち投稿を取得
   const { data: pendingPosts, isLoading } = trpc.agentScheduledPosts.getPendingReview.useQuery({
     limit: 100,
   });
 
-  // 承認
   const approveMutation = trpc.agentScheduledPosts.approve.useMutation({
     onSuccess: () => {
       toast.success("承認しました");
@@ -40,7 +38,6 @@ export default function PostReview() {
     },
   });
 
-  // 却下
   const rejectMutation = trpc.agentScheduledPosts.reject.useMutation({
     onSuccess: () => {
       toast.success("却下しました");
@@ -50,7 +47,6 @@ export default function PostReview() {
     },
   });
 
-  // 編集
   const editMutation = trpc.agentScheduledPosts.edit.useMutation({
     onSuccess: () => {
       toast.success("編集を保存しました");
@@ -59,7 +55,6 @@ export default function PostReview() {
     },
   });
 
-  // 一括承認
   const bulkApproveMutation = trpc.agentScheduledPosts.bulkApprove.useMutation({
     onSuccess: (data) => {
       toast.success(`${data.approved}件を承認しました`);
@@ -68,7 +63,6 @@ export default function PostReview() {
     },
   });
 
-  // 一括却下
   const bulkRejectMutation = trpc.agentScheduledPosts.bulkReject.useMutation({
     onSuccess: (data) => {
       toast.success(`${data.rejected}件を却下しました`);
@@ -95,11 +89,11 @@ export default function PostReview() {
 
   const getPlatformColor = (platform: string) => {
     switch (platform) {
-      case "twitter": return "bg-[#87CEEB]";
-      case "instagram": return "bg-[#FF6B6B]";
-      case "tiktok": return "bg-white/10";
-      case "facebook": return "bg-[#4ECDC4]";
-      default: return "bg-[#6B6B6B]";
+      case "twitter": return "bg-sky-500/20 text-sky-400";
+      case "instagram": return "bg-rose-500/20 text-rose-400";
+      case "tiktok": return "bg-neutral-800 text-neutral-300";
+      case "facebook": return "bg-teal-500/20 text-teal-400";
+      default: return "bg-neutral-800 text-neutral-400";
     }
   };
 
@@ -115,7 +109,7 @@ export default function PostReview() {
   return (
     <>
       <div className="space-y-5 max-w-5xl">
-        {/* ヘッダー */}
+        {/* Header */}
         <div className="fade-in-up page-header">
           <div>
             <h1 className="page-title">投稿レビュー</h1>
@@ -127,7 +121,7 @@ export default function PostReview() {
           {selectedPosts.length > 0 && (
             <div className="flex gap-2">
               <button
-                className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                className="inline-flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/20 px-4 py-2 text-sm font-bold text-emerald-400 transition-all hover:bg-emerald-500/30"
                 onClick={() => bulkApproveMutation.mutate({ postIds: selectedPosts })}
                 disabled={bulkApproveMutation.isPending}
               >
@@ -135,7 +129,7 @@ export default function PostReview() {
                 {selectedPosts.length}件を承認
               </button>
               <button
-                className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-[#FF6B6B] px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                className="inline-flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/20 px-4 py-2 text-sm font-bold text-rose-400 transition-all hover:bg-rose-500/30"
                 onClick={() => {
                   const reason = prompt("却下理由を入力してください");
                   if (reason) {
@@ -151,27 +145,27 @@ export default function PostReview() {
           )}
         </div>
 
-        {/* 統計 */}
+        {/* Stats */}
         <div className="grid gap-3 grid-cols-3">
-          <div className="fade-in-up bg-emerald-500 rounded-lg border border-white/[0.06] p-4">
+          <div className="fade-in-up bg-emerald-500/10 rounded-lg border border-emerald-500/20 p-4">
             <div className="pl-3">
-              <p className="text-[11px] text-white font-bold uppercase tracking-wide">レビュー待ち</p>
+              <p className="text-[11px] text-emerald-400 font-bold uppercase tracking-wide">レビュー待ち</p>
               <p className="text-2xl font-bold text-white mt-0.5">{pendingPosts?.length || 0}</p>
             </div>
           </div>
 
-          <div className="fade-in-up bg-[#3B82F6] rounded-lg border border-white/[0.06] p-4">
+          <div className="fade-in-up bg-blue-500/10 rounded-lg border border-blue-500/20 p-4">
             <div className="pl-3">
-              <p className="text-[11px] text-white font-bold uppercase tracking-wide">エージェント</p>
+              <p className="text-[11px] text-blue-400 font-bold uppercase tracking-wide">エージェント</p>
               <p className="text-2xl font-bold text-white mt-0.5">
                 {new Set(pendingPosts?.map(p => p.agentId).filter(Boolean)).size}
               </p>
             </div>
           </div>
 
-          <div className="fade-in-up bg-[#A8E6CF] rounded-lg border border-white/[0.06] p-4">
+          <div className="fade-in-up bg-teal-500/10 rounded-lg border border-teal-500/20 p-4">
             <div className="pl-3">
-              <p className="text-[11px] text-white font-bold uppercase tracking-wide">24時間以内</p>
+              <p className="text-[11px] text-teal-400 font-bold uppercase tracking-wide">24時間以内</p>
               <p className="text-2xl font-bold text-white mt-0.5">
                 {pendingPosts?.filter(p => {
                   const scheduledTime = new Date(p.scheduledTime);
@@ -184,13 +178,13 @@ export default function PostReview() {
           </div>
         </div>
 
-        {/* 投稿一覧 */}
-        <div className="fade-in-up bg-white rounded-lg border border-white/[0.06] p-4">
+        {/* Post List */}
+        <div className="fade-in-up bg-neutral-900 rounded-lg border border-white/[0.06] p-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-sm text-white">レビュー待ち投稿</h3>
             {pendingPosts && pendingPosts.length > 0 && (
               <button
-                className="rounded-lg border border-white/[0.06] bg-white px-3 py-1 text-xs font-bold text-white transition-all hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
+                className="rounded-lg border border-white/[0.06] bg-neutral-800 px-3 py-1 text-xs font-bold text-neutral-400 transition-all hover:bg-neutral-700"
                 onClick={handleSelectAll}
               >
                 {selectedPosts.length === pendingPosts.length ? "選択解除" : "すべて選択"}
@@ -198,12 +192,12 @@ export default function PostReview() {
             )}
           </div>
           {isLoading ? (
-            <div className="text-center py-8 text-[#6B6B6B] font-bold">読み込み中...</div>
+            <div className="text-center py-8 text-neutral-500 font-bold">読み込み中...</div>
           ) : !pendingPosts || pendingPosts.length === 0 ? (
             <div className="text-center py-8">
-              <CheckCircle className="h-12 w-12 mx-auto text-[#A8E6CF] mb-4 border border-white/[0.06] rounded-full p-2 bg-white" />
+              <CheckCircle className="h-12 w-12 mx-auto text-emerald-400 mb-4 rounded-full p-2 bg-emerald-500/10" />
               <p className="text-lg font-bold text-white">レビュー待ちの投稿はありません</p>
-              <p className="text-[#6B6B6B] font-bold">すべての投稿が処理されています</p>
+              <p className="text-neutral-500 font-bold">すべての投稿が処理されています</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -211,7 +205,7 @@ export default function PostReview() {
                 <div
                   key={post.id}
                   className={`border border-white/[0.06] rounded-lg p-4 transition-colors ${
-                    selectedPosts.includes(post.id) ? "bg-[#FFDAB9]" : "bg-white"
+                    selectedPosts.includes(post.id) ? "bg-amber-500/5 border-amber-500/20" : "bg-neutral-950"
                   }`}
                 >
                   <div className="flex gap-4">
@@ -221,40 +215,40 @@ export default function PostReview() {
                     />
 
                     <div className="flex-1 space-y-3">
-                      {/* メタ情報 */}
+                      {/* Meta */}
                       <div className="flex items-center gap-2 flex-wrap">
                         {post.agent && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border border-white/[0.06] text-[11px] font-bold bg-[#87CEEB] text-white">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border border-sky-500/30 text-[11px] font-bold bg-sky-500/10 text-sky-400">
                             <Bot className="h-3 w-3" />
                             {post.agent.name}
                           </span>
                         )}
                         {post.account && (
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-lg border border-white/[0.06] text-[11px] font-bold text-white ${getPlatformColor(post.account.platform)}`}>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-lg border border-white/[0.06] text-[11px] font-bold ${getPlatformColor(post.account.platform)}`}>
                             @{post.account.username}
                           </span>
                         )}
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border border-white/[0.06] text-[11px] font-bold bg-neutral-950 text-white">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border border-white/[0.06] text-[11px] font-bold bg-neutral-800 text-neutral-400">
                           <Calendar className="h-3 w-3" />
                           {formatDate(post.scheduledTime)}
                         </span>
                         {post.contentConfidence && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border border-white/[0.06] text-[11px] font-bold bg-[#4ECDC4] text-white">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border border-teal-500/30 text-[11px] font-bold bg-teal-500/10 text-teal-400">
                             <Sparkles className="h-3 w-3" />
                             信頼度: {post.contentConfidence}%
                           </span>
                         )}
                       </div>
 
-                      {/* コンテンツ */}
-                      <div className="bg-neutral-950 border border-white/[0.06] rounded-lg p-3">
+                      {/* Content */}
+                      <div className="bg-neutral-900 border border-white/[0.06] rounded-lg p-3">
                         <p className="whitespace-pre-wrap font-bold text-white">{post.content}</p>
                       </div>
 
-                      {/* アクション */}
+                      {/* Actions */}
                       <div className="flex gap-2">
                         <button
-                          className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-emerald-500 px-3 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                          className="inline-flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/20 px-3 py-2 text-sm font-bold text-emerald-400 transition-all hover:bg-emerald-500/30"
                           onClick={() => approveMutation.mutate({ postId: post.id })}
                           disabled={approveMutation.isPending}
                         >
@@ -262,7 +256,7 @@ export default function PostReview() {
                           承認
                         </button>
                         <button
-                          className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white px-3 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                          className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-neutral-800 px-3 py-2 text-sm font-bold text-white transition-all hover:bg-neutral-700"
                           onClick={() => {
                             setEditingPost(post);
                             setEditContent(post.content);
@@ -272,7 +266,7 @@ export default function PostReview() {
                           編集
                         </button>
                         <button
-                          className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-[#FF6B6B] px-3 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                          className="inline-flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/20 px-3 py-2 text-sm font-bold text-rose-400 transition-all hover:bg-rose-500/30"
                           onClick={() => setRejectingPostId(post.id)}
                         >
                           <XCircle className="h-4 w-4" />
@@ -288,9 +282,9 @@ export default function PostReview() {
         </div>
       </div>
 
-      {/* 編集ダイアログ */}
+      {/* Edit Dialog */}
       <Dialog open={!!editingPost} onOpenChange={() => setEditingPost(null)}>
-        <DialogContent className="max-w-2xl border border-white/[0.06]">
+        <DialogContent className="max-w-2xl border border-white/[0.06] bg-neutral-900">
           <DialogHeader>
             <DialogTitle className="text-white font-bold">投稿を編集</DialogTitle>
           </DialogHeader>
@@ -300,10 +294,10 @@ export default function PostReview() {
               onChange={(e) => setEditContent(e.target.value)}
               rows={8}
               placeholder="投稿内容を編集..."
-              className="border border-white/[0.06]"
+              className="border border-white/[0.06] bg-neutral-950"
             />
             {editingPost?.originalContent && editingPost.originalContent !== editContent && (
-              <div className="text-sm text-[#6B6B6B]">
+              <div className="text-sm text-neutral-500">
                 <p className="font-bold text-white">元のコンテンツ:</p>
                 <p className="bg-neutral-950 border border-white/[0.06] p-2 rounded-lg mt-1 font-bold text-white">{editingPost.originalContent}</p>
               </div>
@@ -311,13 +305,13 @@ export default function PostReview() {
           </div>
           <DialogFooter>
             <button
-              className="rounded-lg border border-white/[0.06] bg-white px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+              className="rounded-lg border border-white/[0.06] bg-neutral-800 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-neutral-700"
               onClick={() => setEditingPost(null)}
             >
               キャンセル
             </button>
             <button
-              className="rounded-lg border border-white/[0.06] bg-emerald-500 px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+              className="rounded-lg border border-emerald-500/30 bg-emerald-500/20 px-4 py-2 text-sm font-bold text-emerald-400 transition-all hover:bg-emerald-500/30"
               onClick={() => {
                 editMutation.mutate({
                   postId: editingPost.id,
@@ -332,9 +326,9 @@ export default function PostReview() {
         </DialogContent>
       </Dialog>
 
-      {/* 却下ダイアログ */}
+      {/* Reject Dialog */}
       <Dialog open={!!rejectingPostId} onOpenChange={() => setRejectingPostId(null)}>
-        <DialogContent className="border border-white/[0.06]">
+        <DialogContent className="border border-white/[0.06] bg-neutral-900">
           <DialogHeader>
             <DialogTitle className="text-white font-bold">投稿を却下</DialogTitle>
           </DialogHeader>
@@ -344,18 +338,18 @@ export default function PostReview() {
               onChange={(e) => setRejectReason(e.target.value)}
               rows={4}
               placeholder="却下理由を入力..."
-              className="border border-white/[0.06]"
+              className="border border-white/[0.06] bg-neutral-950"
             />
           </div>
           <DialogFooter>
             <button
-              className="rounded-lg border border-white/[0.06] bg-white px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+              className="rounded-lg border border-white/[0.06] bg-neutral-800 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-neutral-700"
               onClick={() => setRejectingPostId(null)}
             >
               キャンセル
             </button>
             <button
-              className="rounded-lg border border-white/[0.06] bg-[#FF6B6B] px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+              className="rounded-lg border border-rose-500/30 bg-rose-500/20 px-4 py-2 text-sm font-bold text-rose-400 transition-all hover:bg-rose-500/30"
               onClick={() => {
                 if (rejectingPostId && rejectReason) {
                   rejectMutation.mutate({

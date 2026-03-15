@@ -55,14 +55,14 @@ import AutoOptimizationSettings from "@/components/AutoOptimizationSettings";
 
 // Knowledge types with Japanese labels
 const knowledgeTypes = [
-  { value: "success_pattern", label: "成功パターン", icon: CheckCircle, color: "text-[#A8E6CF]" },
-  { value: "failure_pattern", label: "失敗パターン", icon: XCircle, color: "text-[#FF6B6B]" },
-  { value: "content_template", label: "コンテンツテンプレート", icon: Lightbulb, color: "text-[#FFD700]" },
-  { value: "hashtag_strategy", label: "ハッシュタグ戦略", icon: Zap, color: "text-[#87CEEB]" },
-  { value: "timing_insight", label: "タイミングの知見", icon: Clock, color: "text-[#3B82F6]" },
-  { value: "audience_insight", label: "オーディエンスの知見", icon: Bot, color: "text-[#FF6B6B]" },
-  { value: "engagement_tactic", label: "エンゲージメント戦術", icon: Zap, color: "text-[#FFDAB9]" },
-  { value: "general", label: "一般的な知見", icon: Brain, color: "text-[#6B6B6B]" },
+  { value: "success_pattern", label: "成功パターン", icon: CheckCircle, color: "text-emerald-400" },
+  { value: "failure_pattern", label: "失敗パターン", icon: XCircle, color: "text-rose-400" },
+  { value: "content_template", label: "コンテンツテンプレート", icon: Lightbulb, color: "text-amber-400" },
+  { value: "hashtag_strategy", label: "ハッシュタグ戦略", icon: Zap, color: "text-sky-400" },
+  { value: "timing_insight", label: "タイミングの知見", icon: Clock, color: "text-blue-400" },
+  { value: "audience_insight", label: "オーディエンスの知見", icon: Bot, color: "text-rose-400" },
+  { value: "engagement_tactic", label: "エンゲージメント戦術", icon: Zap, color: "text-amber-400" },
+  { value: "general", label: "一般的な知見", icon: Brain, color: "text-neutral-500" },
 ];
 
 // Rule types with Japanese labels
@@ -293,7 +293,7 @@ export default function AgentDetail() {
   if (agentLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="text-[#6B6B6B] font-bold text-lg">読み込み中...</div>
+        <div className="text-neutral-500 font-bold text-lg">読み込み中...</div>
       </div>
     );
   }
@@ -339,18 +339,18 @@ export default function AgentDetail() {
         </Button>
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <div className="bg-[#3B82F6] border border-white/[0.06] rounded-lg p-2">
+            <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-2">
               <Bot className="h-8 w-8 text-white" />
             </div>
             <div>
               <h1 className="text-3xl font-black text-white">{agent.name}</h1>
-              <p className="text-[#6B6B6B] font-bold">{agent.theme}</p>
+              <p className="text-neutral-500 font-bold">{agent.theme}</p>
             </div>
           </div>
         </div>
         <div className="flex gap-3">
           <Button
-            className="bg-[#4ECDC4] text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            className="bg-teal-500/20 text-teal-400 border border-teal-500/30 font-bold rounded-lg hover:bg-teal-500/30 transition-all"
             onClick={() => generateScheduledPostsMutation.mutate({ agentId, count: 5 })}
             disabled={generateScheduledPostsMutation.isPending || linkedAccounts.length === 0}
           >
@@ -370,7 +370,7 @@ export default function AgentDetail() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-[#87CEEB] border border-white/[0.06] rounded-lg p-6 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+        <div className="bg-neutral-950 border border-white/[0.06] rounded-lg p-6 transition-all">
           <div className="flex items-center gap-3">
             <Brain className="h-6 w-6 text-white" />
             <div>
@@ -379,7 +379,7 @@ export default function AgentDetail() {
             </div>
           </div>
         </div>
-        <div className="bg-[#FFDAB9] border border-white/[0.06] rounded-lg p-6 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+        <div className="bg-neutral-950 border border-white/[0.06] rounded-lg p-6 transition-all">
           <div className="flex items-center gap-3">
             <Shield className="h-6 w-6 text-white" />
             <div>
@@ -388,7 +388,7 @@ export default function AgentDetail() {
             </div>
           </div>
         </div>
-        <div className="bg-[#A8E6CF] border border-white/[0.06] rounded-lg p-6 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+        <div className="bg-neutral-950 border border-white/[0.06] rounded-lg p-6 transition-all">
           <div className="flex items-center gap-3">
             <Link2 className="h-6 w-6 text-white" />
             <div>
@@ -397,7 +397,7 @@ export default function AgentDetail() {
             </div>
           </div>
         </div>
-        <div className="bg-[#3B82F6] border border-white/[0.06] rounded-lg p-6 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+        <div className="bg-neutral-950 border border-white/[0.06] rounded-lg p-6 transition-all">
           <div className="flex items-center gap-3">
             <History className="h-6 w-6 text-white" />
             <div>
@@ -415,23 +415,23 @@ export default function AgentDetail() {
             <Brain className="mr-2 h-4 w-4" />
             知見
           </TabsTrigger>
-          <TabsTrigger value="rules" className="font-bold text-white rounded-lg data-[state=active]:bg-[#FFDAB9] data-[state=active]:border-2 data-[state=active]:border-white/[0.06] data-[state=active]:">
+          <TabsTrigger value="rules" className="font-bold text-white rounded-lg data-[state=active]:bg-neutral-800 data-[state=active]:border data-[state=active]:border-white/[0.06]">
             <Shield className="mr-2 h-4 w-4" />
             ルール
           </TabsTrigger>
-          <TabsTrigger value="accounts" className="font-bold text-white rounded-lg data-[state=active]:bg-[#A8E6CF] data-[state=active]:border-2 data-[state=active]:border-white/[0.06] data-[state=active]:">
+          <TabsTrigger value="accounts" className="font-bold text-white rounded-lg data-[state=active]:bg-neutral-800 data-[state=active]:border data-[state=active]:border-white/[0.06]">
             <Link2 className="mr-2 h-4 w-4" />
             アカウント
           </TabsTrigger>
-          <TabsTrigger value="logs" className="font-bold text-white rounded-lg data-[state=active]:bg-[#3B82F6] data-[state=active]:border-2 data-[state=active]:border-white/[0.06] data-[state=active]:">
+          <TabsTrigger value="logs" className="font-bold text-white rounded-lg data-[state=active]:bg-neutral-800 data-[state=active]:border data-[state=active]:border-white/[0.06]">
             <History className="mr-2 h-4 w-4" />
             実行履歴
           </TabsTrigger>
-          <TabsTrigger value="engagement" className="font-bold text-white rounded-lg data-[state=active]:bg-[#87CEEB] data-[state=active]:border-2 data-[state=active]:border-white/[0.06] data-[state=active]:">
+          <TabsTrigger value="engagement" className="font-bold text-white rounded-lg data-[state=active]:bg-neutral-800 data-[state=active]:border data-[state=active]:border-white/[0.06]">
             <BarChart3 className="mr-2 h-4 w-4" />
             エンゲージメント
           </TabsTrigger>
-          <TabsTrigger value="optimization" className="font-bold text-white rounded-lg data-[state=active]:bg-[#BFFF00] data-[state=active]:border-2 data-[state=active]:border-white/[0.06] data-[state=active]:">
+          <TabsTrigger value="optimization" className="font-bold text-white rounded-lg data-[state=active]:bg-neutral-800 data-[state=active]:border data-[state=active]:border-white/[0.06]">
             <Zap className="mr-2 h-4 w-4" />
             AI最適化
           </TabsTrigger>
@@ -444,13 +444,13 @@ export default function AgentDetail() {
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="text-xl font-black text-white">蓄積された知見</h3>
-                  <p className="text-[#6B6B6B] font-bold text-sm mt-1">
+                  <p className="text-neutral-500 font-bold text-sm mt-1">
                     エージェントが学習した成功パターン、失敗パターン、コンテンツテンプレートなど
                   </p>
                 </div>
                 <div className="flex gap-2">
                   <Button
-                    className="bg-[#4ECDC4] text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                    className="bg-teal-500/20 text-teal-400 border border-teal-500/30 font-bold rounded-lg hover:bg-teal-500/30 transition-all"
                     onClick={() => consolidateMutation.mutate({ agentId })}
                     disabled={consolidateMutation.isPending}
                   >
@@ -469,7 +469,7 @@ export default function AgentDetail() {
             </div>
             <div className="p-6">
               {knowledge.length === 0 ? (
-                <div className="text-center py-8 text-[#6B6B6B] font-bold border-2 border-dashed border-white/[0.06] rounded-lg bg-neutral-900">
+                <div className="text-center py-8 text-neutral-500 font-bold border border-dashed border-white/[0.06] rounded-lg bg-neutral-900">
                   まだ知見がありません。エージェントを実行すると自動的に学習します。
                 </div>
               ) : (
@@ -485,19 +485,19 @@ export default function AgentDetail() {
                             <div>
                               <div className="flex items-center gap-2 flex-wrap">
                                 <h4 className="font-bold text-white">{k.title}</h4>
-                                <span className="inline-flex items-center px-2 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#87CEEB] text-white">{typeInfo.label}</span>
-                                <span className="inline-flex items-center px-2 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#3B82F6] text-white">信頼度: {k.confidence}%</span>
+                                <span className="inline-flex items-center px-2 py-0.5 border border-sky-500/30 rounded-lg text-xs font-bold bg-sky-500/20 text-sky-400">{typeInfo.label}</span>
+                                <span className="inline-flex items-center px-2 py-0.5 border border-blue-500/30 rounded-lg text-xs font-bold bg-blue-500/20 text-blue-400">信頼度: {k.confidence}%</span>
                               </div>
-                              <p className="text-sm text-[#6B6B6B] font-bold mt-1">{k.content}</p>
+                              <p className="text-sm text-neutral-500 font-bold mt-1">{k.content}</p>
                               {k.usageCount > 0 && (
-                                <p className="text-xs text-[#6B6B6B] font-bold mt-2">
+                                <p className="text-xs text-neutral-500 font-bold mt-2">
                                   使用回数: {k.usageCount} | 成功率: {k.successRate}%
                                 </p>
                               )}
                             </div>
                           </div>
                           <Button
-                            className="bg-[#FF6B6B] text-white border border-white/[0.06] rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-8 w-8 p-0"
+                            className="bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg hover:bg-rose-500/30 transition-all h-8 w-8 p-0"
                             onClick={() => deleteKnowledgeMutation.mutate({ id: k.id })}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -519,7 +519,7 @@ export default function AgentDetail() {
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="text-xl font-black text-white">ルール設定</h3>
-                  <p className="text-[#6B6B6B] font-bold text-sm mt-1">
+                  <p className="text-neutral-500 font-bold text-sm mt-1">
                     エージェントの行動を制御するルールと制約
                   </p>
                 </div>
@@ -534,7 +534,7 @@ export default function AgentDetail() {
             </div>
             <div className="p-6">
               {rules.length === 0 ? (
-                <div className="text-center py-8 text-[#6B6B6B] font-bold border-2 border-dashed border-white/[0.06] rounded-lg bg-neutral-900">
+                <div className="text-center py-8 text-neutral-500 font-bold border border-dashed border-white/[0.06] rounded-lg bg-neutral-900">
                   まだルールが設定されていません。
                 </div>
               ) : (
@@ -545,13 +545,13 @@ export default function AgentDetail() {
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
                             <h4 className="font-bold text-white">{r.ruleName}</h4>
-                            <span className="inline-flex items-center px-2 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#FFDAB9] text-white">{getRuleTypeLabel(r.ruleType)}</span>
-                            <span className="inline-flex items-center px-2 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#4ECDC4] text-white">優先度: {r.priority}</span>
+                            <span className="inline-flex items-center px-2 py-0.5 border border-amber-500/30 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-400">{getRuleTypeLabel(r.ruleType)}</span>
+                            <span className="inline-flex items-center px-2 py-0.5 border border-teal-500/30 rounded-lg text-xs font-bold bg-teal-500/20 text-teal-400">優先度: {r.priority}</span>
                           </div>
-                          <p className="text-sm text-[#6B6B6B] font-bold mt-1">{r.ruleValue}</p>
+                          <p className="text-sm text-neutral-500 font-bold mt-1">{r.ruleValue}</p>
                         </div>
                         <Button
-                          className="bg-[#FF6B6B] text-white border border-white/[0.06] rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-8 w-8 p-0"
+                          className="bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg hover:bg-rose-500/30 transition-all h-8 w-8 p-0"
                           onClick={() => deleteRuleMutation.mutate({ id: r.id })}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -572,7 +572,7 @@ export default function AgentDetail() {
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="text-xl font-black text-white">リンクされたアカウント</h3>
-                  <p className="text-[#6B6B6B] font-bold text-sm mt-1">
+                  <p className="text-neutral-500 font-bold text-sm mt-1">
                     このエージェントが投稿に使用するSNSアカウント
                   </p>
                 </div>
@@ -588,10 +588,10 @@ export default function AgentDetail() {
             </div>
             <div className="p-6">
               {linkedAccounts.length === 0 ? (
-                <div className="text-center py-8 border-2 border-dashed border-white/[0.06] rounded-lg bg-[#FFDAB9]">
+                <div className="text-center py-8 border border-dashed border-amber-500/30 rounded-lg bg-amber-500/10">
                   <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-white" />
                   <p className="font-bold text-white">アカウントがリンクされていません。</p>
-                  <p className="text-sm font-bold text-[#6B6B6B]">エージェントを実行するにはアカウントをリンクしてください。</p>
+                  <p className="text-sm font-bold text-neutral-500">エージェントを実行するにはアカウントをリンクしてください。</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -599,16 +599,16 @@ export default function AgentDetail() {
                     <div key={la.id} className="border border-white/[0.06] rounded-lg p-4 bg-neutral-950 hover:bg-neutral-900 transition-all">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <span className="inline-flex items-center px-2 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#87CEEB] text-white">{la.account?.platform}</span>
+                          <span className="inline-flex items-center px-2 py-0.5 border border-sky-500/30 rounded-lg text-xs font-bold bg-sky-500/20 text-sky-400">{la.account?.platform}</span>
                           <span className="font-bold text-white">@{la.account?.username}</span>
                           {la.account?.deviceId && (
-                            <span className="text-sm font-bold text-[#6B6B6B]">
+                            <span className="text-sm font-bold text-neutral-500">
                               デバイス: {la.account.deviceId}
                             </span>
                           )}
                         </div>
                         <Button
-                          className="bg-[#FF6B6B] text-white border border-white/[0.06] rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-8 w-8 p-0"
+                          className="bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg hover:bg-rose-500/30 transition-all h-8 w-8 p-0"
                           onClick={() => unlinkAccountMutation.mutate({
                             agentId,
                             accountId: la.accountId
@@ -630,13 +630,13 @@ export default function AgentDetail() {
           <div className="bg-neutral-950 border border-white/[0.06] rounded-lg">
             <div className="p-6 border-b-2 border-white/[0.06]">
               <h3 className="text-xl font-black text-white">実行履歴</h3>
-              <p className="text-[#6B6B6B] font-bold text-sm mt-1">
+              <p className="text-neutral-500 font-bold text-sm mt-1">
                 エージェントの実行ログと結果
               </p>
             </div>
             <div className="p-6">
               {executionLogs.length === 0 ? (
-                <div className="text-center py-8 text-[#6B6B6B] font-bold border-2 border-dashed border-white/[0.06] rounded-lg bg-neutral-900">
+                <div className="text-center py-8 text-neutral-500 font-bold border border-dashed border-white/[0.06] rounded-lg bg-neutral-900">
                   まだ実行履歴がありません。
                 </div>
               ) : (
@@ -646,11 +646,11 @@ export default function AgentDetail() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           {log.status === "success" ? (
-                            <div className="bg-[#A8E6CF] border border-white/[0.06] rounded-lg p-1">
+                            <div className="bg-emerald-500/20 border border-emerald-500/30 rounded-lg p-1">
                               <CheckCircle className="h-5 w-5 text-white" />
                             </div>
                           ) : log.status === "failed" ? (
-                            <div className="bg-[#FF6B6B] border border-white/[0.06] rounded-lg p-1">
+                            <div className="bg-rose-500/20 border border-rose-500/30 rounded-lg p-1">
                               <XCircle className="h-5 w-5 text-white" />
                             </div>
                           ) : (
@@ -666,7 +666,7 @@ export default function AgentDetail() {
                               {log.executionType === "analysis" && "分析"}
                               {log.executionType === "optimization" && "最適化"}
                             </p>
-                            <p className="text-sm font-bold text-[#6B6B6B]">
+                            <p className="text-sm font-bold text-neutral-500">
                               {new Date(log.createdAt).toLocaleString("ja-JP")}
                               {log.executionTimeMs && ` (${log.executionTimeMs}ms)`}
                             </p>
@@ -674,10 +674,10 @@ export default function AgentDetail() {
                         </div>
                         <div className="text-right">
                           {log.postId && (
-                            <span className="inline-flex items-center px-2 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#87CEEB] text-white">投稿ID: {log.postId}</span>
+                            <span className="inline-flex items-center px-2 py-0.5 border border-sky-500/30 rounded-lg text-xs font-bold bg-sky-500/20 text-sky-400">投稿ID: {log.postId}</span>
                           )}
                           {log.errorMessage && (
-                            <p className="text-sm font-bold text-[#FF6B6B] mt-1">{log.errorMessage}</p>
+                            <p className="text-sm font-bold text-rose-400 mt-1">{log.errorMessage}</p>
                           )}
                         </div>
                       </div>
@@ -696,13 +696,13 @@ export default function AgentDetail() {
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="text-xl font-black text-white">エンゲージメント収集</h3>
-                  <p className="text-[#6B6B6B] font-bold text-sm mt-1">
+                  <p className="text-neutral-500 font-bold text-sm mt-1">
                     投稿のエンゲージメント（いいね数・コメント数など）を自動収集し、知見の精度を向上させます
                   </p>
                 </div>
                 <div className="flex gap-2">
                   <Button
-                    className="bg-[#4ECDC4] text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                    className="bg-teal-500/20 text-teal-400 border border-teal-500/30 font-bold rounded-lg hover:bg-teal-500/30 transition-all"
                     onClick={() => collectAllMutation.mutate()}
                     disabled={collectAllMutation.isPending}
                   >
@@ -710,7 +710,7 @@ export default function AgentDetail() {
                     今すぐ収集
                   </Button>
                   <Button
-                    className="bg-[#3B82F6] text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                    className="bg-blue-500/20 text-blue-400 border border-blue-500/30 font-bold rounded-lg hover:bg-blue-500/30 transition-all"
                     onClick={() => updateConfidenceMutation.mutate({ agentId })}
                     disabled={updateConfidenceMutation.isPending}
                   >
@@ -727,17 +727,17 @@ export default function AgentDetail() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-bold text-white">自動収集スケジューラー</h4>
-                      <p className="text-sm font-bold text-[#6B6B6B]">
+                      <p className="text-sm font-bold text-neutral-500">
                         投稿後1時間、6時間、24時間、48時間で自動的にエンゲージメントを収集します
                       </p>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className={`inline-flex items-center px-3 py-1 border border-white/[0.06] rounded-lg text-sm font-bold ${collectorStatus?.isRunning ? 'bg-[#A8E6CF]' : 'bg-neutral-900'} text-white`}>
+                      <span className={`inline-flex items-center px-3 py-1 rounded-lg text-sm font-bold ${collectorStatus?.isRunning ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-neutral-900 text-neutral-400 border border-white/[0.06]'}`}>
                         {collectorStatus?.isRunning ? "実行中" : "停止中"}
                       </span>
                       {collectorStatus?.isRunning ? (
                         <Button
-                          className="bg-[#FF6B6B] text-white border border-white/[0.06] font-bold rounded-lg hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                          className="bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold rounded-lg hover:bg-rose-500/30 transition-all"
                           onClick={() => stopCollectorMutation.mutate()}
                           disabled={stopCollectorMutation.isPending}
                         >
@@ -758,22 +758,22 @@ export default function AgentDetail() {
 
                 {/* Collection Schedule Info */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="border border-white/[0.06] rounded-lg p-4 text-center bg-[#87CEEB] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                  <div className="border border-white/[0.06] rounded-lg p-4 text-center bg-neutral-950 transition-all">
                     <Clock className="h-8 w-8 mx-auto mb-2 text-white" />
                     <p className="font-black text-white">1時間後</p>
                     <p className="text-sm font-bold text-white">初期反応を取得</p>
                   </div>
-                  <div className="border border-white/[0.06] rounded-lg p-4 text-center bg-[#A8E6CF] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                  <div className="border border-white/[0.06] rounded-lg p-4 text-center bg-neutral-950 transition-all">
                     <Clock className="h-8 w-8 mx-auto mb-2 text-white" />
                     <p className="font-black text-white">6時間後</p>
                     <p className="text-sm font-bold text-white">中間反応を取得</p>
                   </div>
-                  <div className="border border-white/[0.06] rounded-lg p-4 text-center bg-[#FFDAB9] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                  <div className="border border-white/[0.06] rounded-lg p-4 text-center bg-neutral-950 transition-all">
                     <Clock className="h-8 w-8 mx-auto mb-2 text-white" />
                     <p className="font-black text-white">24時間後</p>
                     <p className="text-sm font-bold text-white">知見生成開始</p>
                   </div>
-                  <div className="border border-white/[0.06] rounded-lg p-4 text-center bg-[#3B82F6] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                  <div className="border border-white/[0.06] rounded-lg p-4 text-center bg-neutral-950 transition-all">
                     <Clock className="h-8 w-8 mx-auto mb-2 text-white" />
                     <p className="font-black text-white">48時間後</p>
                     <p className="text-sm font-bold text-white">最終分析</p>
@@ -781,7 +781,7 @@ export default function AgentDetail() {
                 </div>
 
                 {/* How it works */}
-                <div className="bg-[#BFFF00] border border-white/[0.06] rounded-lg p-4">
+                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
                   <h4 className="font-black text-white mb-2">エンゲージメント収集の仕組み</h4>
                   <ul className="text-sm font-bold text-white space-y-2">
                     <li>・ 投稿後、設定された時間に自動でエンゲージメントを取得します</li>
@@ -807,7 +807,7 @@ export default function AgentDetail() {
         <DialogContent className="bg-neutral-950 border border-white/[0.06] rounded-lg">
           <DialogHeader>
             <DialogTitle className="text-xl font-black text-white">知見を追加</DialogTitle>
-            <DialogDescription className="text-[#6B6B6B] font-bold">
+            <DialogDescription className="text-neutral-500 font-bold">
               エージェントに新しい知見を教えます
             </DialogDescription>
           </DialogHeader>
@@ -852,7 +852,7 @@ export default function AgentDetail() {
             <div>
               <Label className="font-bold text-white">信頼度 ({knowledgeForm.confidence}%)</Label>
               <Input
-                className="border border-white/[0.06] rounded-lg accent-[#FFD700]"
+                className="border border-white/[0.06] rounded-lg accent-emerald-500"
                 type="range"
                 min="0"
                 max="100"
@@ -884,7 +884,7 @@ export default function AgentDetail() {
         <DialogContent className="bg-neutral-950 border border-white/[0.06] rounded-lg">
           <DialogHeader>
             <DialogTitle className="text-xl font-black text-white">ルールを追加</DialogTitle>
-            <DialogDescription className="text-[#6B6B6B] font-bold">
+            <DialogDescription className="text-neutral-500 font-bold">
               エージェントの行動を制御するルールを設定します
             </DialogDescription>
           </DialogHeader>
@@ -929,7 +929,7 @@ export default function AgentDetail() {
             <div>
               <Label className="font-bold text-white">優先度 ({ruleForm.priority})</Label>
               <Input
-                className="border border-white/[0.06] rounded-lg accent-[#FFD700]"
+                className="border border-white/[0.06] rounded-lg accent-emerald-500"
                 type="range"
                 min="0"
                 max="100"
@@ -961,7 +961,7 @@ export default function AgentDetail() {
         <DialogContent className="bg-neutral-950 border border-white/[0.06] rounded-lg">
           <DialogHeader>
             <DialogTitle className="text-xl font-black text-white">アカウントをリンク</DialogTitle>
-            <DialogDescription className="text-[#6B6B6B] font-bold">
+            <DialogDescription className="text-neutral-500 font-bold">
               エージェントが投稿に使用するアカウントを選択します。Playwrightブラウザ自動化で投稿が実行されます。
             </DialogDescription>
           </DialogHeader>
@@ -982,11 +982,11 @@ export default function AgentDetail() {
                         <span className="font-black text-white">{account.platform}</span>
                         <span className="font-bold">@{account.username}</span>
                         {account.deviceId ? (
-                          <span className="inline-flex items-center px-1.5 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#87CEEB] text-white ml-2">
+                          <span className="inline-flex items-center px-1.5 py-0.5 border border-sky-500/30 rounded-lg text-xs font-bold bg-sky-500/20 text-sky-400 ml-2">
                             デバイス: {account.deviceId.slice(0, 8)}...
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-1.5 py-0.5 border border-white/[0.06] rounded-lg text-xs font-bold bg-[#FF6B6B] text-white ml-2">
+                          <span className="inline-flex items-center px-1.5 py-0.5 border border-rose-500/30 rounded-lg text-xs font-bold bg-rose-500/20 text-rose-400 ml-2">
                             デバイス未設定
                           </span>
                         )}
@@ -996,7 +996,7 @@ export default function AgentDetail() {
                 </SelectContent>
               </Select>
               {selectedAccountId && !availableAccounts.find((a: any) => a.id === selectedAccountId)?.deviceId && (
-                <p className="text-sm font-bold text-[#FF6B6B] mt-2">
+                <p className="text-sm font-bold text-rose-400 mt-2">
                   ※ このアカウントにはPlaywrightセッションが設定されていません。アカウント詳細ページで設定を行ってください。
                 </p>
               )}

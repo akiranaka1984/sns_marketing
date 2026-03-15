@@ -44,7 +44,6 @@ export default function ProjectEdit() {
       setName(project.name);
       setDescription(project.description || "");
 
-      // Parse targets JSON
       if (project.targets) {
         try {
           const targets = typeof project.targets === 'string'
@@ -59,7 +58,6 @@ export default function ProjectEdit() {
         }
       }
 
-      // Set dates and status
       console.log('Setting dates - startDate:', project.startDate, 'endDate:', project.endDate, 'status:', project.status);
       if (project.startDate) {
         const formattedDate = project.startDate.split('T')[0];
@@ -109,7 +107,6 @@ export default function ProjectEdit() {
       return;
     }
 
-    // Build targets object
     const targets: Record<string, number> = {};
     if (followerTarget) targets.followers = parseInt(followerTarget);
     if (engagementTarget) targets.engagementRate = parseFloat(engagementTarget);
@@ -135,7 +132,7 @@ export default function ProjectEdit() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-[#FFD700]" />
+        <Loader2 className="h-8 w-8 animate-spin text-white" />
       </div>
     );
   }
@@ -143,12 +140,12 @@ export default function ProjectEdit() {
   if (!project) {
     return (
       <div className="space-y-5 max-w-5xl">
-        <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
-          <h3 className="font-black text-sm text-[#1A1A1A] mb-1">プロジェクトが見つかりません</h3>
-          <p className="text-xs font-bold text-[#6B6B6B] mb-3">指定されたプロジェクトは存在しません</p>
+        <div className="bg-neutral-900 rounded-lg border border-white/[0.06] p-4">
+          <h3 className="font-black text-sm text-white mb-1">プロジェクトが見つかりません</h3>
+          <p className="text-xs font-bold text-neutral-500 mb-3">指定されたプロジェクトは存在しません</p>
           <Button
             onClick={() => setLocation("/projects")}
-            className="bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold"
+            className="bg-neutral-800 text-white border border-white/[0.06] hover:bg-neutral-700 transition-all font-bold"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             プロジェクト一覧に戻る
@@ -164,15 +161,15 @@ export default function ProjectEdit() {
         <Button
           variant="ghost"
           onClick={() => setLocation(`/projects/${projectId}`)}
-          className="mb-4 border-2 border-[#1A1A1A] bg-[#FFFDF7] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#FFF8DC] transition-all font-bold text-[#1A1A1A]"
+          className="mb-4 border border-white/[0.06] bg-neutral-900 hover:bg-neutral-800 transition-all font-bold text-white"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           プロジェクト詳細に戻る
         </Button>
-        <div className="bg-[#FFD700] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
+        <div className="bg-neutral-900 rounded-lg border border-white/[0.06] p-4">
           <div>
-            <h1 className="text-2xl font-black text-[#1A1A1A]">プロジェクトを編集</h1>
-            <p className="font-bold text-[#1A1A1A]/70 text-sm mt-1">
+            <h1 className="text-2xl font-black text-white">プロジェクトを編集</h1>
+            <p className="font-bold text-neutral-400 text-sm mt-1">
               プロジェクトの基本情報とKPI目標を編集します
             </p>
           </div>
@@ -180,86 +177,86 @@ export default function ProjectEdit() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4">
-          <h3 className="font-black text-sm text-[#1A1A1A] mb-1">基本情報</h3>
-          <p className="text-xs font-bold text-[#6B6B6B] mb-3">
+        <div className="bg-neutral-900 rounded-lg border border-white/[0.06] p-4">
+          <h3 className="font-black text-sm text-white mb-1">基本情報</h3>
+          <p className="text-xs font-bold text-neutral-500 mb-3">
             プロジェクト名と説明を入力してください
           </p>
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name" className="font-bold text-[#1A1A1A]">プロジェクト名 *</Label>
+              <Label htmlFor="name" className="font-bold text-white">プロジェクト名 *</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="例: 春の新商品キャンペーン"
                 required
-                className="border-2 border-[#1A1A1A] rounded-lg bg-white font-bold text-[#1A1A1A] placeholder:text-[#6B6B6B] focus:ring-[#FFD700] focus:border-[#FFD700]"
+                className="border border-white/[0.06] rounded-lg bg-neutral-950 font-bold text-white placeholder:text-neutral-600"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description" className="font-bold text-[#1A1A1A]">説明</Label>
+              <Label htmlFor="description" className="font-bold text-white">説明</Label>
               <Textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="プロジェクトの目的や概要を入力してください"
                 rows={4}
-                className="border-2 border-[#1A1A1A] rounded-lg bg-white font-bold text-[#1A1A1A] placeholder:text-[#6B6B6B] focus:ring-[#FFD700] focus:border-[#FFD700]"
+                className="border border-white/[0.06] rounded-lg bg-neutral-950 font-bold text-white placeholder:text-neutral-600"
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="startDate" className="font-bold text-[#1A1A1A]">開始日</Label>
+                <Label htmlFor="startDate" className="font-bold text-white">開始日</Label>
                 <Input
                   id="startDate"
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="border-2 border-[#1A1A1A] rounded-lg bg-white font-bold text-[#1A1A1A] focus:ring-[#FFD700] focus:border-[#FFD700]"
+                  className="border border-white/[0.06] rounded-lg bg-neutral-950 font-bold text-white"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="endDate" className="font-bold text-[#1A1A1A]">終了日</Label>
+                <Label htmlFor="endDate" className="font-bold text-white">終了日</Label>
                 <Input
                   id="endDate"
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="border-2 border-[#1A1A1A] rounded-lg bg-white font-bold text-[#1A1A1A] focus:ring-[#FFD700] focus:border-[#FFD700]"
+                  className="border border-white/[0.06] rounded-lg bg-neutral-950 font-bold text-white"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="status" className="font-bold text-[#1A1A1A]">ステータス</Label>
+              <Label htmlFor="status" className="font-bold text-white">ステータス</Label>
               <Select value={status} onValueChange={(value: "draft" | "active" | "paused" | "completed") => setStatus(value)}>
-                <SelectTrigger id="status" className="border-2 border-[#1A1A1A] rounded-lg bg-white font-bold text-[#1A1A1A] focus:ring-[#FFD700]">
+                <SelectTrigger id="status" className="border border-white/[0.06] rounded-lg bg-neutral-950 font-bold text-white">
                   <SelectValue placeholder="ステータスを選択" />
                 </SelectTrigger>
-                <SelectContent className="border-2 border-[#1A1A1A] rounded-lg bg-[#FFFDF7] shadow-[4px_4px_0_#1A1A1A]">
-                  <SelectItem value="draft" className="font-bold text-[#1A1A1A] hover:bg-[#FFF8DC]">下書き</SelectItem>
-                  <SelectItem value="active" className="font-bold text-[#1A1A1A] hover:bg-[#FFF8DC]">実行中</SelectItem>
-                  <SelectItem value="paused" className="font-bold text-[#1A1A1A] hover:bg-[#FFF8DC]">一時停止</SelectItem>
-                  <SelectItem value="completed" className="font-bold text-[#1A1A1A] hover:bg-[#FFF8DC]">完了</SelectItem>
+                <SelectContent className="border border-white/[0.06] rounded-lg bg-neutral-900">
+                  <SelectItem value="draft" className="font-bold text-white">下書き</SelectItem>
+                  <SelectItem value="active" className="font-bold text-white">実行中</SelectItem>
+                  <SelectItem value="paused" className="font-bold text-white">一時停止</SelectItem>
+                  <SelectItem value="completed" className="font-bold text-white">完了</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
         </div>
 
-        <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-4 mt-5">
-          <h3 className="font-black text-sm text-[#1A1A1A] mb-1">KPI目標</h3>
-          <p className="text-xs font-bold text-[#6B6B6B] mb-3">
+        <div className="bg-neutral-900 rounded-lg border border-white/[0.06] p-4 mt-5">
+          <h3 className="font-black text-sm text-white mb-1">KPI目標</h3>
+          <p className="text-xs font-bold text-neutral-500 mb-3">
             達成したい目標値を設定してください（任意）
           </p>
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="followerTarget" className="font-bold text-[#1A1A1A]">フォロワー目標数</Label>
+                <Label htmlFor="followerTarget" className="font-bold text-white">フォロワー目標数</Label>
                 <Input
                   id="followerTarget"
                   type="number"
@@ -267,12 +264,12 @@ export default function ProjectEdit() {
                   onChange={(e) => setFollowerTarget(e.target.value)}
                   placeholder="例: 10000"
                   min="0"
-                  className="border-2 border-[#1A1A1A] rounded-lg bg-white font-bold text-[#1A1A1A] placeholder:text-[#6B6B6B] focus:ring-[#FFD700] focus:border-[#FFD700]"
+                  className="border border-white/[0.06] rounded-lg bg-neutral-950 font-bold text-white placeholder:text-neutral-600"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="engagementTarget" className="font-bold text-[#1A1A1A]">エンゲージメント率目標 (%)</Label>
+                <Label htmlFor="engagementTarget" className="font-bold text-white">エンゲージメント率目標 (%)</Label>
                 <Input
                   id="engagementTarget"
                   type="number"
@@ -282,12 +279,12 @@ export default function ProjectEdit() {
                   placeholder="例: 5.0"
                   min="0"
                   max="100"
-                  className="border-2 border-[#1A1A1A] rounded-lg bg-white font-bold text-[#1A1A1A] placeholder:text-[#6B6B6B] focus:ring-[#FFD700] focus:border-[#FFD700]"
+                  className="border border-white/[0.06] rounded-lg bg-neutral-950 font-bold text-white placeholder:text-neutral-600"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="clickTarget" className="font-bold text-[#1A1A1A]">クリック数目標</Label>
+                <Label htmlFor="clickTarget" className="font-bold text-white">クリック数目標</Label>
                 <Input
                   id="clickTarget"
                   type="number"
@@ -295,12 +292,12 @@ export default function ProjectEdit() {
                   onChange={(e) => setClickTarget(e.target.value)}
                   placeholder="例: 1000"
                   min="0"
-                  className="border-2 border-[#1A1A1A] rounded-lg bg-white font-bold text-[#1A1A1A] placeholder:text-[#6B6B6B] focus:ring-[#FFD700] focus:border-[#FFD700]"
+                  className="border border-white/[0.06] rounded-lg bg-neutral-950 font-bold text-white placeholder:text-neutral-600"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="conversionTarget" className="font-bold text-[#1A1A1A]">コンバージョン数目標</Label>
+                <Label htmlFor="conversionTarget" className="font-bold text-white">コンバージョン数目標</Label>
                 <Input
                   id="conversionTarget"
                   type="number"
@@ -308,7 +305,7 @@ export default function ProjectEdit() {
                   onChange={(e) => setConversionTarget(e.target.value)}
                   placeholder="例: 100"
                   min="0"
-                  className="border-2 border-[#1A1A1A] rounded-lg bg-white font-bold text-[#1A1A1A] placeholder:text-[#6B6B6B] focus:ring-[#FFD700] focus:border-[#FFD700]"
+                  className="border border-white/[0.06] rounded-lg bg-neutral-950 font-bold text-white placeholder:text-neutral-600"
                 />
               </div>
             </div>
@@ -319,7 +316,7 @@ export default function ProjectEdit() {
           <Button
             type="submit"
             disabled={updateMutation.isPending}
-            className="flex-1 bg-[#FFD700] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#FFF8DC] transition-all font-black text-base"
+            className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white border border-white/[0.06] transition-all font-black text-base"
           >
             {updateMutation.isPending ? (
               <>
@@ -337,23 +334,23 @@ export default function ProjectEdit() {
             type="button"
             variant="outline"
             onClick={() => setLocation(`/projects/${projectId}`)}
-            className="bg-[#FFFDF7] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#FFF8DC] transition-all font-bold"
+            className="bg-neutral-900 text-white border border-white/[0.06] hover:bg-neutral-800 transition-all font-bold"
           >
             キャンセル
           </Button>
         </div>
       </form>
 
-      <div className="bg-[#FFFDF7] rounded-lg border-2 border-[#FF6B6B] shadow-[4px_4px_0_#FF6B6B] p-4">
-        <h3 className="font-black text-sm text-[#FF6B6B] mb-1">危険なゾーン</h3>
-        <p className="text-xs font-bold text-[#6B6B6B] mb-3">
+      <div className="bg-neutral-900 rounded-lg border border-rose-500/30 p-4">
+        <h3 className="font-black text-sm text-rose-400 mb-1">危険なゾーン</h3>
+        <p className="text-xs font-bold text-neutral-500 mb-3">
           プロジェクトを削除すると、関連するすべてのデータが失われます。この操作は元に戻せません。
         </p>
         <Button
           variant="destructive"
           onClick={() => setShowDeleteDialog(true)}
           disabled={deleteMutation.isPending}
-          className="bg-[#FF6B6B] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold"
+          className="bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:bg-rose-500/30 transition-all font-bold"
         >
           {deleteMutation.isPending ? (
             <>
@@ -370,19 +367,19 @@ export default function ProjectEdit() {
       </div>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent className="border-2 border-[#1A1A1A] rounded-lg bg-[#FFFDF7] shadow-[4px_4px_0_#1A1A1A]">
+        <AlertDialogContent className="border border-white/[0.06] rounded-lg bg-neutral-900">
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-black text-[#1A1A1A]">本当に削除しますか?</AlertDialogTitle>
-            <AlertDialogDescription className="font-bold text-[#6B6B6B]">
+            <AlertDialogTitle className="font-black text-white">本当に削除しますか?</AlertDialogTitle>
+            <AlertDialogDescription className="font-bold text-neutral-500">
               プロジェクト「{project?.name}」を削除します。この操作は元に戻せません。
               関連するすべてのエージェント、投稿、戦略も削除されます。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-[#FFFDF7] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-[#FFF8DC] transition-all font-bold">キャンセル</AlertDialogCancel>
+            <AlertDialogCancel className="bg-neutral-800 text-white border border-white/[0.06] hover:bg-neutral-700 transition-all font-bold">キャンセル</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-[#FF6B6B] text-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold"
+              className="bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:bg-rose-500/30 transition-all font-bold"
             >
               削除する
             </AlertDialogAction>

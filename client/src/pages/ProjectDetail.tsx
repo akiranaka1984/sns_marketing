@@ -191,10 +191,10 @@ export default function ProjectDetail() {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      draft: { label: "下書き", className: "bg-[#F5F5F5] text-white border border-white/[0.06]", icon: null },
-      active: { label: "実行中", className: "bg-[#A8E6CF] text-white border border-white/[0.06]", icon: <Play className="h-3 w-3" /> },
-      paused: { label: "一時停止", className: "bg-[#FFDAB9] text-white border border-white/[0.06]", icon: <Pause className="h-3 w-3" /> },
-      completed: { label: "完了", className: "bg-[#87CEEB] text-white border border-white/[0.06]", icon: <CheckCircle className="h-3 w-3" /> },
+      draft: { label: "下書き", className: "bg-neutral-800 text-neutral-400 border border-white/[0.06]", icon: null },
+      active: { label: "実行中", className: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30", icon: <Play className="h-3 w-3" /> },
+      paused: { label: "一時停止", className: "bg-amber-500/20 text-amber-400 border border-amber-500/30", icon: <Pause className="h-3 w-3" /> },
+      completed: { label: "完了", className: "bg-sky-500/20 text-sky-400 border border-sky-500/30", icon: <CheckCircle className="h-3 w-3" /> },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.draft;
@@ -230,7 +230,7 @@ export default function ProjectDetail() {
       <div className="space-y-5 max-w-5xl">
         <div className="flex flex-col items-center justify-center h-64 bg-neutral-950 border border-white/[0.06] rounded-lg p-8">
           <h2 className="text-2xl font-black text-white mb-2">プロジェクトが見つかりません</h2>
-          <p className="text-[#6B6B6B] font-bold mb-6">指定されたプロジェクトは存在しないか、削除されました</p>
+          <p className="text-neutral-500 font-bold mb-6">指定されたプロジェクトは存在しないか、削除されました</p>
           <Button
             onClick={() => setLocation("/projects")}
             className="bg-emerald-500 text-white border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold"
@@ -261,9 +261,9 @@ export default function ProjectDetail() {
               <h1 className="text-3xl font-black text-white">{project.name}</h1>
               {getStatusBadge(project.status)}
             </div>
-            <p className="text-[#6B6B6B] font-bold mt-1">{project.objective}</p>
+            <p className="text-neutral-500 font-bold mt-1">{project.objective}</p>
             {project.description && (
-              <p className="text-[#6B6B6B] mt-2 font-bold">{project.description}</p>
+              <p className="text-neutral-500 mt-2 font-bold">{project.description}</p>
             )}
           </div>
           <Button
@@ -284,7 +284,7 @@ export default function ProjectDetail() {
             <h3 className="font-black text-sm text-white">実行モード</h3>
           </div>
         </div>
-        <p className="text-xs text-[#6B6B6B] font-bold mb-3">
+        <p className="text-xs text-neutral-500 font-bold mb-3">
           プロジェクトの投稿承認フローを設定します
         </p>
         <ExecutionModeSelector projectId={projectId} currentMode={project.executionMode || 'confirm'} />
@@ -294,11 +294,11 @@ export default function ProjectDetail() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-4 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#FFDAB9] rounded-lg border border-white/[0.06]">
-              <Calendar className="h-5 w-5 text-white" />
+            <div className="p-2 bg-amber-500/20 rounded-lg border border-amber-500/30">
+              <Calendar className="h-5 w-5 text-amber-400" />
             </div>
             <div>
-              <p className="text-sm text-[#6B6B6B] font-bold">期間</p>
+              <p className="text-sm text-neutral-500 font-bold">期間</p>
               <p className="text-lg font-black text-white">
                 {formatDate(project.startDate)} 〜 {formatDate(project.endDate)}
               </p>
@@ -308,11 +308,11 @@ export default function ProjectDetail() {
 
         <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-4 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#4ECDC4] rounded-lg border border-white/[0.06]">
-              <Users className="h-5 w-5 text-white" />
+            <div className="p-2 bg-teal-500/20 rounded-lg border border-teal-500/30">
+              <Users className="h-5 w-5 text-teal-400" />
             </div>
             <div>
-              <p className="text-sm text-[#6B6B6B] font-bold">アカウント数</p>
+              <p className="text-sm text-neutral-500 font-bold">アカウント数</p>
               <p className="text-lg font-black text-white">
                 {project.accounts?.length || 0}
               </p>
@@ -322,11 +322,11 @@ export default function ProjectDetail() {
 
         <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-4 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#87CEEB] rounded-lg border border-white/[0.06]">
-              <FileText className="h-5 w-5 text-white" />
+            <div className="p-2 bg-sky-500/20 rounded-lg border border-sky-500/30">
+              <FileText className="h-5 w-5 text-sky-400" />
             </div>
             <div>
-              <p className="text-sm text-[#6B6B6B] font-bold">投稿数</p>
+              <p className="text-sm text-neutral-500 font-bold">投稿数</p>
               <p className="text-lg font-black text-white">
                 {project.posts?.length || 0}
               </p>
@@ -336,11 +336,11 @@ export default function ProjectDetail() {
 
         <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-4 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-500 rounded-lg border border-white/[0.06]">
-              <Target className="h-5 w-5 text-white" />
+            <div className="p-2 bg-emerald-500/20 rounded-lg border border-emerald-500/30">
+              <Target className="h-5 w-5 text-emerald-400" />
             </div>
             <div>
-              <p className="text-sm text-[#6B6B6B] font-bold">目標</p>
+              <p className="text-sm text-neutral-500 font-bold">目標</p>
               <p className="text-lg font-black text-white">
                 {(() => {
                   if (!project.targets) return "未設定";
@@ -384,16 +384,16 @@ export default function ProjectDetail() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-neutral-950 border border-white/[0.06] rounded-lg p-1 w-fit">
-        <button onClick={() => setActiveTab("accounts")} className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeTab === "accounts" ? "bg-emerald-500 text-white border border-white/[0.06]" : "text-[#6B6B6B] hover:bg-neutral-900 border-2 border-transparent"}`}>
+        <button onClick={() => setActiveTab("accounts")} className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeTab === "accounts" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "text-neutral-500 hover:bg-neutral-900 border border-transparent"}`}>
           アカウント
         </button>
-        <button onClick={() => setActiveTab("strategies")} className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeTab === "strategies" ? "bg-emerald-500 text-white border border-white/[0.06]" : "text-[#6B6B6B] hover:bg-neutral-900 border-2 border-transparent"}`}>
+        <button onClick={() => setActiveTab("strategies")} className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeTab === "strategies" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "text-neutral-500 hover:bg-neutral-900 border border-transparent"}`}>
           戦略
         </button>
-        <button onClick={() => setActiveTab("posts")} className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeTab === "posts" ? "bg-emerald-500 text-white border border-white/[0.06]" : "text-[#6B6B6B] hover:bg-neutral-900 border-2 border-transparent"}`}>
+        <button onClick={() => setActiveTab("posts")} className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeTab === "posts" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "text-neutral-500 hover:bg-neutral-900 border border-transparent"}`}>
           投稿
         </button>
-        <button onClick={() => setActiveTab("interactions")} className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeTab === "interactions" ? "bg-emerald-500 text-white border border-white/[0.06]" : "text-[#6B6B6B] hover:bg-neutral-900 border-2 border-transparent"}`}>
+        <button onClick={() => setActiveTab("interactions")} className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${activeTab === "interactions" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "text-neutral-500 hover:bg-neutral-900 border border-transparent"}`}>
           相互連携
         </button>
       </div>
@@ -404,7 +404,7 @@ export default function ProjectDetail() {
           <div className="flex items-center justify-between mb-1">
             <div>
               <h3 className="font-black text-sm text-white">プロジェクトアカウント</h3>
-              <p className="text-xs text-[#6B6B6B] font-bold mb-3">このプロジェクトで使用するSNSアカウント</p>
+              <p className="text-xs text-neutral-500 font-bold mb-3">このプロジェクトで使用するSNSアカウント</p>
             </div>
             <Dialog open={isAddAccountDialogOpen} onOpenChange={setIsAddAccountDialogOpen}>
               <DialogTrigger asChild>
@@ -416,17 +416,17 @@ export default function ProjectDetail() {
               <DialogContent className="border border-white/[0.06] rounded-lg bg-neutral-950">
                 <DialogHeader>
                   <DialogTitle className="font-black text-white">アカウントを追加</DialogTitle>
-                  <DialogDescription className="font-bold text-[#6B6B6B]">
+                  <DialogDescription className="font-bold text-neutral-500">
                     プロジェクトに追加するアカウントを選択してください
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   {availableAccounts.length === 0 ? (
                     <div className="text-center py-8">
-                      <p className="text-[#6B6B6B] font-bold mb-4">追加可能なアカウントがありません</p>
+                      <p className="text-neutral-500 font-bold mb-4">追加可能なアカウントがありません</p>
                       <Button
                         onClick={() => setLocation("/accounts/new")}
-                        className="bg-[#4ECDC4] text-white border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold"
+                        className="bg-teal-500/20 text-teal-400 border border-teal-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold"
                       >
                         新しいアカウントを作成
                       </Button>
@@ -448,10 +448,10 @@ export default function ProjectDetail() {
                               <div>
                                 <p className="font-bold text-white">{account.username}</p>
                                 {account.xHandle && (
-                                  <p className="text-sm text-[#6B6B6B] font-bold">@{account.xHandle}</p>
+                                  <p className="text-sm text-neutral-500 font-bold">@{account.xHandle}</p>
                                 )}
                               </div>
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-white bg-[#87CEEB]">{account.platform}</span>
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold border border-sky-500/30 bg-sky-500/20 text-sky-400">{account.platform}</span>
                             </div>
                           </div>
                         ))}
@@ -484,25 +484,25 @@ export default function ProjectDetail() {
             {!project.accounts || project.accounts.length === 0 ? (
               <div className="text-center py-12">
                 <Users className="h-12 w-12 text-white mx-auto mb-4" />
-                <p className="text-[#6B6B6B] font-bold mb-4">まだアカウントが追加されていません</p>
+                <p className="text-neutral-500 font-bold mb-4">まだアカウントが追加されていません</p>
                 <Dialog open={isAddAccountDialogOpen} onOpenChange={setIsAddAccountDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button className="bg-[#4ECDC4] text-white border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold">アカウントを追加</Button>
+                    <Button className="bg-teal-500/20 text-teal-400 border border-teal-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold">アカウントを追加</Button>
                   </DialogTrigger>
                   <DialogContent className="border border-white/[0.06] rounded-lg bg-neutral-950">
                     <DialogHeader>
                       <DialogTitle className="font-black text-white">アカウントを追加</DialogTitle>
-                      <DialogDescription className="font-bold text-[#6B6B6B]">
+                      <DialogDescription className="font-bold text-neutral-500">
                         プロジェクトに追加するアカウントを選択してください
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                       {availableAccounts.length === 0 ? (
                         <div className="text-center py-8">
-                          <p className="text-[#6B6B6B] font-bold mb-4">追加可能なアカウントがありません</p>
+                          <p className="text-neutral-500 font-bold mb-4">追加可能なアカウントがありません</p>
                           <Button
                             onClick={() => setLocation("/accounts/new")}
-                            className="bg-[#4ECDC4] text-white border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold"
+                            className="bg-teal-500/20 text-teal-400 border border-teal-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold"
                           >
                             新しいアカウントを作成
                           </Button>
@@ -516,7 +516,7 @@ export default function ProjectDetail() {
                                 onClick={() => setSelectedAccountId(account.id)}
                                 className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                                   selectedAccountId === account.id
-                                    ? "border-white/[0.06] bg-emerald-500"
+                                    ? "border-emerald-500/30 bg-emerald-500/20"
                                     : "border-white/[0.06] bg-neutral-950 hover:bg-neutral-900"
                                 }`}
                               >
@@ -524,10 +524,10 @@ export default function ProjectDetail() {
                                   <div>
                                     <p className="font-bold text-white">{account.username}</p>
                                     {account.xHandle && (
-                                      <p className="text-sm text-[#6B6B6B] font-bold">@{account.xHandle}</p>
+                                      <p className="text-sm text-neutral-500 font-bold">@{account.xHandle}</p>
                                     )}
                                   </div>
-                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-white bg-[#87CEEB]">{account.platform}</span>
+                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold border border-sky-500/30 bg-sky-500/20 text-sky-400">{account.platform}</span>
                                 </div>
                               </div>
                             ))}
@@ -561,18 +561,18 @@ export default function ProjectDetail() {
                 {project.accounts.map((pa) => (
                   <div key={pa.id} className="flex items-center justify-between p-4 border border-white/[0.06] rounded-lg bg-neutral-950 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg border border-white/[0.06] bg-emerald-500 flex items-center justify-center text-white font-black">
+                      <div className="w-10 h-10 rounded-lg border border-emerald-500/30 bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-black">
                         {pa.account?.username?.charAt(0).toUpperCase()}
                       </div>
                       <div>
                         <p className="font-bold text-white">{pa.account?.username}</p>
-                        <p className="text-sm text-[#6B6B6B] font-bold">
+                        <p className="text-sm text-neutral-500 font-bold">
                           Lv.{pa.account?.level || 1} • {pa.account?.experiencePoints || 0} XP
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-white bg-[#87CEEB]">{pa.account?.platform}</span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold border border-sky-500/30 bg-sky-500/20 text-sky-400">{pa.account?.platform}</span>
                       <Link href={`/accounts/${pa.accountId}`}>
                         <Button className="gap-1 bg-neutral-950 text-white border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold text-sm">
                           詳細・設定
@@ -594,11 +594,11 @@ export default function ProjectDetail() {
           <div className="flex items-center justify-between mb-1">
             <div>
               <h3 className="font-black text-sm text-white">マーケティング戦略</h3>
-              <p className="text-xs text-[#6B6B6B] font-bold mb-3">このプロジェクトに紐づく戦略</p>
+              <p className="text-xs text-neutral-500 font-bold mb-3">このプロジェクトに紐づく戦略</p>
             </div>
             <div className="flex gap-2">
               <Button
-                className="gap-2 bg-[#3B82F6] text-white border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold"
+                className="gap-2 bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold"
                 onClick={handleGenerateStrategy}
                 disabled={isGeneratingStrategy}
               >
@@ -621,12 +621,12 @@ export default function ProjectDetail() {
             {!project.strategies || project.strategies.length === 0 ? (
               <div className="text-center py-12">
                 <Target className="h-12 w-12 text-white mx-auto mb-4" />
-                <p className="text-[#6B6B6B] font-bold mb-4">まだ戦略が生成されていません</p>
+                <p className="text-neutral-500 font-bold mb-4">まだ戦略が生成されていません</p>
                 <div className="flex gap-2 justify-center">
                   <Button
                     onClick={handleGenerateStrategy}
                     disabled={isGeneratingStrategy}
-                    className="bg-[#3B82F6] text-white border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold"
+                    className="bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold"
                   >
                     {isGeneratingStrategy ? (
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -639,7 +639,7 @@ export default function ProjectDetail() {
                     <Button className="bg-neutral-950 text-white border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold">基本戦略を生成</Button>
                   </Link>
                 </div>
-                <p className="text-xs text-[#6B6B6B] font-bold mt-4">
+                <p className="text-xs text-neutral-500 font-bold mt-4">
                   ※データ統合戦略：バズ分析データとモデルアカウントの学習を活用して戦略を生成します
                 </p>
               </div>
@@ -650,17 +650,17 @@ export default function ProjectDetail() {
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
                         <p className="font-bold text-white mb-1">{strategy.objective}</p>
-                        <p className="text-sm text-[#6B6B6B] font-bold">{strategy.contentType}</p>
+                        <p className="text-sm text-neutral-500 font-bold">{strategy.contentType}</p>
                       </div>
                       {(strategy.incorporatedBuzzLearnings || strategy.incorporatedModelPatterns) && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-[#3B82F6] text-white border border-white/[0.06] gap-1">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30 gap-1">
                           <Sparkles className="h-3 w-3" />
                           データ統合
                         </span>
                       )}
                     </div>
                     {strategy.timingGuidelines && (
-                      <div className="mt-2 text-xs text-[#6B6B6B] font-bold">
+                      <div className="mt-2 text-xs text-neutral-500 font-bold">
                         {(() => {
                           try {
                             const timing = JSON.parse(strategy.timingGuidelines);
@@ -685,7 +685,7 @@ export default function ProjectDetail() {
           <div className="flex items-center justify-between mb-1">
             <div>
               <h3 className="font-black text-sm text-white">投稿スケジュール</h3>
-              <p className="text-xs text-[#6B6B6B] font-bold mb-3">予定されている投稿と実績</p>
+              <p className="text-xs text-neutral-500 font-bold mb-3">予定されている投稿と実績</p>
             </div>
             <Dialog open={isCreatePostDialogOpen} onOpenChange={setIsCreatePostDialogOpen}>
               <DialogTrigger asChild>
@@ -697,7 +697,7 @@ export default function ProjectDetail() {
               <DialogContent className="border border-white/[0.06] rounded-lg bg-neutral-950">
                 <DialogHeader>
                   <DialogTitle className="font-black text-white">投稿を作成</DialogTitle>
-                  <DialogDescription className="font-bold text-[#6B6B6B]">
+                  <DialogDescription className="font-bold text-neutral-500">
                     新しい投稿をスケジュールします
                   </DialogDescription>
                 </DialogHeader>
@@ -717,7 +717,7 @@ export default function ProjectDetail() {
                             <div className="flex items-center gap-2">
                               <span className="font-bold">{pa.account?.username}</span>
                               {pa.account?.xHandle && (
-                                <span className="text-[#6B6B6B] text-xs font-bold">@{pa.account.xHandle}</span>
+                                <span className="text-neutral-500 text-xs font-bold">@{pa.account.xHandle}</span>
                               )}
                             </div>
                           </SelectItem>
@@ -739,9 +739,9 @@ export default function ProjectDetail() {
                           {agents?.map((agent: any) => (
                             <SelectItem key={agent.id} value={agent.id.toString()}>
                               <div className="flex items-center gap-2">
-                                <Bot className="h-4 w-4 text-[#3B82F6]" />
+                                <Bot className="h-4 w-4 text-blue-400" />
                                 <span className="font-bold">{agent.name}</span>
-                                <span className="text-[#6B6B6B] text-xs font-bold">- {agent.theme}</span>
+                                <span className="text-neutral-500 text-xs font-bold">- {agent.theme}</span>
                               </div>
                             </SelectItem>
                           ))}
@@ -751,7 +751,7 @@ export default function ProjectDetail() {
                         type="button"
                         onClick={handleGenerateContent}
                         disabled={!selectedAgent || isGenerating}
-                        className="flex-shrink-0 bg-[#3B82F6] text-white border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold disabled:opacity-50"
+                        className="flex-shrink-0 bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold disabled:opacity-50"
                       >
                         {isGenerating ? (
                           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -762,7 +762,7 @@ export default function ProjectDetail() {
                       </Button>
                     </div>
                     {selectedAgent && agents && (
-                      <p className="text-xs text-[#6B6B6B] font-bold">
+                      <p className="text-xs text-neutral-500 font-bold">
                         選択したエージェントのスタイルで投稿内容を自動生成します
                       </p>
                     )}
@@ -770,7 +770,7 @@ export default function ProjectDetail() {
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-white">投稿内容</label>
                     <textarea
-                      className="w-full min-h-[120px] p-3 border border-white/[0.06] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#FFD700] bg-neutral-950 font-bold text-white"
+                      className="w-full min-h-[120px] p-3 border border-white/[0.06] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/50 bg-neutral-950 font-bold text-white"
                       placeholder="投稿内容を入力、またはエージェントでAI生成..."
                       value={postContent}
                       onChange={(e) => setPostContent(e.target.value)}
@@ -780,7 +780,7 @@ export default function ProjectDetail() {
                     <label className="text-sm font-bold text-white">投稿予定日時</label>
                     <input
                       type="datetime-local"
-                      className="w-full p-3 border border-white/[0.06] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFD700] bg-neutral-950 font-bold text-white"
+                      className="w-full p-3 border border-white/[0.06] rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 bg-neutral-950 font-bold text-white"
                       value={postScheduledTime}
                       onChange={(e) => setPostScheduledTime(e.target.value)}
                     />
@@ -808,15 +808,15 @@ export default function ProjectDetail() {
             {!project.posts || project.posts.length === 0 ? (
               <div className="text-center py-12">
                 <FileText className="h-12 w-12 text-white mx-auto mb-4" />
-                <p className="text-[#6B6B6B] font-bold mb-4">まだ投稿が作成されていません</p>
+                <p className="text-neutral-500 font-bold mb-4">まだ投稿が作成されていません</p>
                 <Dialog open={isCreatePostDialogOpen} onOpenChange={setIsCreatePostDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button className="bg-[#4ECDC4] text-white border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold">投稿を作成</Button>
+                    <Button className="bg-teal-500/20 text-teal-400 border border-teal-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold">投稿を作成</Button>
                   </DialogTrigger>
                   <DialogContent className="border border-white/[0.06] rounded-lg bg-neutral-950">
                     <DialogHeader>
                       <DialogTitle className="font-black text-white">投稿を作成</DialogTitle>
-                      <DialogDescription className="font-bold text-[#6B6B6B]">
+                      <DialogDescription className="font-bold text-neutral-500">
                         新しい投稿をスケジュールします
                       </DialogDescription>
                     </DialogHeader>
@@ -836,7 +836,7 @@ export default function ProjectDetail() {
                                 <div className="flex items-center gap-2">
                                   <span className="font-bold">{pa.account?.username}</span>
                                   {pa.account?.xHandle && (
-                                    <span className="text-[#6B6B6B] text-xs font-bold">@{pa.account.xHandle}</span>
+                                    <span className="text-neutral-500 text-xs font-bold">@{pa.account.xHandle}</span>
                                   )}
                                 </div>
                               </SelectItem>
@@ -858,9 +858,9 @@ export default function ProjectDetail() {
                               {agents?.map((agent: any) => (
                                 <SelectItem key={agent.id} value={agent.id.toString()}>
                                   <div className="flex items-center gap-2">
-                                    <Bot className="h-4 w-4 text-[#3B82F6]" />
+                                    <Bot className="h-4 w-4 text-blue-400" />
                                     <span className="font-bold">{agent.name}</span>
-                                    <span className="text-[#6B6B6B] text-xs font-bold">- {agent.theme}</span>
+                                    <span className="text-neutral-500 text-xs font-bold">- {agent.theme}</span>
                                   </div>
                                 </SelectItem>
                               ))}
@@ -870,7 +870,7 @@ export default function ProjectDetail() {
                             type="button"
                             onClick={handleGenerateContent}
                             disabled={!selectedAgent || isGenerating}
-                            className="flex-shrink-0 bg-[#3B82F6] text-white border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold disabled:opacity-50"
+                            className="flex-shrink-0 bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold disabled:opacity-50"
                           >
                             {isGenerating ? (
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -881,7 +881,7 @@ export default function ProjectDetail() {
                           </Button>
                         </div>
                         {selectedAgent && agents && (
-                          <p className="text-xs text-[#6B6B6B] font-bold">
+                          <p className="text-xs text-neutral-500 font-bold">
                             選択したエージェントのスタイルで投稿内容を自動生成します
                           </p>
                         )}
@@ -889,7 +889,7 @@ export default function ProjectDetail() {
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-white">投稿内容</label>
                         <textarea
-                          className="w-full min-h-[120px] p-3 border border-white/[0.06] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#FFD700] bg-neutral-950 font-bold text-white"
+                          className="w-full min-h-[120px] p-3 border border-white/[0.06] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/50 bg-neutral-950 font-bold text-white"
                           placeholder="投稿内容を入力、またはエージェントでAI生成..."
                           value={postContent}
                           onChange={(e) => setPostContent(e.target.value)}
@@ -899,7 +899,7 @@ export default function ProjectDetail() {
                         <label className="text-sm font-bold text-white">投稿予定日時</label>
                         <input
                           type="datetime-local"
-                          className="w-full p-3 border border-white/[0.06] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFD700] bg-neutral-950 font-bold text-white"
+                          className="w-full p-3 border border-white/[0.06] rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 bg-neutral-950 font-bold text-white"
                           value={postScheduledTime}
                           onChange={(e) => setPostScheduledTime(e.target.value)}
                         />
@@ -932,17 +932,17 @@ export default function ProjectDetail() {
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
                         {postAccount && (
-                          <p className="text-xs text-[#6B6B6B] font-bold mb-1">
+                          <p className="text-xs text-neutral-500 font-bold mb-1">
                             @{postAccount.account?.xHandle || postAccount.account?.username}
                           </p>
                         )}
                         <p className="font-bold text-white">{post.content.substring(0, 100)}...</p>
                       </div>
                       <div className="flex items-center gap-2 ml-2">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-white bg-[#87CEEB]">{post.status}</span>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold border border-sky-500/30 bg-sky-500/20 text-sky-400">{post.status}</span>
                         {post.status === "pending" && (
                           <Button
-                            className="h-8 text-xs bg-[#A8E6CF] text-white border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold"
+                            className="h-8 text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all font-bold"
                             onClick={() => handlePublishNow(post.id)}
                             disabled={publishNowMutation.isPending}
                           >
@@ -955,7 +955,7 @@ export default function ProjectDetail() {
                           </Button>
                         )}
                         <Button
-                          className="h-8 w-8 p-0 bg-[#FF6B6B] text-white border border-white/[0.06] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                          className="h-8 w-8 p-0 bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                           onClick={() => handleDeletePost(post.id)}
                           disabled={deletePostMutation.isPending}
                         >
@@ -964,7 +964,7 @@ export default function ProjectDetail() {
                       </div>
                     </div>
                     {post.scheduledTime && (
-                      <p className="text-sm text-[#6B6B6B] font-bold">
+                      <p className="text-sm text-neutral-500 font-bold">
                         予定: {formatDate(post.scheduledTime)}
                       </p>
                     )}

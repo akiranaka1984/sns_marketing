@@ -91,7 +91,7 @@ export default function ContentCollection() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-white">コンテンツ収集</h1>
-          <p className="text-[#6B6B6B] font-bold">SNSプラットフォームからコンテンツを自動収集します</p>
+          <p className="text-neutral-500 font-bold">SNSプラットフォームからコンテンツを自動収集します</p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
@@ -103,7 +103,7 @@ export default function ContentCollection() {
           <DialogContent className="max-w-2xl border border-white/[0.06] rounded-lg">
             <DialogHeader>
               <DialogTitle className="font-bold">収集スケジュール作成</DialogTitle>
-              <DialogDescription className="font-bold text-[#6B6B6B]">
+              <DialogDescription className="font-bold text-neutral-500">
                 コンテンツ収集のスケジュールを設定します
               </DialogDescription>
             </DialogHeader>
@@ -179,7 +179,7 @@ export default function ContentCollection() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="bg-white hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg">
+              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="bg-neutral-950 hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg">
                 キャンセル
               </Button>
               <Button onClick={handleCreateSchedule} disabled={createSchedule.isPending} className="bg-emerald-500 hover:bg-emerald-500 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg">
@@ -199,11 +199,11 @@ export default function ContentCollection() {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between font-bold">
                   <span className="capitalize">{schedule.platform}</span>
-                  <Badge variant={schedule.isActive ? "default" : "secondary"} className={`font-bold border border-white/[0.06] ${schedule.isActive ? 'bg-[#4ECDC4] text-white' : 'bg-[#A8E6CF] text-white'}`}>
+                  <Badge variant={schedule.isActive ? "default" : "secondary"} className={`font-bold border ${schedule.isActive ? 'bg-teal-500/20 text-teal-400 border-teal-500/30' : 'bg-neutral-800 text-neutral-400 border-white/[0.06]'}`}>
                     {schedule.isActive ? "有効" : "無効"}
                   </Badge>
                 </CardTitle>
-                <CardDescription className="font-bold text-[#6B6B6B]">
+                <CardDescription className="font-bold text-neutral-500">
                   {schedule.frequency === "hourly" && "1時間ごと"}
                   {schedule.frequency === "daily" && "1日ごと"}
                   {schedule.frequency === "weekly" && "1週間ごと"}
@@ -213,37 +213,37 @@ export default function ContentCollection() {
                 <div className="space-y-2 text-sm">
                   {schedule.searchKeywords && schedule.searchKeywords.length > 0 && (
                     <div className="flex items-start gap-2">
-                      <Hash className="h-4 w-4 mt-0.5 text-[#6B6B6B]" />
+                      <Hash className="h-4 w-4 mt-0.5 text-neutral-500" />
                       <div className="flex-1">
                         <p className="font-bold">キーワード:</p>
-                        <p className="text-[#6B6B6B] font-bold">{schedule.searchKeywords.join(", ")}</p>
+                        <p className="text-neutral-500 font-bold">{schedule.searchKeywords.join(", ")}</p>
                       </div>
                     </div>
                   )}
                   {schedule.searchHashtags && schedule.searchHashtags.length > 0 && (
                     <div className="flex items-start gap-2">
-                      <Hash className="h-4 w-4 mt-0.5 text-[#6B6B6B]" />
+                      <Hash className="h-4 w-4 mt-0.5 text-neutral-500" />
                       <div className="flex-1">
                         <p className="font-bold">ハッシュタグ:</p>
-                        <p className="text-[#6B6B6B] font-bold">#{schedule.searchHashtags.join(", #")}</p>
+                        <p className="text-neutral-500 font-bold">#{schedule.searchHashtags.join(", #")}</p>
                       </div>
                     </div>
                   )}
                   {schedule.searchAccounts && schedule.searchAccounts.length > 0 && (
                     <div className="flex items-start gap-2">
-                      <User className="h-4 w-4 mt-0.5 text-[#6B6B6B]" />
+                      <User className="h-4 w-4 mt-0.5 text-neutral-500" />
                       <div className="flex-1">
                         <p className="font-bold">アカウント:</p>
-                        <p className="text-[#6B6B6B] font-bold">{schedule.searchAccounts.join(", ")}</p>
+                        <p className="text-neutral-500 font-bold">{schedule.searchAccounts.join(", ")}</p>
                       </div>
                     </div>
                   )}
                   {schedule.lastRunAt && (
                     <div className="flex items-start gap-2">
-                      <Calendar className="h-4 w-4 mt-0.5 text-[#6B6B6B]" />
+                      <Calendar className="h-4 w-4 mt-0.5 text-neutral-500" />
                       <div className="flex-1">
                         <p className="font-bold">最終実行:</p>
-                        <p className="text-[#6B6B6B] font-bold">
+                        <p className="text-neutral-500 font-bold">
                           {new Date(schedule.lastRunAt).toLocaleString("ja-JP")}
                         </p>
                       </div>
@@ -255,7 +255,7 @@ export default function ContentCollection() {
                     size="sm"
                     onClick={() => handleCollectNow(schedule.id)}
                     disabled={collectContent.isPending}
-                    className="bg-[#4ECDC4] hover:bg-[#4ECDC4] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg"
+                    className="bg-teal-500/20 hover:bg-teal-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-teal-400 font-bold border border-teal-500/30 rounded-lg"
                   >
                     <Play className="mr-2 h-4 w-4" />
                     今すぐ収集
@@ -264,7 +264,7 @@ export default function ContentCollection() {
                     size="sm"
                     variant="destructive"
                     onClick={() => deleteSchedule.mutate({ id: schedule.id })}
-                    className="bg-[#FF6B6B] hover:bg-[#FF6B6B] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg"
+                    className="bg-rose-500/20 hover:bg-rose-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-rose-400 font-bold border border-rose-500/30 rounded-lg"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -285,7 +285,7 @@ export default function ContentCollection() {
                 <CardTitle className="flex items-center justify-between font-bold">
                   <span className="capitalize">{content.platform}</span>
                   <div className="flex gap-2">
-                    <Badge variant="outline" className="font-bold border border-white/[0.06] bg-[#3B82F6] text-white">{content.author}</Badge>
+                    <Badge variant="outline" className="font-bold border border-blue-500/30 bg-blue-500/20 text-blue-400">{content.author}</Badge>
                     <Button
                       size="sm"
                       variant="ghost"
@@ -296,7 +296,7 @@ export default function ContentCollection() {
                     </Button>
                   </div>
                 </CardTitle>
-                <CardDescription className="font-bold text-[#6B6B6B]">
+                <CardDescription className="font-bold text-neutral-500">
                   {new Date(content.collectedAt).toLocaleString("ja-JP")}
                 </CardDescription>
               </CardHeader>
@@ -305,13 +305,13 @@ export default function ContentCollection() {
                 {content.hashtags && content.hashtags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
                     {content.hashtags.map((tag: string, idx: number) => (
-                      <Badge key={idx} variant="secondary" className="font-bold border border-white/[0.06] bg-emerald-500 text-white">
+                      <Badge key={idx} variant="secondary" className="font-bold border border-emerald-500/30 bg-emerald-500/20 text-emerald-400">
                         #{tag}
                       </Badge>
                     ))}
                   </div>
                 )}
-                <div className="flex gap-4 text-sm text-[#6B6B6B] font-bold">
+                <div className="flex gap-4 text-sm text-neutral-500 font-bold">
                   <span>👁️ {content.views?.toLocaleString() || 0}</span>
                   <span>❤️ {content.likes?.toLocaleString() || 0}</span>
                   <span>💬 {content.comments?.toLocaleString() || 0}</span>

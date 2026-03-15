@@ -106,26 +106,26 @@ export default function Engagement() {
   const getTaskTypeBadge = (type: string) => {
     switch (type) {
       case "like":
-        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#FF6B6B] text-white border border-white/[0.06]"><Heart className="h-3 w-3" />いいね</span>;
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30"><Heart className="h-3 w-3" />いいね</span>;
       case "follow":
-        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#4ECDC4] text-white border border-white/[0.06]"><UserPlus className="h-3 w-3" />フォロー</span>;
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-teal-500/20 text-teal-400 border border-teal-500/30"><UserPlus className="h-3 w-3" />フォロー</span>;
       case "comment":
-        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#87CEEB] text-white border border-white/[0.06]"><MessageCircle className="h-3 w-3" />コメント</span>;
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30"><MessageCircle className="h-3 w-3" />コメント</span>;
       default:
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-[#6B6B6B]">{type}</span>;
+        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-neutral-500">{type}</span>;
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#A8E6CF] text-white border border-white/[0.06]">アクティブ</span>;
+        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">アクティブ</span>;
       case "paused":
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-[#6B6B6B] bg-neutral-950">一時停止</span>;
+        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-neutral-500 bg-neutral-950">一時停止</span>;
       case "completed":
-        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#3B82F6] text-white border border-white/[0.06]">完了</span>;
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">完了</span>;
       default:
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-[#6B6B6B]">{status}</span>;
+        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-neutral-500">{status}</span>;
     }
   };
 
@@ -221,14 +221,14 @@ export default function Engagement() {
       <div className="grid gap-4 mb-0">
         <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
           <h3 className="font-bold text-sm text-white mb-1">アクティブなタスク</h3>
-          <p className="text-xs text-[#6B6B6B] mb-3 font-bold">
+          <p className="text-xs text-neutral-500 mb-3 font-bold">
             {tasksQuery.data?.filter((t: any) => t.status === "active").length || 0}件のタスクが実行中
           </p>
           {tasksQuery.isLoading ? (
-            <p className="text-center text-[#6B6B6B] py-8 font-bold">読み込み中...</p>
+            <p className="text-center text-neutral-500 py-8 font-bold">読み込み中...</p>
           ) : tasksQuery.data && tasksQuery.data.length > 0 ? (
             <div className="border border-white/[0.06] rounded-lg overflow-hidden">
-              <div className="grid grid-cols-6 gap-0 bg-emerald-500 text-[11px] font-bold text-white uppercase tracking-wide border-b-2 border-white/[0.06]">
+              <div className="grid grid-cols-6 gap-0 bg-emerald-500/10 text-[11px] font-bold text-emerald-400 uppercase tracking-wide border-b border-white/[0.06]">
                 <div className="px-3 py-2">タイプ</div>
                 <div className="px-3 py-2">アカウント</div>
                 <div className="px-3 py-2">ターゲット</div>
@@ -239,7 +239,7 @@ export default function Engagement() {
               {tasksQuery.data.map((task: any) => {
                 const account = accountsQuery.data?.find((a) => a.id === task.accountId);
                 return (
-                  <div key={task.id} className="grid grid-cols-6 gap-0 border-b-2 border-white/[0.06] last:border-b-0 hover:bg-neutral-900 transition-colors bg-neutral-950">
+                  <div key={task.id} className="grid grid-cols-6 gap-0 border-b border-white/[0.06] last:border-b-0 hover:bg-neutral-900 transition-colors bg-neutral-950">
                     <div className="px-3 py-2.5 text-xs text-white font-bold">{getTaskTypeBadge(task.taskType)}</div>
                     <div className="px-3 py-2.5 text-xs text-white font-bold">{account?.username || `ID: ${task.accountId}`}</div>
                     <div className="px-3 py-2.5 text-xs text-white max-w-xs truncate font-bold">
@@ -289,7 +289,7 @@ export default function Engagement() {
               })}
             </div>
           ) : (
-            <p className="text-center text-[#6B6B6B] py-8 font-bold">
+            <p className="text-center text-neutral-500 py-8 font-bold">
               タスクがありません
             </p>
           )}
@@ -297,40 +297,40 @@ export default function Engagement() {
 
         <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
           <h3 className="font-bold text-sm text-white mb-1">実行ログ</h3>
-          <p className="text-xs text-[#6B6B6B] mb-3 font-bold">
+          <p className="text-xs text-neutral-500 mb-3 font-bold">
             最近の{logsQuery.data?.length || 0}件の実行記録
           </p>
           {logsQuery.isLoading ? (
-            <p className="text-center text-[#6B6B6B] py-8 font-bold">読み込み中...</p>
+            <p className="text-center text-neutral-500 py-8 font-bold">読み込み中...</p>
           ) : logsQuery.data && logsQuery.data.length > 0 ? (
             <div className="border border-white/[0.06] rounded-lg overflow-hidden">
-              <div className="grid grid-cols-4 gap-0 bg-emerald-500 text-[11px] font-bold text-white uppercase tracking-wide border-b-2 border-white/[0.06]">
+              <div className="grid grid-cols-4 gap-0 bg-emerald-500/10 text-[11px] font-bold text-emerald-400 uppercase tracking-wide border-b border-white/[0.06]">
                 <div className="px-3 py-2">実行日時</div>
                 <div className="px-3 py-2">タスクID</div>
                 <div className="px-3 py-2">結果</div>
                 <div className="px-3 py-2">詳細</div>
               </div>
               {logsQuery.data.map((log: any) => (
-                <div key={log.id} className="grid grid-cols-4 gap-0 border-b-2 border-white/[0.06] last:border-b-0 hover:bg-neutral-900 transition-colors bg-neutral-950">
+                <div key={log.id} className="grid grid-cols-4 gap-0 border-b border-white/[0.06] last:border-b-0 hover:bg-neutral-900 transition-colors bg-neutral-950">
                   <div className="px-3 py-2.5 text-xs text-white font-bold">
                     {new Date(log.executedAt).toLocaleString("ja-JP")}
                   </div>
                   <div className="px-3 py-2.5 text-xs text-white font-mono font-bold">{log.taskId}</div>
                   <div className="px-3 py-2.5 text-xs text-white">
                     {log.success ? (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#A8E6CF] text-white border border-white/[0.06]">成功</span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">成功</span>
                     ) : (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-red-50 text-red-700 border border-white/[0.06]">失敗</span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">失敗</span>
                     )}
                   </div>
-                  <div className="px-3 py-2.5 text-xs text-[#6B6B6B] max-w-xs truncate font-bold">
+                  <div className="px-3 py-2.5 text-xs text-neutral-500 max-w-xs truncate font-bold">
                     {log.result || "-"}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-center text-[#6B6B6B] py-8 font-bold">
+            <p className="text-center text-neutral-500 py-8 font-bold">
               実行ログがありません
             </p>
           )}

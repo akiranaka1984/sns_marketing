@@ -141,15 +141,15 @@ export default function ABTesting() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "draft":
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#A8E6CF] text-white border border-white/[0.06]">下書き</span>;
+        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-neutral-800 text-neutral-400 border border-white/[0.06]">下書き</span>;
       case "running":
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#87CEEB] text-white border border-white/[0.06]">実行中</span>;
+        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">実行中</span>;
       case "completed":
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#4ECDC4] text-white border border-white/[0.06]">完了</span>;
+        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-teal-500/20 text-teal-400 border border-teal-500/30">完了</span>;
       case "cancelled":
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#FF6B6B] text-white border border-white/[0.06]">キャンセル</span>;
+        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">キャンセル</span>;
       default:
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-white bg-white">{status}</span>;
+        return <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-neutral-500 bg-neutral-900">{status}</span>;
     }
   };
 
@@ -185,36 +185,36 @@ export default function ABTesting() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="fade-in-up bg-[#87CEEB] rounded-lg border border-white/[0.06] p-4">
+          <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
             <div className="pl-3">
-              <p className="text-[11px] text-[#6B6B6B] font-bold uppercase tracking-wide">総テスト数</p>
+              <p className="text-[11px] text-neutral-500 font-bold uppercase tracking-wide">総テスト数</p>
               <p className="text-2xl font-bold text-white mt-0.5">{tests.length}</p>
-              <p className="text-[10px] text-[#6B6B6B] mt-0.5 font-bold">全テスト</p>
+              <p className="text-[10px] text-neutral-500 mt-0.5 font-bold">全テスト</p>
             </div>
           </div>
-          <div className="fade-in-up bg-[#4ECDC4] rounded-lg border border-white/[0.06] p-4">
+          <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
             <div className="pl-3">
-              <p className="text-[11px] text-[#6B6B6B] font-bold uppercase tracking-wide">実行中</p>
+              <p className="text-[11px] text-neutral-500 font-bold uppercase tracking-wide">実行中</p>
               <p className="text-2xl font-bold text-white mt-0.5">
                 {tests.filter((t: any) => t.status === "running").length}
               </p>
-              <p className="text-[10px] text-[#6B6B6B] mt-0.5 font-bold">アクティブ</p>
+              <p className="text-[10px] text-neutral-500 mt-0.5 font-bold">アクティブ</p>
             </div>
           </div>
-          <div className="fade-in-up bg-[#3B82F6] rounded-lg border border-white/[0.06] p-4">
+          <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
             <div className="pl-3">
-              <p className="text-[11px] text-[#6B6B6B] font-bold uppercase tracking-wide">完了</p>
+              <p className="text-[11px] text-neutral-500 font-bold uppercase tracking-wide">完了</p>
               <p className="text-2xl font-bold text-white mt-0.5">
                 {tests.filter((t: any) => t.status === "completed").length}
               </p>
-              <p className="text-[10px] text-[#6B6B6B] mt-0.5 font-bold">終了済み</p>
+              <p className="text-[10px] text-neutral-500 mt-0.5 font-bold">終了済み</p>
             </div>
           </div>
-          <div className="fade-in-up bg-[#FFDAB9] rounded-lg border border-white/[0.06] p-4">
+          <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
             <div className="pl-3">
-              <p className="text-[11px] text-[#6B6B6B] font-bold uppercase tracking-wide">獲得した学習</p>
+              <p className="text-[11px] text-neutral-500 font-bold uppercase tracking-wide">獲得した学習</p>
               <p className="text-2xl font-bold text-white mt-0.5">{learnings.length}</p>
-              <p className="text-[10px] text-[#6B6B6B] mt-0.5 font-bold">インサイト</p>
+              <p className="text-[10px] text-neutral-500 mt-0.5 font-bold">インサイト</p>
             </div>
           </div>
         </div>
@@ -222,11 +222,11 @@ export default function ABTesting() {
         {/* Tests List */}
         <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
           <h3 className="font-bold text-sm text-white mb-1">テスト一覧</h3>
-          <p className="text-[11px] text-[#6B6B6B] mb-4 font-bold">
+          <p className="text-[11px] text-neutral-500 mb-4 font-bold">
             作成したA/Bテストの管理と結果の確認
           </p>
           {tests.length === 0 ? (
-            <div className="text-center py-12 text-[#6B6B6B]">
+            <div className="text-center py-12 text-neutral-500">
               <FlaskConical className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p className="font-bold">まだA/Bテストがありません</p>
               <p className="text-sm mt-1 font-bold">新規テストを作成して、最適な投稿スタイルを見つけましょう</p>
@@ -234,23 +234,23 @@ export default function ABTesting() {
           ) : (
             <div className="space-y-4">
               {tests.map((test: any) => (
-                <div key={test.id} className="border border-white/[0.06] rounded-lg bg-white p-4">
+                <div key={test.id} className="border border-white/[0.06] rounded-lg bg-neutral-900 p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <h3 className="font-bold">{test.name}</h3>
                         {getStatusBadge(test.status)}
                         {test.winnerId && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] bg-emerald-500 text-white">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-amber-500/30 bg-amber-500/20 text-amber-400">
                             <Trophy className="h-3 w-3 mr-1" />
                             勝者決定
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-[#6B6B6B] mt-1 font-bold">
+                      <p className="text-sm text-neutral-500 mt-1 font-bold">
                         テーマ: {test.theme}
                       </p>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-[#6B6B6B] font-bold">
+                      <div className="flex items-center gap-4 mt-2 text-sm text-neutral-500 font-bold">
                         <span>バリエーション: {test.variationCount}個</span>
                         <span>期間: {test.testDurationHours}時間</span>
                         {test.confidenceLevel && (
@@ -281,7 +281,7 @@ export default function ABTesting() {
                           variant="outline"
                           onClick={() => analyzeMutation.mutate({ testId: test.id })}
                           disabled={analyzeMutation.isPending}
-                          className="bg-white hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg"
+                          className="bg-neutral-950 hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg"
                         >
                           <BarChart3 className="h-4 w-4 mr-1" />
                           分析
@@ -293,7 +293,7 @@ export default function ABTesting() {
                           variant="outline"
                           onClick={() => analyzeMutation.mutate({ testId: test.id })}
                           disabled={analyzeMutation.isPending}
-                          className="bg-white hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg"
+                          className="bg-neutral-950 hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg"
                         >
                           <BarChart3 className="h-4 w-4 mr-1" />
                           結果確認
@@ -305,7 +305,7 @@ export default function ABTesting() {
                           variant="outline"
                           onClick={() => extractLearningsMutation.mutate({ testId: test.id })}
                           disabled={extractLearningsMutation.isPending}
-                          className="bg-white hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg"
+                          className="bg-neutral-950 hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg"
                         >
                           <Lightbulb className="h-4 w-4 mr-1" />
                           学習抽出
@@ -331,24 +331,24 @@ export default function ABTesting() {
               <Lightbulb className="h-4 w-4 text-amber-500" />
               獲得した学習
             </h3>
-            <p className="text-[11px] text-[#6B6B6B] mb-4 font-bold">
+            <p className="text-[11px] text-neutral-500 mb-4 font-bold">
               A/Bテストから抽出されたインサイト
             </p>
             <div className="space-y-3">
               {learnings.slice(0, 5).map((learning: any) => (
-                <div key={learning.id} className="border border-white/[0.06] rounded-lg bg-white p-3">
+                <div key={learning.id} className="border border-white/[0.06] rounded-lg bg-neutral-900 p-3">
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-white bg-[#A8E6CF]">{getLearningTypeLabel(learning.learningType)}</span>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-emerald-500/30 bg-emerald-500/20 text-emerald-400">{getLearningTypeLabel(learning.learningType)}</span>
                         <span className="font-bold">{learning.title}</span>
                       </div>
-                      <p className="text-sm text-[#6B6B6B] mt-1 font-bold">{learning.insight}</p>
+                      <p className="text-sm text-neutral-500 mt-1 font-bold">{learning.insight}</p>
                     </div>
                     {learning.isApplied ? (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#4ECDC4] text-white border border-white/[0.06]">適用済み</span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-teal-500/20 text-teal-400 border border-teal-500/30">適用済み</span>
                     ) : (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-emerald-500 text-white border border-white/[0.06]">信頼度: {learning.confidence}%</span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">信頼度: {learning.confidence}%</span>
                     )}
                   </div>
                 </div>
@@ -363,7 +363,7 @@ export default function ABTesting() {
         <DialogContent className="max-w-lg border border-white/[0.06] rounded-lg">
           <DialogHeader>
             <DialogTitle className="font-bold">新規A/Bテスト作成</DialogTitle>
-            <DialogDescription className="font-bold text-[#6B6B6B]">
+            <DialogDescription className="font-bold text-neutral-500">
               同じテーマで異なるスタイルの投稿を比較します
             </DialogDescription>
           </DialogHeader>
@@ -444,7 +444,7 @@ export default function ABTesting() {
             </div>
             <Button
               variant="outline"
-              className="w-full bg-white hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg"
+              className="w-full bg-neutral-950 hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg"
               onClick={() => previewMutation.mutate({
                 theme: formData.theme,
                 count: formData.variationCount
@@ -456,7 +456,7 @@ export default function ABTesting() {
             </Button>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateOpen(false)} className="bg-white hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg">
+            <Button variant="outline" onClick={() => setIsCreateOpen(false)} className="bg-neutral-950 hover:bg-neutral-900 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg">
               キャンセル
             </Button>
             <Button
@@ -475,24 +475,24 @@ export default function ABTesting() {
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto border border-white/[0.06] rounded-lg">
           <DialogHeader>
             <DialogTitle className="font-bold">バリエーションプレビュー</DialogTitle>
-            <DialogDescription className="font-bold text-[#6B6B6B]">
+            <DialogDescription className="font-bold text-neutral-500">
               生成されるバリエーションの例
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             {previewVariations.map((v, i) => (
-              <div key={i} className="border border-white/[0.06] rounded-lg bg-white p-4">
+              <div key={i} className="border border-white/[0.06] rounded-lg bg-neutral-900 p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#4ECDC4] text-white border border-white/[0.06]">バリエーション {v.variationName}</span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-white bg-[#A8E6CF]">{v.config.tone}</span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-white bg-[#FFDAB9]">{v.config.contentLength}</span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-white/[0.06] text-white bg-[#3B82F6]">絵文字: {v.config.emojiUsage}</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-teal-500/20 text-teal-400 border border-teal-500/30">バリエーション {v.variationName}</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-emerald-500/30 text-emerald-400 bg-emerald-500/20">{v.config.tone}</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-amber-500/30 text-amber-400 bg-amber-500/20">{v.config.contentLength}</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold border border-blue-500/30 text-blue-400 bg-blue-500/20">絵文字: {v.config.emojiUsage}</span>
                 </div>
                 <p className="text-sm font-bold">{v.content}</p>
                 {v.hashtags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {v.hashtags.map((tag: string, j: number) => (
-                      <span key={j} className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-emerald-500 text-white border border-white/[0.06]">
+                      <span key={j} className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                         #{tag}
                       </span>
                     ))}
@@ -517,7 +517,7 @@ export default function ABTesting() {
               <BarChart3 className="h-5 w-5" />
               分析結果
             </DialogTitle>
-            <DialogDescription className="font-bold text-[#6B6B6B]">
+            <DialogDescription className="font-bold text-neutral-500">
               A/Bテストの統計分析結果
             </DialogDescription>
           </DialogHeader>
@@ -526,18 +526,18 @@ export default function ABTesting() {
             <div className="space-y-6">
               {/* Winner Section */}
               {analysisResult.winnerId ? (
-                <div className="border border-white/[0.06] rounded-lg p-4 bg-[#4ECDC4]">
+                <div className="border border-emerald-500/30 rounded-lg p-4 bg-emerald-500/10">
                   <div className="flex items-center gap-2 mb-2">
-                    <Trophy className="h-5 w-5 text-amber-500" />
-                    <span className="font-bold">勝者決定</span>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-emerald-500 text-white border border-white/[0.06]">
+                    <Trophy className="h-5 w-5 text-amber-400" />
+                    <span className="font-bold text-white">勝者決定</span>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                       信頼度: {analysisResult.confidence}%
                     </span>
                   </div>
-                  <p className="text-sm whitespace-pre-wrap font-bold">{analysisResult.analysis}</p>
+                  <p className="text-sm whitespace-pre-wrap font-bold text-white">{analysisResult.analysis}</p>
                 </div>
               ) : (
-                <div className="border border-white/[0.06] rounded-lg p-4 bg-[#FFDAB9]">
+                <div className="border border-amber-500/30 rounded-lg p-4 bg-amber-500/10">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="h-5 w-5 text-amber-500" />
                     <span className="font-bold">まだ十分なデータがありません</span>
@@ -555,8 +555,8 @@ export default function ABTesting() {
 
                   {/* Significance */}
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="border border-white/[0.06] rounded-lg bg-white p-3">
-                      <div className="text-sm text-[#6B6B6B] font-bold">統計的有意性</div>
+                    <div className="border border-white/[0.06] rounded-lg bg-neutral-900 p-3">
+                      <div className="text-sm text-neutral-500 font-bold">統計的有意性</div>
                       <div className="flex items-center gap-2 mt-1">
                         {analysisResult.statistics.isStatisticallySignificant ? (
                           <>
@@ -565,15 +565,15 @@ export default function ABTesting() {
                           </>
                         ) : (
                           <>
-                            <XCircle className="h-5 w-5 text-[#6B6B6B]" />
-                            <span className="font-bold text-[#6B6B6B]">有意差なし</span>
+                            <XCircle className="h-5 w-5 text-neutral-500" />
+                            <span className="font-bold text-neutral-500">有意差なし</span>
                           </>
                         )}
                       </div>
                     </div>
 
-                    <div className="border border-white/[0.06] rounded-lg bg-white p-3">
-                      <div className="text-sm text-[#6B6B6B] font-bold">p値</div>
+                    <div className="border border-white/[0.06] rounded-lg bg-neutral-900 p-3">
+                      <div className="text-sm text-neutral-500 font-bold">p値</div>
                       <div className="font-bold mt-1">
                         {analysisResult.statistics.pValue !== null
                           ? analysisResult.statistics.pValue.toFixed(4)
@@ -581,8 +581,8 @@ export default function ABTesting() {
                       </div>
                     </div>
 
-                    <div className="border border-white/[0.06] rounded-lg bg-white p-3">
-                      <div className="text-sm text-[#6B6B6B] font-bold">効果量 (Cohen's d)</div>
+                    <div className="border border-white/[0.06] rounded-lg bg-neutral-900 p-3">
+                      <div className="text-sm text-neutral-500 font-bold">効果量 (Cohen's d)</div>
                       <div className="font-bold mt-1">
                         {analysisResult.statistics.effectSize !== null
                           ? `${analysisResult.statistics.effectSize.toFixed(2)} (${analysisResult.statistics.effectSizeInterpretation})`
@@ -590,8 +590,8 @@ export default function ABTesting() {
                       </div>
                     </div>
 
-                    <div className="border border-white/[0.06] rounded-lg bg-white p-3">
-                      <div className="text-sm text-[#6B6B6B] font-bold">信頼区間 (95%)</div>
+                    <div className="border border-white/[0.06] rounded-lg bg-neutral-900 p-3">
+                      <div className="text-sm text-neutral-500 font-bold">信頼区間 (95%)</div>
                       <div className="font-bold mt-1">
                         {analysisResult.statistics.confidenceInterval
                           ? `[${analysisResult.statistics.confidenceInterval.lower.toFixed(2)}, ${analysisResult.statistics.confidenceInterval.upper.toFixed(2)}]`
@@ -601,9 +601,9 @@ export default function ABTesting() {
                   </div>
 
                   {/* Sample Size Progress */}
-                  <div className="border border-white/[0.06] rounded-lg bg-white p-3">
+                  <div className="border border-white/[0.06] rounded-lg bg-neutral-900 p-3">
                     <div className="flex justify-between items-center mb-2">
-                      <div className="text-sm text-[#6B6B6B] font-bold">サンプルサイズ</div>
+                      <div className="text-sm text-neutral-500 font-bold">サンプルサイズ</div>
                       <div className="text-sm font-bold">
                         {analysisResult.statistics.currentSampleSize} / {analysisResult.statistics.requiredSampleSize}
                       </div>
@@ -622,14 +622,14 @@ export default function ABTesting() {
 
                   {/* Warnings */}
                   {analysisResult.statistics.warnings.length > 0 && (
-                    <div className="border border-white/[0.06] rounded-lg p-3 bg-[#FFDAB9]">
+                    <div className="border border-amber-500/30 rounded-lg p-3 bg-amber-500/10">
                       <div className="flex items-center gap-2 mb-2">
-                        <AlertTriangle className="h-4 w-4 text-amber-500" />
-                        <span className="font-bold text-sm">警告</span>
+                        <AlertTriangle className="h-4 w-4 text-amber-400" />
+                        <span className="font-bold text-sm text-amber-400">警告</span>
                       </div>
                       <ul className="space-y-1">
                         {analysisResult.statistics.warnings.map((warning, i) => (
-                          <li key={i} className="text-sm text-amber-700 font-bold">
+                          <li key={i} className="text-sm text-amber-400 font-bold">
                             {warning}
                           </li>
                         ))}

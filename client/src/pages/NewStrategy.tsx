@@ -53,14 +53,14 @@ export default function NewStrategy() {
     try {
       // Update project KPIs if any are set
       const targets: Record<string, number> = {};
-      if (kpis.followers) targets.followers = parseInt(kpis.followers);
-      if (kpis.engagement) targets.engagement = parseFloat(kpis.engagement);
-      if (kpis.clicks) targets.clicks = parseInt(kpis.clicks);
-      if (kpis.conversions) targets.conversions = parseInt(kpis.conversions);
+      if (kpis.followers) targets.followers = Number.parseInt(kpis.followers);
+      if (kpis.engagement) targets.engagement = Number.parseFloat(kpis.engagement);
+      if (kpis.clicks) targets.clicks = Number.parseInt(kpis.clicks);
+      if (kpis.conversions) targets.conversions = Number.parseInt(kpis.conversions);
 
       if (Object.keys(targets).length > 0) {
         await updateProjectMutation.mutateAsync({
-          id: parseInt(projectId),
+          id: Number.parseInt(projectId),
           targets,
         });
       }
@@ -68,7 +68,7 @@ export default function NewStrategy() {
       // Generate strategy
       await generateMutation.mutateAsync({
         objective,
-        projectId: parseInt(projectId),
+        projectId: Number.parseInt(projectId),
       });
     } catch (error) {
       // Error handling is done in mutation callbacks
@@ -91,16 +91,16 @@ export default function NewStrategy() {
       <div className="fade-in-up">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-            <Sparkles className="h-8 w-8 text-[#FFD700]" />
+            <Sparkles className="h-8 w-8 text-amber-400" />
             戦略生成
           </h1>
-          <p className="text-sm text-[#6B6B6B] font-bold mt-1">AIがあなたの目標に基づいた包括的なマーケティング戦略を作成します</p>
+          <p className="text-sm text-neutral-500 font-bold mt-1">AIがあなたの目標に基づいた包括的なマーケティング戦略を作成します</p>
         </div>
       </div>
 
       <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
         <h3 className="text-sm font-bold text-white mb-1">マーケティング目標</h3>
-        <p className="text-xs text-[#6B6B6B] font-bold mb-3">マーケティングの目標とターゲットオーディエンスを説明してください。できるだけ具体的に記述してください。</p>
+        <p className="text-xs text-neutral-500 font-bold mb-3">マーケティングの目標とターゲットオーディエンスを説明してください。できるだけ具体的に記述してください。</p>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="project" className="text-sm font-bold text-white">プロジェクト *</Label>
@@ -116,7 +116,7 @@ export default function NewStrategy() {
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-[#6B6B6B] font-bold">
+            <p className="text-xs text-neutral-500 font-bold">
               この戦略を紐付けるプロジェクトを選択してください
             </p>
           </div>
@@ -132,7 +132,7 @@ export default function NewStrategy() {
               rows={6}
               className="resize-none border border-white/[0.06] bg-neutral-950 rounded-lg font-bold"
             />
-            <p className="text-xs text-[#6B6B6B] font-bold">
+            <p className="text-xs text-neutral-500 font-bold">
               最低20文字。ターゲットオーディエンス、プラットフォーム、目標についての詳細を含めてください。
             </p>
           </div>
@@ -170,10 +170,10 @@ export default function NewStrategy() {
 
       <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
         <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
-          <Target className="h-5 w-5 text-[#FFD700]" />
+          <Target className="h-5 w-5 text-amber-400" />
           KPI目標（オプション）
         </h3>
-        <p className="text-xs text-[#6B6B6B] font-bold mb-3">プロジェクトの具体的な数値目標を設定します。後から変更することもできます。</p>
+        <p className="text-xs text-neutral-500 font-bold mb-3">プロジェクトの具体的な数値目標を設定します。後から変更することもできます。</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="followers" className="text-sm font-bold text-white">フォロワー目標数</Label>
@@ -229,14 +229,14 @@ export default function NewStrategy() {
 
       <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
         <h3 className="text-sm font-bold text-white mb-1">目標の例</h3>
-        <p className="text-xs text-[#6B6B6B] font-bold mb-3">クリックして例を使用できます</p>
+        <p className="text-xs text-neutral-500 font-bold mb-3">クリックして例を使用できます</p>
         <div className="space-y-3">
           {exampleObjectives.map((example, index) => (
             <button
               key={index}
               onClick={() => handleUseExample(example)}
               disabled={generateMutation.isPending}
-              className="w-full text-left p-4 rounded-lg border border-white/[0.06] bg-neutral-900 hover:bg-[#FFDAB9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-bold hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+              className="w-full text-left p-4 rounded-lg border border-white/[0.06] bg-neutral-900 hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-bold"
             >
               <p className="text-sm text-white">{example}</p>
             </button>
@@ -246,9 +246,9 @@ export default function NewStrategy() {
 
       <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
         <h3 className="text-sm font-bold text-white mb-1">生成される内容</h3>
-        <div className="space-y-3 text-sm font-bold text-[#6B6B6B] mt-3">
+        <div className="space-y-3 text-sm font-bold text-neutral-500 mt-3">
           <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#A8E6CF] text-white flex items-center justify-center font-bold text-xs border border-white/[0.06]">
+            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold text-xs border border-teal-500/30">
               ✓
             </div>
             <div>
@@ -257,7 +257,7 @@ export default function NewStrategy() {
             </div>
           </div>
           <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#4ECDC4] text-white flex items-center justify-center font-bold text-xs border border-white/[0.06]">
+            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-xs border border-sky-500/30">
               ✓
             </div>
             <div>
@@ -266,7 +266,7 @@ export default function NewStrategy() {
             </div>
           </div>
           <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-bold text-xs border border-white/[0.06]">
+            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs border border-emerald-500/30">
               ✓
             </div>
             <div>
@@ -275,7 +275,7 @@ export default function NewStrategy() {
             </div>
           </div>
           <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#FF6B6B] text-white flex items-center justify-center font-bold text-xs border border-white/[0.06]">
+            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-xs border border-rose-500/30">
               ✓
             </div>
             <div>
@@ -284,7 +284,7 @@ export default function NewStrategy() {
             </div>
           </div>
           <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#3B82F6] text-white flex items-center justify-center font-bold text-xs border border-white/[0.06]">
+            <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs border border-blue-500/30">
               ✓
             </div>
             <div>

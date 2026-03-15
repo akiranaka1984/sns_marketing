@@ -82,10 +82,10 @@ function healthBg(score: number | null): string {
 // ---- Content type color ----
 function contentTypeColor(type: string): string {
   const map: Record<string, string> = {
-    image: "bg-[#3db9cf]/20 text-[#3db9cf] border-[#3db9cf]/30",
-    video: "bg-[#8b5cf6]/20 text-[#8b5cf6] border-[#8b5cf6]/30",
-    carousel: "bg-[#e5a000]/20 text-[#e5a000] border-[#e5a000]/30",
-    text: "bg-[#30a46c]/20 text-[#30a46c] border-[#30a46c]/30",
+    image: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+    video: "bg-violet-500/20 text-violet-400 border-violet-500/30",
+    carousel: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    text: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
     story: "bg-pink-500/20 text-pink-400 border-pink-500/30",
     reel: "bg-orange-500/20 text-orange-400 border-orange-500/30",
   };
@@ -231,8 +231,8 @@ export default function GrowthDashboard() {
       value: kpiSummary?.recentStats.totalPosts ?? 0,
       icon: Send,
       gradient: "from-[#3db9cf] to-[#3db9cf]/60",
-      iconBg: "bg-[#3db9cf]/10",
-      iconColor: "text-[#3db9cf]",
+      iconBg: "bg-cyan-500/10",
+      iconColor: "text-cyan-400",
       sparkColor: "#3db9cf",
     },
     {
@@ -240,8 +240,8 @@ export default function GrowthDashboard() {
       value: kpiSummary?.recentStats.avgLikes ?? 0,
       icon: Heart,
       gradient: "from-[#e5484d] to-[#e5484d]/60",
-      iconBg: "bg-[#e5484d]/10",
-      iconColor: "text-[#e5484d]",
+      iconBg: "bg-rose-500/10",
+      iconColor: "text-rose-400",
       sparkColor: "#e5484d",
     },
     {
@@ -249,8 +249,8 @@ export default function GrowthDashboard() {
       value: kpiSummary?.recentStats.avgComments ?? 0,
       icon: MessageCircle,
       gradient: "from-[#8b5cf6] to-[#8b5cf6]/60",
-      iconBg: "bg-[#8b5cf6]/10",
-      iconColor: "text-[#8b5cf6]",
+      iconBg: "bg-violet-500/10",
+      iconColor: "text-violet-400",
       sparkColor: "#8b5cf6",
     },
     {
@@ -258,8 +258,8 @@ export default function GrowthDashboard() {
       value: kpiSummary?.pendingPostsCount ?? 0,
       icon: Clock,
       gradient: "from-[#e5a000] to-[#e5a000]/60",
-      iconBg: "bg-[#e5a000]/10",
-      iconColor: "text-[#e5a000]",
+      iconBg: "bg-amber-500/10",
+      iconColor: "text-amber-400",
       sparkColor: "#e5a000",
     },
   ];
@@ -382,7 +382,7 @@ export default function GrowthDashboard() {
               <div className="bg-card rounded-2xl p-6 h-full shadow-sm border border-border">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-2 rounded-lg bg-gradient-to-br from-[#3db9cf]/10 to-[#8b5cf6]/10">
-                    <Zap className="w-5 h-5 text-[#8b5cf6]" />
+                    <Zap className="w-5 h-5 text-violet-400" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg text-foreground">Growth Loop</h3>
@@ -502,8 +502,8 @@ export default function GrowthDashboard() {
               <div className="bg-card rounded-2xl p-6 h-full shadow-sm border border-border">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-[#3db9cf]/10">
-                      <Activity className="w-5 h-5 text-[#3db9cf]" />
+                    <div className="p-2 rounded-lg bg-cyan-500/10">
+                      <Activity className="w-5 h-5 text-cyan-400" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg text-foreground">Recent Actions</h3>
@@ -583,8 +583,8 @@ export default function GrowthDashboard() {
           <div className="fade-in-up animation-delay-500">
             <div className="bg-card rounded-2xl p-6 shadow-sm border border-border">
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 rounded-lg bg-[#30a46c]/10">
-                  <Shield className="w-5 h-5 text-[#30a46c]" />
+                <div className="p-2 rounded-lg bg-emerald-500/10">
+                  <Shield className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg text-foreground">Account Health</h3>
@@ -698,8 +698,8 @@ export default function GrowthDashboard() {
             <div className="fade-in-up animation-delay-600">
               <div className="bg-card rounded-2xl p-6 h-full shadow-sm border border-border">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 rounded-lg bg-[#e5a000]/10">
-                    <CalendarDays className="w-5 h-5 text-[#e5a000]" />
+                  <div className="p-2 rounded-lg bg-amber-500/10">
+                    <CalendarDays className="w-5 h-5 text-amber-400" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg text-foreground">Content Calendar</h3>
@@ -783,7 +783,7 @@ export default function GrowthDashboard() {
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-[#3db9cf]" />
+                            <TrendingUp className="w-4 h-4 text-cyan-400" />
                             <span className="text-sm font-medium text-foreground">
                               {trend.trendName}
                             </span>
@@ -927,8 +927,8 @@ export default function GrowthDashboard() {
             <div className="fade-in-up animation-delay-900 lg:col-span-1">
               <div className="bg-card rounded-2xl p-6 h-full shadow-sm border border-border">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 rounded-lg bg-[#8b5cf6]/10">
-                    <FileText className="w-5 h-5 text-[#8b5cf6]" />
+                  <div className="p-2 rounded-lg bg-violet-500/10">
+                    <FileText className="w-5 h-5 text-violet-400" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg text-foreground">Performance Report</h3>
@@ -964,7 +964,7 @@ export default function GrowthDashboard() {
                     <div className="p-3 rounded-xl bg-muted">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs text-muted-foreground">Total Posts</span>
-                        <Send className="w-3.5 h-3.5 text-[#3db9cf]" />
+                        <Send className="w-3.5 h-3.5 text-cyan-400" />
                       </div>
                       <p className="text-2xl font-bold text-foreground">
                         {report.metrics.totalPosts.toLocaleString()}
@@ -973,7 +973,7 @@ export default function GrowthDashboard() {
                     <div className="p-3 rounded-xl bg-muted">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs text-muted-foreground">Avg Likes</span>
-                        <Heart className="w-3.5 h-3.5 text-[#e5484d]" />
+                        <Heart className="w-3.5 h-3.5 text-rose-400" />
                       </div>
                       <p className="text-2xl font-bold text-foreground">
                         {report.metrics.avgLikes.toLocaleString()}
@@ -982,7 +982,7 @@ export default function GrowthDashboard() {
                     <div className="p-3 rounded-xl bg-muted">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs text-muted-foreground">Total Engagement</span>
-                        <Target className="w-3.5 h-3.5 text-[#8b5cf6]" />
+                        <Target className="w-3.5 h-3.5 text-violet-400" />
                       </div>
                       <p className="text-2xl font-bold text-foreground">
                         {report.metrics.totalEngagement.toLocaleString()}
@@ -991,7 +991,7 @@ export default function GrowthDashboard() {
                     <div className="p-3 rounded-xl bg-muted">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs text-muted-foreground">Automation Actions</span>
-                        <Zap className="w-3.5 h-3.5 text-[#e5a000]" />
+                        <Zap className="w-3.5 h-3.5 text-amber-400" />
                       </div>
                       <p className="text-2xl font-bold text-foreground">
                         {report.automationActions.toLocaleString()}

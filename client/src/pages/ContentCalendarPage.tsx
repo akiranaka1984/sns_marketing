@@ -23,14 +23,14 @@ export default function ContentCalendarPage() {
       {/* Page Header */}
       <div className="fade-in-up page-header mb-6">
         <div className="flex items-center gap-4 mb-2">
-          <div className="w-12 h-12 rounded-lg bg-[#FFD700] flex items-center justify-center border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]">
-            <Calendar className="h-6 w-6 text-[#1A1A1A]" />
+          <div className="w-12 h-12 rounded-lg bg-amber-500/20 flex items-center justify-center border border-amber-500/30">
+            <Calendar className="h-6 w-6 text-amber-400" />
           </div>
           <div>
-            <h1 className="page-title font-bold text-[#1A1A1A]">
+            <h1 className="page-title font-bold text-white">
               コンテンツカレンダー
             </h1>
-            <p className="page-subtitle font-bold text-[#6B6B6B]">
+            <p className="page-subtitle font-bold text-neutral-500">
               投稿スケジュールを視覚的に管理
             </p>
           </div>

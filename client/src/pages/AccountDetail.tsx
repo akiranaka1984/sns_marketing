@@ -22,13 +22,13 @@ import AccountAgentsTab from "@/components/AccountAgentsTab";
 
 function SessionStatusBadge({ status }: { status: string }) {
   const config: Record<string, { bg: string; text: string; border: string; icon: typeof ShieldCheck; label: string }> = {
-    active: { bg: "bg-[#A8E6CF]", text: "text-white", border: "border-white/[0.06]", icon: ShieldCheck, label: "Active" },
-    expired: { bg: "bg-[#FFDAB9]", text: "text-white", border: "border-white/[0.06]", icon: ShieldAlert, label: "Expired" },
-    needs_login: { bg: "bg-[#FF6B6B]", text: "text-white", border: "border-white/[0.06]", icon: ShieldX, label: "Needs Login" },
+    active: { bg: "bg-emerald-500/20", text: "text-emerald-400", border: "border-emerald-500/30", icon: ShieldCheck, label: "Active" },
+    expired: { bg: "bg-amber-500/20", text: "text-amber-400", border: "border-amber-500/30", icon: ShieldAlert, label: "Expired" },
+    needs_login: { bg: "bg-rose-500/20", text: "text-rose-400", border: "border-rose-500/30", icon: ShieldX, label: "Needs Login" },
   };
   const { bg, text, border, icon: Icon, label } = config[status] || config.needs_login;
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${bg} ${text} border-2 ${border}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${bg} ${text} border ${border}`}>
       <Icon className="w-3.5 h-3.5" />
       {label}
     </span>
@@ -192,8 +192,8 @@ export default function AccountDetail() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-6 w-6 animate-spin text-[#FFD700]" />
-          <span className="text-sm text-[#6B6B6B] font-bold">Loading account...</span>
+          <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
+          <span className="text-sm text-neutral-500 font-bold">Loading account...</span>
         </div>
       </div>
     );
@@ -203,7 +203,7 @@ export default function AccountDetail() {
     return (
       <div className="max-w-5xl">
         <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-8 text-center">
-          <p className="text-[#6B6B6B] font-bold mb-4">Account not found</p>
+          <p className="text-neutral-500 font-bold mb-4">Account not found</p>
           <Button asChild size="sm" className="bg-emerald-500 hover:bg-emerald-500 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] text-white font-bold border border-white/[0.06] rounded-lg">
             <Link href="/accounts">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -222,24 +222,24 @@ export default function AccountDetail() {
       {/* Back + Header */}
       <div className="fade-in-up">
         <Link href="/accounts">
-          <button className="flex items-center gap-1.5 text-xs font-bold text-[#6B6B6B] hover:text-white transition-colors mb-4 px-3 py-1.5 rounded-lg border border-white/[0.06] bg-neutral-950 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+          <button className="flex items-center gap-1.5 text-xs font-bold text-neutral-500 hover:text-white transition-colors mb-4 px-3 py-1.5 rounded-lg border border-white/[0.06] bg-neutral-950 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to Accounts
           </button>
         </Link>
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] mb-1">Account Detail</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-1">Account Detail</p>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
               @{account.username}
             </h1>
-            <p className="text-sm text-[#6B6B6B] font-bold capitalize mt-0.5">
+            <p className="text-sm text-neutral-500 font-bold capitalize mt-0.5">
               {t('accounts.platform.' + account.platform)} Account
             </p>
           </div>
           <div className="flex items-center gap-2">
             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-white border border-white/[0.06] ${
-              (account as any).postingMethod === 'api_v2' ? 'bg-[#4ECDC4]' : 'bg-[#3B82F6]'
+              (account as any).postingMethod === 'api_v2' ? 'bg-teal-500/20 border border-teal-500/30' : 'bg-blue-500/20 border border-blue-500/30'
             }`}>
               {(account as any).postingMethod === 'api_v2' ? (
                 <><Zap className="w-3.5 h-3.5" />API v2</>
@@ -250,10 +250,10 @@ export default function AccountDetail() {
             {/* Status badge */}
             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border border-white/[0.06] ${
               account.status === 'active'
-                ? 'bg-[#A8E6CF] text-white'
+                ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
                 : account.status === 'pending'
-                ? 'bg-[#FFDAB9] text-white'
-                : 'bg-[#FF6B6B] text-white'
+                ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
             }`}>
               {account.status}
             </span>
@@ -295,7 +295,7 @@ export default function AccountDetail() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                   activeTab === tab.value
                     ? "bg-white/10 text-white"
-                    : "text-[#6B6B6B] hover:text-white hover:bg-neutral-900"
+                    : "text-neutral-500 hover:text-white hover:bg-neutral-900"
                 }`}
               >
                 <tab.icon className="w-3.5 h-3.5" />
@@ -309,7 +309,7 @@ export default function AccountDetail() {
             <div className="space-y-4">
               {/* Quick Stats */}
               <div className="grid gap-3 md:grid-cols-3">
-                <div className="bg-[#4ECDC4] rounded-lg border border-white/[0.06] p-4">
+                <div className="bg-teal-500/10 rounded-lg border border-teal-500/20 p-4">
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-white">投稿方式</p>
                     <div className="p-1.5 rounded-lg bg-neutral-950 border border-white/[0.06]">
@@ -337,7 +337,7 @@ export default function AccountDetail() {
                         }`}
                       >
                         <p className="text-[11px] font-bold">{method.label}</p>
-                        <p className={`text-[9px] font-bold ${((account as any).postingMethod || 'playwright') === method.value ? 'text-gray-300' : 'text-[#6B6B6B]'}`}>{method.sub}</p>
+                        <p className={`text-[9px] font-bold ${((account as any).postingMethod || 'playwright') === method.value ? 'text-gray-300' : 'text-neutral-500'}`}>{method.sub}</p>
                       </button>
                     ))}
                   </div>
@@ -358,7 +358,7 @@ export default function AccountDetail() {
                   </p>
                 </div>
 
-                <div className="bg-[#FF6B6B] rounded-lg border border-white/[0.06] p-4">
+                <div className="bg-rose-500/10 rounded-lg border border-rose-500/20 p-4">
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-white">成長データ</p>
                     <div className="p-1.5 rounded-lg bg-neutral-950 border border-white/[0.06]">
@@ -388,22 +388,22 @@ export default function AccountDetail() {
               {/* X API OAuth Connection */}
               <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B]">X API 連携</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">X API 連携</p>
                   {oauthStatus?.oauthTokenStatus === 'active' && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#A8E6CF] text-white border border-white/[0.06]">
-                      <span className="w-[5px] h-[5px] rounded-full bg-white/10" />
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                      <span className="w-[5px] h-[5px] rounded-full bg-emerald-400" />
                       連携済み
                     </span>
                   )}
                   {oauthStatus?.oauthTokenStatus === 'expired' && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#FFDAB9] text-white border border-white/[0.06]">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
                       <AlertTriangle className="w-3.5 h-3.5" />
                       期限切れ
                     </span>
                   )}
                   {(oauthStatus?.oauthTokenStatus === 'not_connected' || oauthStatus?.oauthTokenStatus === 'revoked' || !oauthStatus) && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#FF6B6B] text-white border border-white/[0.06]">
-                      <span className="w-[5px] h-[5px] rounded-full bg-white/10" />
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                      <span className="w-[5px] h-[5px] rounded-full bg-rose-400" />
                       未連携
                     </span>
                   )}
@@ -412,7 +412,7 @@ export default function AccountDetail() {
                 {/* Connected state */}
                 {oauthStatus?.oauthTokenStatus === 'active' && (
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-[#A8E6CF] border border-white/[0.06]">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                       <div className="p-2 rounded-lg bg-neutral-950 border border-white/[0.06]">
                         <Link2 className="w-4 h-4 text-white" />
                       </div>
@@ -421,7 +421,7 @@ export default function AccountDetail() {
                           @{oauthStatus.oauthUsername || account.username}
                         </p>
                         {oauthStatus.oauthConnectedAt && (
-                          <p className="text-[10px] font-bold text-[#6B6B6B] mt-0.5">
+                          <p className="text-[10px] font-bold text-neutral-500 mt-0.5">
                             連携日: {new Date(oauthStatus.oauthConnectedAt).toLocaleDateString('ja-JP')}
                           </p>
                         )}
@@ -435,7 +435,7 @@ export default function AccountDetail() {
                           }
                         }}
                         disabled={disconnectMutation.isPending}
-                        className="h-8 text-xs font-bold border border-white/[0.06] bg-[#FF6B6B] text-white hover:bg-[#FF6B6B] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
+                        className="h-8 text-xs font-bold border border-rose-500/30 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
                       >
                         {disconnectMutation.isPending ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
@@ -445,7 +445,7 @@ export default function AccountDetail() {
                         連携解除
                       </Button>
                     </div>
-                    <p className="text-[11px] font-bold text-[#6B6B6B]">
+                    <p className="text-[11px] font-bold text-neutral-500">
                       X API v2を使用して直接投稿が可能です。投稿方式を「API v2」に設定してください。
                     </p>
                   </div>
@@ -454,13 +454,13 @@ export default function AccountDetail() {
                 {/* Expired / Revoked state */}
                 {(oauthStatus?.oauthTokenStatus === 'expired' || oauthStatus?.oauthTokenStatus === 'revoked') && (
                   <div className="space-y-3">
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-[#FFDAB9] border border-white/[0.06]">
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
                       <div className="p-2 rounded-lg bg-neutral-950 border border-white/[0.06]">
                         <AlertTriangle className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-bold text-white">アクセストークンが無効です</p>
-                        <p className="text-[10px] font-bold text-[#6B6B6B] mt-0.5">
+                        <p className="text-[10px] font-bold text-neutral-500 mt-0.5">
                           {oauthStatus.oauthTokenStatus === 'expired'
                             ? 'トークンの有効期限が切れました。再連携してください。'
                             : 'アクセスが取り消されました。再連携してください。'}
@@ -486,7 +486,7 @@ export default function AccountDetail() {
                 {/* Not connected state */}
                 {(oauthStatus?.oauthTokenStatus === 'not_connected' || !oauthStatus) && (
                   <div className="space-y-3">
-                    <p className="text-[11px] font-bold text-[#6B6B6B] leading-relaxed">
+                    <p className="text-[11px] font-bold text-neutral-500 leading-relaxed">
                       3-legged OAuthでXアカウントを連携し、API v2で投稿できるようにします
                     </p>
                     <Button
@@ -508,17 +508,17 @@ export default function AccountDetail() {
 
               {/* Account Details */}
               <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-5">
-                <p className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B] mb-4">アカウント詳細</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-4">アカウント詳細</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#6B6B6B]">Username</label>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Username</label>
                     <p className="text-sm font-bold text-white mt-0.5">{account.username}</p>
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#6B6B6B]">X Handle</label>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">X Handle</label>
                     {isEditingXHandle ? (
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-sm font-bold text-[#6B6B6B]">@</span>
+                        <span className="text-sm font-bold text-neutral-500">@</span>
                         <Input
                           value={xHandleInput}
                           onChange={(e) => setXHandleInput(e.target.value)}
@@ -528,7 +528,7 @@ export default function AccountDetail() {
                         <button
                           onClick={handleSaveXHandle}
                           disabled={updateAccountMutation.isPending}
-                          className="p-1.5 rounded-lg hover:bg-[#A8E6CF] text-white font-bold transition-colors border border-white/[0.06]"
+                          className="p-1.5 rounded-lg hover:bg-emerald-500/20 text-neutral-400 hover:text-emerald-400 font-bold transition-colors border border-white/[0.06]"
                         >
                           {updateAccountMutation.isPending ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -538,7 +538,7 @@ export default function AccountDetail() {
                         </button>
                         <button
                           onClick={handleCancelEdit}
-                          className="p-1.5 rounded-lg hover:bg-neutral-900 text-[#6B6B6B] font-bold transition-colors border border-white/[0.06]"
+                          className="p-1.5 rounded-lg hover:bg-neutral-900 text-neutral-500 font-bold transition-colors border border-white/[0.06]"
                         >
                           <X className="h-4 w-4" />
                         </button>
@@ -550,20 +550,20 @@ export default function AccountDetail() {
                             @{(account as any).xHandle}
                           </code>
                         ) : (
-                          <span className="text-sm font-bold text-[#6B6B6B]">未設定</span>
+                          <span className="text-sm font-bold text-neutral-500">未設定</span>
                         )}
-                        <button onClick={handleEditXHandle} className="p-1 rounded-lg hover:bg-neutral-900 text-[#6B6B6B] font-bold transition-colors border border-white/[0.06]">
+                        <button onClick={handleEditXHandle} className="p-1 rounded-lg hover:bg-neutral-900 text-neutral-500 font-bold transition-colors border border-white/[0.06]">
                           <Edit2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     )}
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#6B6B6B]">Platform</label>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Platform</label>
                     <p className="text-sm font-bold text-white mt-0.5 capitalize">{account.platform}</p>
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#6B6B6B]">Device ID</label>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Device ID</label>
                     <p className="text-sm font-bold text-white mt-0.5 font-mono">{account.deviceId || 'N/A'}</p>
                   </div>
                 </div>
@@ -577,7 +577,7 @@ export default function AccountDetail() {
               {/* Session Status */}
               <div className="bg-neutral-950 rounded-lg border border-white/[0.06] p-5">
                   <div className="flex items-center justify-between mb-4">
-                    <p className="text-xs font-bold uppercase tracking-wider text-[#6B6B6B]">ブラウザセッション</p>
+                    <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">ブラウザセッション</p>
                     <SessionStatusBadge status={currentSessionStatus} />
                   </div>
 
@@ -586,8 +586,8 @@ export default function AccountDetail() {
                     <div className="p-3 rounded-lg bg-neutral-900 border border-white/[0.06]">
                       <div className="flex items-start gap-3">
                         <div className={`p-2 rounded-lg border border-white/[0.06] ${
-                          currentSessionStatus === 'active' ? 'bg-[#A8E6CF]' :
-                          currentSessionStatus === 'expired' ? 'bg-[#FFDAB9]' : 'bg-[#FF6B6B]'
+                          currentSessionStatus === 'active' ? 'bg-emerald-500' :
+                          currentSessionStatus === 'expired' ? 'bg-amber-500' : 'bg-rose-500'
                         }`}>
                           {currentSessionStatus === 'active' ? (
                             <ShieldCheck className="w-5 h-5 text-white" />
@@ -605,7 +605,7 @@ export default function AccountDetail() {
                               ? 'セッション期限切れ'
                               : 'ログインが必要'}
                           </p>
-                          <p className="text-xs font-bold text-[#6B6B6B] mt-0.5">
+                          <p className="text-xs font-bold text-neutral-500 mt-0.5">
                             {currentSessionStatus === 'active'
                               ? 'X.comへの投稿が可能です。'
                               : currentSessionStatus === 'expired'
@@ -622,7 +622,7 @@ export default function AccountDetail() {
                         variant="outline"
                         size="sm"
                         onClick={() => setPreviewOpen(true)}
-                        className="h-8 text-xs font-bold border border-white/[0.06] bg-[#3B82F6] text-white hover:bg-[#3B82F6] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
+                        className="h-8 text-xs font-bold border border-blue-500/30 bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
                       >
                         <Eye className="h-3.5 w-3.5 mr-1.5" />
                         ライブプレビュー
@@ -636,7 +636,7 @@ export default function AccountDetail() {
                           testPreviewMutation.mutate({ accountId });
                         }}
                         disabled={testPreviewMutation.isPending}
-                        className="h-8 text-xs font-bold border border-white/[0.06] bg-[#A8E6CF] text-white hover:bg-[#A8E6CF] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
+                        className="h-8 text-xs font-bold border border-emerald-500/30 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
                       >
                         {testPreviewMutation.isPending ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
@@ -691,7 +691,7 @@ export default function AccountDetail() {
                             }
                           }}
                           disabled={deleteSessionMutation.isPending}
-                          className="h-8 text-xs font-bold border border-white/[0.06] bg-[#FF6B6B] text-white hover:bg-[#FF6B6B] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
+                          className="h-8 text-xs font-bold border border-rose-500/30 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] rounded-lg"
                         >
                           {deleteSessionMutation.isPending ? (
                             <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
@@ -707,8 +707,8 @@ export default function AccountDetail() {
 
               {/* Info note */}
               <div className="flex items-start gap-2.5 p-3 rounded-lg bg-neutral-900 border border-white/[0.06]">
-                <Info className="w-4 h-4 text-[#6B6B6B] mt-0.5 flex-shrink-0" />
-                <div className="text-xs font-bold text-[#6B6B6B] leading-relaxed">
+                <Info className="w-4 h-4 text-neutral-500 mt-0.5 flex-shrink-0" />
+                <div className="text-xs font-bold text-neutral-500 leading-relaxed">
                   <p className="font-bold text-white mb-1">セッションについて</p>
                   <p>
                     Playwrightブラウザ自動化を使用してX.comに投稿します。

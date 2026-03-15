@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Calendar, Plus, Play, X, Clock, CheckCircle2, XCircle, Bot, Sparkles, Loader2, RefreshCw, ImagePlus, Trash, Image as ImageIcon } from "lucide-react";
+import { Calendar, Plus, Play, X, Clock, CheckCircle2, XCircle, Bot, Sparkles, Loader2, RefreshCw, Trash, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { calculateCharCount, getCharCountDisplay, isCharCountExceeded } from "@/lib/charCounter";
 
@@ -37,16 +37,13 @@ export default function ScheduledPosts() {
   const [repeatInterval, setRepeatInterval] = useState<"none" | "daily" | "weekly" | "monthly">("none");
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Queries
   const postsQuery = trpc.scheduledPosts.getAll.useQuery({ limit: 100 });
   const projectsQuery = trpc.projects.list.useQuery();
   const accountsQuery = trpc.accounts.list.useQuery();
 
-  // Selected account data
   const selectedAccountData = accountsQuery.data?.find(a => a.id === selectedAccount);
   const agentsQuery = trpc.agents.list.useQuery();
 
-  // Generate content mutation
   const generateMutation = trpc.scheduledPosts.generateWithAgent.useMutation({
     onSuccess: (data) => {
       const hashtagsText = data.hashtags?.length > 0 ? '\n\n' + data.hashtags.map((h: string) => `#${h}`).join(' ') : '';
@@ -60,7 +57,6 @@ export default function ScheduledPosts() {
     },
   });
 
-  // Mutations
   const createMutation = trpc.scheduledPosts.create.useMutation({
     onSuccess: () => {
       toast.success("スケジュール投稿を作成しました");
@@ -133,13 +129,11 @@ export default function ScheduledPosts() {
       return;
     }
 
-    // Instagramの場合、画像が必須
     if (selectedAccountData?.platform === 'instagram' && mediaFiles.length === 0 && mediaUrls.length === 0) {
       toast.error("Instagram投稿には画像または動画が必須です");
       return;
     }
 
-    // 画像をアップロード
     let uploadedUrls: string[] = [...mediaUrls];
     if (mediaFiles.length > 0) {
       setIsUploadingMedia(true);
@@ -183,35 +177,35 @@ export default function ScheduledPosts() {
     switch (status) {
       case "pending":
         return (
-          <span className="inline-flex items-center gap-1 rounded-lg border border-white/[0.06] bg-emerald-500 px-2 py-0.5 text-xs font-bold text-white">
+          <span className="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/20 px-2 py-0.5 text-xs font-bold text-amber-400">
             <Clock className="h-3 w-3" />
             待機中
           </span>
         );
       case "posted":
         return (
-          <span className="inline-flex items-center gap-1 rounded-lg border border-white/[0.06] bg-[#A8E6CF] px-2 py-0.5 text-xs font-bold text-white">
+          <span className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-400">
             <CheckCircle2 className="h-3 w-3" />
             投稿済み
           </span>
         );
       case "failed":
         return (
-          <span className="inline-flex items-center gap-1 rounded-lg border border-white/[0.06] bg-[#FF6B6B] px-2 py-0.5 text-xs font-bold text-white">
+          <span className="inline-flex items-center gap-1 rounded-lg border border-rose-500/30 bg-rose-500/20 px-2 py-0.5 text-xs font-bold text-rose-400">
             <XCircle className="h-3 w-3" />
             失敗
           </span>
         );
       case "cancelled":
         return (
-          <span className="inline-flex items-center gap-1 rounded-lg border border-white/[0.06] bg-neutral-950 px-2 py-0.5 text-xs font-bold text-[#6B6B6B]">
+          <span className="inline-flex items-center gap-1 rounded-lg border border-white/[0.06] bg-neutral-800 px-2 py-0.5 text-xs font-bold text-neutral-500">
             <X className="h-3 w-3" />
             キャンセル
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center rounded-lg border border-white/[0.06] bg-neutral-950 px-2 py-0.5 text-xs font-bold text-[#6B6B6B]">
+          <span className="inline-flex items-center rounded-lg border border-white/[0.06] bg-neutral-800 px-2 py-0.5 text-xs font-bold text-neutral-500">
             {status}
           </span>
         );
@@ -221,18 +215,18 @@ export default function ScheduledPosts() {
   const getRepeatBadge = (interval: string) => {
     switch (interval) {
       case "daily":
-        return <span className="inline-flex items-center rounded-lg border border-white/[0.06] bg-[#87CEEB] px-2 py-0.5 text-xs font-bold text-white">毎日</span>;
+        return <span className="inline-flex items-center rounded-lg border border-sky-500/30 bg-sky-500/10 px-2 py-0.5 text-xs font-bold text-sky-400">毎日</span>;
       case "weekly":
-        return <span className="inline-flex items-center rounded-lg border border-white/[0.06] bg-[#3B82F6] px-2 py-0.5 text-xs font-bold text-white">毎週</span>;
+        return <span className="inline-flex items-center rounded-lg border border-blue-500/30 bg-blue-500/10 px-2 py-0.5 text-xs font-bold text-blue-400">毎週</span>;
       case "monthly":
-        return <span className="inline-flex items-center rounded-lg border border-white/[0.06] bg-[#FFDAB9] px-2 py-0.5 text-xs font-bold text-white">毎月</span>;
+        return <span className="inline-flex items-center rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-bold text-amber-400">毎月</span>;
       default:
         return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950">
+    <div className="min-h-screen">
       <div className="mx-auto max-w-7xl px-6 py-8">
         {/* Page Header */}
         <div className="page-header">
@@ -244,15 +238,15 @@ export default function ScheduledPosts() {
           </div>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <button className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-emerald-500 px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+              <button className="inline-flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/20 px-4 py-2 text-sm font-bold text-emerald-400 transition-all hover:bg-emerald-500/30">
                 <Plus className="h-4 w-4" />
                 新規作成
               </button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border border-white/[0.06]">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border border-white/[0.06] bg-neutral-900">
               <DialogHeader>
                 <DialogTitle className="text-white font-bold">スケジュール投稿を作成</DialogTitle>
-                <DialogDescription className="text-[#6B6B6B] text-sm">
+                <DialogDescription className="text-neutral-500 text-sm">
                   投稿内容と実行日時を設定してください
                 </DialogDescription>
               </DialogHeader>
@@ -261,12 +255,12 @@ export default function ScheduledPosts() {
                   <Label htmlFor="project" className="text-xs font-bold text-white">プロジェクト</Label>
                   <Select
                     value={selectedProject?.toString()}
-                    onValueChange={(value) => setSelectedProject(parseInt(value))}
+                    onValueChange={(value) => setSelectedProject(Number.parseInt(value))}
                   >
-                    <SelectTrigger className="border border-white/[0.06]">
+                    <SelectTrigger className="border border-white/[0.06] bg-neutral-950">
                       <SelectValue placeholder="プロジェクトを選択" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="border border-white/[0.06] bg-neutral-900">
                       {projectsQuery.data?.map((project) => (
                         <SelectItem key={project.id} value={project.id.toString()}>
                           {project.name}
@@ -279,23 +273,23 @@ export default function ScheduledPosts() {
                   <Label htmlFor="account" className="text-xs font-bold text-white">アカウント（投稿に使用するデバイス）</Label>
                   <Select
                     value={selectedAccount?.toString()}
-                    onValueChange={(value) => setSelectedAccount(parseInt(value))}
+                    onValueChange={(value) => setSelectedAccount(Number.parseInt(value))}
                   >
-                    <SelectTrigger className="border border-white/[0.06]">
+                    <SelectTrigger className="border border-white/[0.06] bg-neutral-950">
                       <SelectValue placeholder="アカウントを選択" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="border border-white/[0.06] bg-neutral-900">
                       {accountsQuery.data?.map((account) => (
                         <SelectItem key={account.id} value={account.id.toString()}>
                           <div className="flex items-center gap-2">
                             <span className="font-bold text-sm text-white">{account.platform}</span>
-                            <span className="text-sm text-white">@{account.username}</span>
+                            <span className="text-sm text-neutral-400">@{account.username}</span>
                             {account.deviceId ? (
-                              <span className="ml-2 inline-flex items-center rounded-lg border border-white/[0.06] px-2 py-0.5 text-xs text-[#6B6B6B]">
+                              <span className="ml-2 inline-flex items-center rounded-lg border border-white/[0.06] px-2 py-0.5 text-xs text-neutral-500">
                                 デバイス: {account.deviceId.slice(0, 8)}...
                               </span>
                             ) : (
-                              <span className="ml-2 inline-flex items-center rounded-lg bg-[#FF6B6B] border border-white/[0.06] px-2 py-0.5 text-xs font-bold text-white">
+                              <span className="ml-2 inline-flex items-center rounded-lg bg-rose-500/20 border border-rose-500/30 px-2 py-0.5 text-xs font-bold text-rose-400">
                                 デバイス未設定
                               </span>
                             )}
@@ -310,18 +304,18 @@ export default function ScheduledPosts() {
                   <div className="flex gap-2">
                     <Select
                       value={selectedAgent?.toString()}
-                      onValueChange={(value) => setSelectedAgent(parseInt(value))}
+                      onValueChange={(value) => setSelectedAgent(Number.parseInt(value))}
                     >
-                      <SelectTrigger className="flex-1 border border-white/[0.06]">
+                      <SelectTrigger className="flex-1 border border-white/[0.06] bg-neutral-950">
                         <SelectValue placeholder="エージェントを選択（任意）" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="border border-white/[0.06] bg-neutral-900">
                         {agentsQuery.data?.map((agent: any) => (
                           <SelectItem key={agent.id} value={agent.id.toString()}>
                             <div className="flex items-center gap-2">
-                              <Bot className="h-4 w-4 text-white" />
-                              <span className="font-bold text-sm">{agent.name}</span>
-                              <span className="text-[#6B6B6B] text-xs">- {agent.theme}</span>
+                              <Bot className="h-4 w-4 text-teal-400" />
+                              <span className="font-bold text-sm text-white">{agent.name}</span>
+                              <span className="text-neutral-500 text-xs">- {agent.theme}</span>
                             </div>
                           </SelectItem>
                         ))}
@@ -329,7 +323,7 @@ export default function ScheduledPosts() {
                     </Select>
                     <button
                       type="button"
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-[#4ECDC4] px-3 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-teal-500/30 bg-teal-500/20 px-3 py-2 text-sm font-bold text-teal-400 transition-all hover:bg-teal-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={handleGenerateContent}
                       disabled={!selectedAgent || isGenerating}
                     >
@@ -342,7 +336,7 @@ export default function ScheduledPosts() {
                     </button>
                   </div>
                   {selectedAgent && agentsQuery.data && (
-                    <p className="text-xs text-[#6B6B6B]">
+                    <p className="text-xs text-neutral-500">
                       選択したエージェントのスタイルで投稿内容を自動生成します
                     </p>
                   )}
@@ -352,10 +346,10 @@ export default function ScheduledPosts() {
                     <Label htmlFor="content" className="text-xs font-bold text-white">投稿内容</Label>
                     <span className={`text-sm ${
                       isCharCountExceeded(content)
-                        ? 'text-red-600 font-bold'
+                        ? 'text-red-500 font-bold'
                         : calculateCharCount(content) > 240
-                          ? 'text-orange-600 font-bold'
-                          : 'text-[#6B6B6B]'
+                          ? 'text-orange-400 font-bold'
+                          : 'text-neutral-500'
                     }`}>
                       {getCharCountDisplay(content)}
                     </span>
@@ -366,10 +360,10 @@ export default function ScheduledPosts() {
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     rows={5}
-                    className={`border border-white/[0.06] text-sm ${isCharCountExceeded(content) ? 'border-red-500' : ''}`}
+                    className={`border border-white/[0.06] bg-neutral-950 text-sm ${isCharCountExceeded(content) ? 'border-red-500' : ''}`}
                   />
                   {isCharCountExceeded(content) && (
-                    <p className="text-xs text-red-600">
+                    <p className="text-xs text-red-500">
                       文字数が上限を超えています（全角文字は2文字としてカウント）
                     </p>
                   )}
@@ -377,7 +371,7 @@ export default function ScheduledPosts() {
                 <div className="space-y-2">
                   <Label htmlFor="media" className="text-xs font-bold text-white">画像・動画</Label>
                   {selectedAccountData?.platform === 'instagram' && (
-                    <p className="text-xs text-[#6B6B6B] mb-2">
+                    <p className="text-xs text-neutral-500 mb-2">
                       ※ Instagram投稿には画像または動画が必須です
                     </p>
                   )}
@@ -387,7 +381,7 @@ export default function ScheduledPosts() {
                       type="file"
                       accept="image/*,video/*"
                       multiple
-                      className="border border-white/[0.06] text-sm"
+                      className="border border-white/[0.06] bg-neutral-950 text-sm"
                       onChange={(e) => {
                         const files = Array.from(e.target.files || []);
                         setMediaFiles(files);
@@ -406,7 +400,7 @@ export default function ScheduledPosts() {
                             </div>
                             <button
                               type="button"
-                              className="absolute -top-2 -right-2 h-6 w-6 rounded-full border border-white/[0.06] bg-[#FF6B6B] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                              className="absolute -top-2 -right-2 h-6 w-6 rounded-full border border-rose-500/30 bg-rose-500/20 text-rose-400 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-500/30"
                               onClick={() => {
                                 setMediaFiles(mediaFiles.filter((_, i) => i !== index));
                               }}
@@ -426,7 +420,7 @@ export default function ScheduledPosts() {
                     type="datetime-local"
                     value={scheduledTime}
                     onChange={(e) => setScheduledTime(e.target.value)}
-                    className="border border-white/[0.06] text-sm"
+                    className="border border-white/[0.06] bg-neutral-950 text-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -435,10 +429,10 @@ export default function ScheduledPosts() {
                     value={repeatInterval}
                     onValueChange={(value: any) => setRepeatInterval(value)}
                   >
-                    <SelectTrigger className="border border-white/[0.06]">
+                    <SelectTrigger className="border border-white/[0.06] bg-neutral-950">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="border border-white/[0.06] bg-neutral-900">
                       <SelectItem value="none">なし</SelectItem>
                       <SelectItem value="daily">毎日</SelectItem>
                       <SelectItem value="weekly">毎週</SelectItem>
@@ -449,13 +443,13 @@ export default function ScheduledPosts() {
               </div>
               <DialogFooter>
                 <button
-                  className="rounded-lg border border-white/[0.06] bg-white px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                  className="rounded-lg border border-white/[0.06] bg-neutral-800 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-neutral-700"
                   onClick={() => setIsCreateDialogOpen(false)}
                 >
                   キャンセル
                 </button>
                 <button
-                  className="rounded-lg border border-white/[0.06] bg-emerald-500 px-4 py-2 text-sm font-bold text-white transition-all hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-lg border border-emerald-500/30 bg-emerald-500/20 px-4 py-2 text-sm font-bold text-emerald-400 transition-all hover:bg-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleCreate}
                   disabled={createMutation.isPending}
                 >
@@ -467,20 +461,20 @@ export default function ScheduledPosts() {
         </div>
 
         {/* Posts Table Card */}
-        <div className="bg-white rounded-lg border border-white/[0.06]">
-          <div className="px-5 py-4 border-b-2 border-white/[0.06] bg-emerald-500">
+        <div className="bg-neutral-900 rounded-lg border border-white/[0.06]">
+          <div className="px-5 py-4 border-b border-white/[0.06] bg-emerald-500/10">
             <h2 className="text-sm font-bold text-white">スケジュール投稿一覧</h2>
-            <p className="text-xs text-white mt-0.5">
+            <p className="text-xs text-neutral-500 mt-0.5">
               {postsQuery.data?.length || 0}件の投稿が登録されています
             </p>
           </div>
           <div className="p-0">
             {postsQuery.isLoading ? (
-              <p className="text-center text-sm text-[#6B6B6B] py-12">読み込み中...</p>
+              <p className="text-center text-sm text-neutral-500 py-12">読み込み中...</p>
             ) : postsQuery.data && postsQuery.data.length > 0 ? (
               <div className="overflow-x-auto">
                 {/* Table Header */}
-                <div className="grid grid-cols-[60px_1fr_160px_80px_100px_50px_200px] gap-3 px-5 py-3 border-b-2 border-white/[0.06] bg-emerald-500 text-xs font-bold text-white uppercase tracking-wider">
+                <div className="grid grid-cols-[60px_1fr_160px_80px_100px_50px_200px] gap-3 px-5 py-3 border-b border-white/[0.06] bg-emerald-500/10 text-xs font-bold text-white uppercase tracking-wider">
                   <div>ID</div>
                   <div>内容</div>
                   <div>実行日時</div>
@@ -493,9 +487,9 @@ export default function ScheduledPosts() {
                 {postsQuery.data.map((post) => (
                   <div
                     key={post.id}
-                    className="grid grid-cols-[60px_1fr_160px_80px_100px_50px_200px] gap-3 px-5 py-3 border-b-2 border-white/[0.06] last:border-b-0 items-center hover:bg-neutral-900 transition-colors"
+                    className="grid grid-cols-[60px_1fr_160px_80px_100px_50px_200px] gap-3 px-5 py-3 border-b border-white/[0.06] last:border-b-0 items-center hover:bg-neutral-800 transition-colors"
                   >
-                    <div className="font-mono text-xs text-[#6B6B6B]">{post.id}</div>
+                    <div className="font-mono text-xs text-neutral-500">{post.id}</div>
                     <div className="text-sm text-white truncate font-bold">{post.content}</div>
                     <div className="text-xs text-white font-bold">
                       {new Date(post.scheduledTime).toLocaleString("ja-JP")}
@@ -506,14 +500,14 @@ export default function ScheduledPosts() {
                       {post.screenshotUrl && (
                         <Dialog>
                           <DialogTrigger asChild>
-                            <button className="flex items-center justify-center h-8 w-8 rounded-lg border border-white/[0.06] text-[#6B6B6B] transition-all hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-neutral-900 hover:text-white">
+                            <button className="flex items-center justify-center h-8 w-8 rounded-lg border border-white/[0.06] text-neutral-500 transition-all hover:bg-neutral-800 hover:text-white">
                               <ImageIcon className="h-4 w-4" />
                             </button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-4xl border border-white/[0.06]">
+                          <DialogContent className="max-w-4xl border border-white/[0.06] bg-neutral-900">
                             <DialogHeader>
                               <DialogTitle className="text-white font-bold">投稿検証スクリーンショット</DialogTitle>
-                              <DialogDescription className="text-[#6B6B6B] text-sm">
+                              <DialogDescription className="text-neutral-500 text-sm">
                                 投稿ID: {post.id} - {new Date(post.scheduledTime).toLocaleString("ja-JP")}
                               </DialogDescription>
                             </DialogHeader>
@@ -531,7 +525,7 @@ export default function ScheduledPosts() {
                                   href={post.postUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-white hover:underline text-sm font-bold"
+                                  className="text-teal-400 hover:underline text-sm font-bold"
                                 >
                                   {post.postUrl}
                                 </a>
@@ -545,14 +539,14 @@ export default function ScheduledPosts() {
                       {post.status === "pending" && (
                         <>
                           <button
-                            className="inline-flex items-center gap-1 rounded-lg border border-white/[0.06] bg-white px-2.5 py-1.5 text-xs font-bold text-white transition-all hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
+                            className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/20 px-2.5 py-1.5 text-xs font-bold text-emerald-400 transition-all hover:bg-emerald-500/30"
                             onClick={() => publishNowMutation.mutate({ id: post.id })}
                           >
                             <Play className="h-3 w-3" />
                             今すぐ実行
                           </button>
                           <button
-                            className="inline-flex items-center gap-1 rounded-lg border border-white/[0.06] bg-white px-2.5 py-1.5 text-xs font-bold text-white transition-all hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
+                            className="inline-flex items-center gap-1 rounded-lg border border-white/[0.06] bg-neutral-800 px-2.5 py-1.5 text-xs font-bold text-white transition-all hover:bg-neutral-700"
                             onClick={() => cancelMutation.mutate({ id: post.id })}
                           >
                             <X className="h-3 w-3" />
@@ -562,7 +556,7 @@ export default function ScheduledPosts() {
                       )}
                       {post.status === "failed" && (
                         <button
-                          className="inline-flex items-center gap-1 rounded-lg border border-white/[0.06] bg-[#FFDAB9] px-2.5 py-1.5 text-xs font-bold text-white transition-all hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
+                          className="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-xs font-bold text-amber-400 transition-all hover:bg-amber-500/20"
                           onClick={() => retryMutation.mutate({ id: post.id })}
                         >
                           <RefreshCw className="h-3 w-3" />
@@ -570,7 +564,7 @@ export default function ScheduledPosts() {
                         </button>
                       )}
                       <button
-                        className="inline-flex items-center rounded-lg border border-white/[0.06] bg-[#FF6B6B] px-2.5 py-1.5 text-xs font-bold text-white transition-all hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
+                        className="inline-flex items-center rounded-lg border border-rose-500/30 bg-rose-500/20 px-2.5 py-1.5 text-xs font-bold text-rose-400 transition-all hover:bg-rose-500/30"
                         onClick={() => deleteMutation.mutate({ id: post.id })}
                       >
                         削除
@@ -580,7 +574,7 @@ export default function ScheduledPosts() {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-sm text-[#6B6B6B] py-12">
+              <p className="text-center text-sm text-neutral-500 py-12">
                 スケジュール投稿がありません
               </p>
             )}
