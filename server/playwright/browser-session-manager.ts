@@ -9,6 +9,9 @@ import { chromium, type Browser, type BrowserContext } from 'playwright';
 import fs from 'fs/promises';
 import path from 'path';
 import { startScreencast, stopScreencast, setOperationStatus } from './screencast-service';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('browser-session-manager');
 import {
   SESSION_DIR,
   MAX_CONCURRENT_BROWSERS,
@@ -104,13 +107,13 @@ function startIdleCleanup(): void {
     const now = Date.now();
     for (const [accountId, mc] of activeContexts) {
       if (now - mc.lastUsed > IDLE_TIMEOUT_MS) {
-        console.log(`[PlaywrightSession] Auto-closing idle context for account ${accountId}`);
+        logger.info(`[PlaywrightSession] Auto-closing idle context for account ${accountId}`);
         await releaseContext(accountId);
       }
     }
     // If no contexts remain, close the browser process too
     if (activeContexts.size === 0 && browser) {
-      console.log('[PlaywrightSession] No active contexts, closing browser process');
+      logger.info('[PlaywrightSession] No active contexts, closing browser process');
       try {
         await browser.close();
       } catch {
@@ -252,7 +255,7 @@ export async function releaseContext(accountId: number): Promise<void> {
   try {
     await mc.context.storageState({ path: sessionPath(accountId) });
   } catch (err) {
-    console.error(`[PlaywrightSession] Failed to save session for account ${accountId}:`, err);
+    logger.error(`[PlaywrightSession] Failed to save session for account ${accountId}:`, err);
   }
 
   try {
@@ -329,7 +332,7 @@ export async function checkSessionHealth(
       await page.close();
     }
   } catch (err) {
-    console.error(`[PlaywrightSession] Health check failed for account ${accountId}:`, err);
+    logger.error(`[PlaywrightSession] Health check failed for account ${accountId}:`, err);
     await db
       .update(accounts)
       .set({ sessionStatus: 'expired' })

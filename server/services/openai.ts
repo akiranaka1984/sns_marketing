@@ -4,6 +4,10 @@
  * Wrapper utilities for OpenAI API calls used across the platform.
  */
 
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger("openai");
+
 /**
  * Generate an image using DALL-E 3 for social media posts.
  * Returns the image URL or null if generation fails/is disabled.
@@ -39,14 +43,14 @@ Style: Clean, modern, professional. No text overlay. Suitable for X/Twitter. Asp
     });
 
     if (!response.ok) {
-      console.error('[DALL-E] Generation failed:', response.status);
+      logger.error('[DALL-E] Generation failed:', response.status);
       return null;
     }
 
     const data = await response.json();
     return data.data?.[0]?.url ?? null;
   } catch (error) {
-    console.error('[DALL-E] Error:', error);
+    logger.error('[DALL-E] Error:', error);
     return null;
   }
 }
