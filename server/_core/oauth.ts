@@ -275,10 +275,10 @@ export function registerOAuthRoutes(app: Express) {
         .set({
           oauthAccessToken: ensureEncrypted(accessToken),
           oauthAccessTokenSecret: ensureEncrypted(accessTokenSecret),
-          oauthTokenStatus: "active",
+          oauthTokenStatus: "active" as const,
           oauthUsername: screenName ?? null,
           oauthConnectedAt: now,
-        } as any)
+        })
         .where(eq(accounts.id, accountId));
 
       logger.info(

@@ -172,7 +172,7 @@ export default function AccountDetail() {
   });
 
   const handleEditXHandle = () => {
-    setXHandleInput((account as any)?.xHandle || "");
+    setXHandleInput(account?.xHandle || "");
     setIsEditingXHandle(true);
   };
 
@@ -215,7 +215,7 @@ export default function AccountDetail() {
     );
   }
 
-  const currentSessionStatus = sessionStatus?.sessionStatus || (account as any).sessionStatus || 'needs_login';
+  const currentSessionStatus = sessionStatus?.sessionStatus || account.sessionStatus || 'needs_login';
 
   return (
     <div className="max-w-5xl space-y-5">
@@ -239,9 +239,9 @@ export default function AccountDetail() {
           </div>
           <div className="flex items-center gap-2">
             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-white border border-white/[0.06] ${
-              (account as any).postingMethod === 'api_v2' ? 'bg-teal-500/20 border border-teal-500/30' : 'bg-blue-500/20 border border-blue-500/30'
+              account.postingMethod === 'api_v2' ? 'bg-teal-500/20 border border-teal-500/30' : 'bg-blue-500/20 border border-blue-500/30'
             }`}>
-              {(account as any).postingMethod === 'api_v2' ? (
+              {account.postingMethod === 'api_v2' ? (
                 <><Zap className="w-3.5 h-3.5" />API v2</>
               ) : (
                 <><Monitor className="w-3.5 h-3.5" />Playwright</>
@@ -313,7 +313,7 @@ export default function AccountDetail() {
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-white">投稿方式</p>
                     <div className="p-1.5 rounded-lg bg-neutral-950 border border-white/[0.06]">
-                      {(account as any).postingMethod === 'api_v2' ? (
+                      {account.postingMethod === 'api_v2' ? (
                         <Zap className="h-3.5 w-3.5 text-white" />
                       ) : (
                         <Monitor className="h-3.5 w-3.5 text-white" />
@@ -331,13 +331,13 @@ export default function AccountDetail() {
                         onClick={() => updatePostingMethodMutation.mutate({ accountId, postingMethod: method.value })}
                         disabled={updatePostingMethodMutation.isPending}
                         className={`flex-1 px-2 py-1.5 rounded-lg border border-white/[0.06] text-left transition-all ${
-                          ((account as any).postingMethod || 'playwright') === method.value
+                          (account.postingMethod || 'playwright') === method.value
                             ? 'bg-white/10 text-white shadow-none'
                             : 'bg-neutral-950 text-white hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]'
                         }`}
                       >
                         <p className="text-[11px] font-bold">{method.label}</p>
-                        <p className={`text-[9px] font-bold ${((account as any).postingMethod || 'playwright') === method.value ? 'text-gray-300' : 'text-neutral-500'}`}>{method.sub}</p>
+                        <p className={`text-[9px] font-bold ${(account.postingMethod || 'playwright') === method.value ? 'text-gray-300' : 'text-neutral-500'}`}>{method.sub}</p>
                       </button>
                     ))}
                   </div>
@@ -545,9 +545,9 @@ export default function AccountDetail() {
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 mt-0.5">
-                        {(account as any).xHandle ? (
+                        {account.xHandle ? (
                           <code className="text-sm font-bold bg-neutral-900 text-white px-2 py-0.5 rounded-lg border border-white/[0.06]">
-                            @{(account as any).xHandle}
+                            @{account.xHandle}
                           </code>
                         ) : (
                           <span className="text-sm font-bold text-neutral-500">未設定</span>
@@ -730,9 +730,9 @@ export default function AccountDetail() {
             <AccountPersonaTab
               accountId={accountId}
               account={{
-                personaRole: (account as any).personaRole,
-                personaTone: (account as any).personaTone,
-                personaCharacteristics: (account as any).personaCharacteristics,
+                personaRole: account.personaRole,
+                personaTone: account.personaTone,
+                personaCharacteristics: account.personaCharacteristics,
               }}
             />
           )}
@@ -748,11 +748,11 @@ export default function AccountDetail() {
               accountId={accountId}
               account={{
                 username: account.username,
-                xHandle: (account as any).xHandle,
+                xHandle: account.xHandle,
                 platform: account.platform,
-                personaRole: (account as any).personaRole,
-                personaTone: (account as any).personaTone,
-                personaCharacteristics: (account as any).personaCharacteristics,
+                personaRole: account.personaRole,
+                personaTone: account.personaTone,
+                personaCharacteristics: account.personaCharacteristics,
               }}
             />
           )}

@@ -321,8 +321,8 @@ export default function Accounts() {
                     <span className="text-[14px] font-bold text-white truncate block">
                       {account.username}
                     </span>
-                    {(account as any).xHandle && (
-                      <span className="text-[11px] text-neutral-500">@{(account as any).xHandle}</span>
+                    {account.xHandle && (
+                      <span className="text-[11px] text-neutral-500">@{account.xHandle}</span>
                     )}
                   </div>
                 </div>
@@ -334,7 +334,7 @@ export default function Accounts() {
                 </div>
                 <div className="px-3 py-3">
                   {account.platform === 'twitter' ? (
-                    <PlanTag plan={(account as any).planType || 'free'} />
+                    <PlanTag plan={account.planType || 'free'} />
                   ) : (
                     <span className="text-[12px] font-bold text-neutral-500">—</span>
                   )}

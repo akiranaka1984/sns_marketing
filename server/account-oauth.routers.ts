@@ -16,6 +16,7 @@ import { z } from "zod";
 import crypto from "crypto";
 import { TRPCError } from "@trpc/server";
 import { db } from "./db";
+import { getAccountById } from "./db";
 import { xApiSettings, accounts } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { createLogger } from "./utils/logger";
@@ -134,9 +135,11 @@ function buildOAuthHeader(
 async function getConsumerCredentials(
   userId: number,
 ): Promise<ConsumerCredentials | null> {
-  const settings = await db.query.xApiSettings.findFirst({
-    where: eq(xApiSettings.userId, userId),
-  });
+  const [settings] = await db
+    .select()
+    .from(xApiSettings)
+    .where(eq(xApiSettings.userId, userId))
+    .limit(1);
 
   if (!settings?.apiKey || !settings?.apiSecret) {
     logger.error(
@@ -168,9 +171,7 @@ export const accountOAuthRouter = router({
     .input(z.object({ accountId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       // Verify the account belongs to this user
-      const account = await db.query.accounts.findFirst({
-        where: eq(accounts.id, input.accountId),
-      });
+      const account = await getAccountById(input.accountId);
 
       if (!account || account.userId !== ctx.user.id) {
         throw new TRPCError({
@@ -279,9 +280,7 @@ export const accountOAuthRouter = router({
   getOAuthStatus: protectedProcedure
     .input(z.object({ accountId: z.number() }))
     .query(async ({ ctx, input }) => {
-      const account = await db.query.accounts.findFirst({
-        where: eq(accounts.id, input.accountId),
-      });
+      const account = await getAccountById(input.accountId);
 
       if (!account || account.userId !== ctx.user.id) {
         throw new TRPCError({
@@ -292,9 +291,9 @@ export const accountOAuthRouter = router({
 
       return {
         accountId: account.id,
-        oauthTokenStatus: (account as any).oauthTokenStatus ?? "not_connected",
-        oauthUsername: (account as any).oauthUsername ?? null,
-        oauthConnectedAt: (account as any).oauthConnectedAt ?? null,
+        oauthTokenStatus: account.oauthTokenStatus ?? "not_connected",
+        oauthUsername: account.oauthUsername ?? null,
+        oauthConnectedAt: account.oauthConnectedAt ?? null,
       };
     }),
 
@@ -305,9 +304,7 @@ export const accountOAuthRouter = router({
   disconnectAccount: protectedProcedure
     .input(z.object({ accountId: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      const account = await db.query.accounts.findFirst({
-        where: eq(accounts.id, input.accountId),
-      });
+      const account = await getAccountById(input.accountId);
 
       if (!account || account.userId !== ctx.user.id) {
         throw new TRPCError({
@@ -324,7 +321,7 @@ export const accountOAuthRouter = router({
           oauthTokenStatus: "not_connected",
           oauthUsername: null,
           oauthConnectedAt: null,
-        } as any)
+        })
         .where(eq(accounts.id, input.accountId));
 
       logger.info(
