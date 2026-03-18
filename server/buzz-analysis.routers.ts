@@ -3,6 +3,9 @@ import { router, protectedProcedure } from "./_core/trpc";
 import { db } from "./db";
 import { buzzPosts, buzzLearnings, agentKnowledge, accounts, learningSyncLog } from "../drizzle/schema";
 import { eq, and, desc, gte, sql } from "drizzle-orm";
+import { createLogger } from "./utils/logger";
+
+const logger = createLogger("buzz-analysis");
 import { analyzeBuzzPost, extractBuzzPatterns, generateLearningEntry, predictViralScore } from "./services/buzz-analyzer";
 import { classifyPost } from "./services/category-classifier";
 import { syncLearningsToLinkedProjects } from "./project-model-accounts.routers";
@@ -153,7 +156,7 @@ export const buzzAnalysisRouter = router({
           analysis,
         };
       } catch (error: any) {
-        console.error("[BuzzAnalysis] Error analyzing post:", error);
+        logger.error("[BuzzAnalysis] Error analyzing post:", error);
         return { success: false, error: error.message };
       }
     }),
@@ -218,7 +221,7 @@ export const buzzAnalysisRouter = router({
 
           analyzed++;
         } catch (error) {
-          console.error(`[BuzzAnalysis] Error analyzing post ${post.id}:`, error);
+          logger.error(`[BuzzAnalysis] Error analyzing post ${post.id}:`, error);
           errors++;
         }
       }
@@ -300,7 +303,7 @@ export const buzzAnalysisRouter = router({
               .from(accounts)
               .where(eq(accounts.userId, ctx.user.id));
 
-            console.log(`[BuzzAnalysis] Auto-applying ${savedLearnings.length} learnings to ${userAccounts.length} accounts`);
+            logger.info(`[BuzzAnalysis] Auto-applying ${savedLearnings.length} learnings to ${userAccounts.length} accounts`);
 
             // Apply each learning to each account and record sync log
             for (const learningId of savedLearnings) {
@@ -319,19 +322,19 @@ export const buzzAnalysisRouter = router({
                     autoApplied: 1,
                   });
                 } catch (applyError) {
-                  console.error(`[BuzzAnalysis] Error applying learning ${learningId} to account ${account.id}:`, applyError);
+                  logger.error(`[BuzzAnalysis] Error applying learning ${learningId} to account ${account.id}:`, applyError);
                   applyErrors++;
                 }
               }
             }
 
-            console.log(`[BuzzAnalysis] Applied ${appliedCount} learnings (${applyErrors} errors)`);
+            logger.info(`[BuzzAnalysis] Applied ${appliedCount} learnings (${applyErrors} errors)`);
 
             // Also sync to linked projects (for project-specific targeting)
             const linkedProjectResults = await syncLearningsToLinkedProjects(savedLearnings, ctx.user.id);
-            console.log("[BuzzAnalysis] Also synced to linked projects:", linkedProjectResults);
+            logger.info("[BuzzAnalysis] Also synced to linked projects:", linkedProjectResults);
           } catch (autoApplyError) {
-            console.error("[BuzzAnalysis] Error auto-applying learnings:", autoApplyError);
+            logger.error("[BuzzAnalysis] Error auto-applying learnings:", autoApplyError);
             // Don't fail the main request if auto-apply fails
           }
         }
@@ -347,7 +350,7 @@ export const buzzAnalysisRouter = router({
           },
         };
       } catch (error: any) {
-        console.error("[BuzzAnalysis] Error extracting patterns:", error);
+        logger.error("[BuzzAnalysis] Error extracting patterns:", error);
         return { success: false, error: error.message, patterns: [] };
       }
     }),
@@ -448,7 +451,7 @@ export const buzzAnalysisRouter = router({
 
         return { success: true, knowledgeKey };
       } catch (error: any) {
-        console.error("[BuzzAnalysis] Error applying learning:", error);
+        logger.error("[BuzzAnalysis] Error applying learning:", error);
         return { success: false, error: error.message };
       }
     }),
