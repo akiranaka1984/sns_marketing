@@ -31,7 +31,7 @@ export function registerOAuthRoutes(app: Express) {
     (process.env.ENABLE_DEV_LOGIN === "true" && process.env.NODE_ENV !== "production");
 
   if (process.env.NODE_ENV === "production" && process.env.ENABLE_DEV_LOGIN === "true") {
-    console.warn(
+    logger.warn(
       "[Dev Login] WARNING: ENABLE_DEV_LOGIN=true is set but ignored in production (NODE_ENV=production). " +
       "Remove this environment variable to suppress this warning."
     );
@@ -62,15 +62,15 @@ export function registerOAuthRoutes(app: Express) {
         const cookieOptions = getSessionCookieOptions(req);
         res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
-        console.log("[Dev Login] Test user logged in successfully");
+        logger.info("[Dev Login] Test user logged in successfully");
         res.redirect(302, "/");
       } catch (error) {
-        console.error("[Dev Login] Failed:", error);
+        logger.error("[Dev Login] Failed:", error);
         res.status(500).json({ error: "Dev login failed" });
       }
     });
 
-    console.log("[Dev] Development login enabled at /api/dev-login");
+    logger.info("[Dev] Development login enabled at /api/dev-login");
   }
   // Admin password login endpoint
   app.post("/api/admin-login", async (req: Request, res: Response) => {
@@ -329,7 +329,7 @@ export function registerOAuthRoutes(app: Express) {
 
       res.redirect(302, "/");
     } catch (error) {
-      console.error("[OAuth] Callback failed", error);
+      logger.error("[OAuth] Callback failed", error);
       res.status(500).json({ error: "OAuth callback failed" });
     }
   });

@@ -4,6 +4,9 @@ import { eq, and, desc, gte, inArray, sql } from "drizzle-orm";
 import * as schema from "../drizzle/schema";
 import type { BuzzLearningInput, ModelPatternInput } from "./aiEngine";
 import { encrypt, decrypt, ensureEncrypted } from "./utils/encryption";
+import { createLogger } from "./utils/logger";
+
+const logger = createLogger("db");
 
 const connection = mysql.createPool({
   uri: process.env.DATABASE_URL!,
@@ -506,7 +509,7 @@ export async function getSetting(key: string): Promise<string | null> {
     } catch (err) {
       // Decryption failure means the stored value is corrupt or was encrypted with a different key.
       // Log a warning and return null rather than crashing the caller.
-      console.warn(`[db] Failed to decrypt setting "${key}": ${err instanceof Error ? err.message : String(err)}`);
+      logger.warn(`[db] Failed to decrypt setting "${key}": ${err instanceof Error ? err.message : String(err)}`);
       return null;
     }
   }
@@ -538,7 +541,7 @@ export async function getAllSettings(): Promise<Record<string, string>> {
       } catch (err) {
         // Decryption failure: the value is corrupt or was encrypted with a different key.
         // Exclude from the result rather than exposing ciphertext or crashing.
-        console.warn(`[db] Failed to decrypt setting "${setting.key}": ${err instanceof Error ? err.message : String(err)}`);
+        logger.warn(`[db] Failed to decrypt setting "${setting.key}": ${err instanceof Error ? err.message : String(err)}`);
         return acc;
       }
     }

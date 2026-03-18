@@ -7,7 +7,6 @@ import {
   Hash,
   Home,
   Layers,
-  Search,
   Settings,
   TestTube2,
   TrendingUp,

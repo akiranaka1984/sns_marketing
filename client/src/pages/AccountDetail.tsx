@@ -1,6 +1,6 @@
 import { useRoute, Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
 import {
@@ -9,7 +9,7 @@ import {
   Monitor, Shield, ShieldCheck, ShieldAlert, ShieldX, LogIn, Trash2, Eye, Zap,
   Link2, Unlink, AlertTriangle
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import BrowserPreviewDialog from "@/components/BrowserPreviewDialog";
 import { toast } from "sonner";
 import { useI18n } from "@/contexts/I18nContext";
@@ -50,7 +50,7 @@ export default function AccountDetail() {
     { refetchInterval: 60000 }
   );
 
-  const { data: growthStats, isLoading: isLoadingGrowth } = trpc.accounts.growthStats.useQuery(
+  const { data: growthStats } = trpc.accounts.growthStats.useQuery(
     { accountId },
     { enabled: !!accountId }
   );

@@ -307,7 +307,7 @@ export function startInteractionEnqueuer(): void {
   logger.info("[InteractionScheduler] Started enqueuer");
 
   // Run immediately
-  enqueuePendingInteractions().catch(console.error);
+  enqueuePendingInteractions().catch((err) => logger.error("[InteractionScheduler] Initial enqueue failed", err));
 
   // Run every minute
   schedulerInterval = setInterval(async () => {

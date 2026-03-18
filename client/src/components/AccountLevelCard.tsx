@@ -24,7 +24,6 @@ export default function AccountLevelCard({
   // Calculate total learnings by category
   const successPatterns = (learningsByType.success_pattern || 0) + (learningsByType.engagement_pattern || 0);
   const stylePatterns = (learningsByType.posting_style || 0) + (learningsByType.comment_style || 0);
-  const otherPatterns = totalLearningsCount - successPatterns - stylePatterns;
 
   return (
     <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">

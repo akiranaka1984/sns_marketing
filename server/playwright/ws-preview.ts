@@ -19,7 +19,9 @@ import {
   getOperationStatus,
   type FrameListener,
 } from './screencast-service';
+import { createLogger } from '../utils/logger';
 
+const logger = createLogger('ws-preview');
 const WS_PATH = '/ws/playwright-preview';
 
 let wss: WebSocketServer | null = null;
@@ -62,11 +64,11 @@ export function attachWebSocketServer(server: Server): void {
     return originalEmit(event, ...args);
   } as Server['emit'];
 
-  console.log('[WebSocket] Playwright preview server attached');
+  logger.info('[WebSocket] Playwright preview server attached');
 }
 
 function handleConnection(ws: WebSocket, accountId: number): void {
-  console.log(`[WebSocket] Client connected for account ${accountId}`);
+  logger.info(`[WebSocket] Client connected for account ${accountId}`);
 
   // Send initial status
   const initialStatus = isScreencasting(accountId) ? 'streaming' : 'idle';
@@ -104,13 +106,13 @@ function handleConnection(ws: WebSocket, accountId: number): void {
   }, 1000);
 
   ws.on('close', () => {
-    console.log(`[WebSocket] Client disconnected for account ${accountId}`);
+    logger.info(`[WebSocket] Client disconnected for account ${accountId}`);
     removeFrameListener(accountId, frameListener);
     clearInterval(statusInterval);
   });
 
   ws.on('error', (err) => {
-    console.error(`[WebSocket] Error for account ${accountId}:`, err.message);
+    logger.error(`[WebSocket] Error for account ${accountId}:`, err.message);
     removeFrameListener(accountId, frameListener);
     clearInterval(statusInterval);
   });

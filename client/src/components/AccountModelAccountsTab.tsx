@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Users2, Plus, Trash2, Loader2, ExternalLink, RefreshCw } from "lucide-react";
+import { Users2, Plus, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface AccountModelAccountsTabProps {

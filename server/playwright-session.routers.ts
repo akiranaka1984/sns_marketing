@@ -176,8 +176,8 @@ export const playwrightSessionRouter = router({
       }
 
       return {
-        postingMethod: (account as any).postingMethod || 'playwright',
-        sessionStatus: (account as any).sessionStatus || 'needs_login',
+        postingMethod: account.postingMethod || 'playwright',
+        sessionStatus: account.sessionStatus || 'needs_login',
       };
     }),
 });

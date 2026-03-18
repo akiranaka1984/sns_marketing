@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Bell } from "lucide-react";
 import { useRealtimeEvents, type RealtimeEvent } from "@/hooks/useRealtimeEvents";
 import {

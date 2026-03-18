@@ -379,7 +379,7 @@ export async function resetDailyCounters(): Promise<number> {
       updatedAt: toMySQLTimestamp(new Date()),
     });
 
-  const affectedRows = (result as any)[0]?.affectedRows ?? 0;
+  const affectedRows = (result as { affectedRows?: number }[])[0]?.affectedRows ?? 0;
   logger.info(`Reset daily counters for ${affectedRows} accounts`);
   return affectedRows;
 }
