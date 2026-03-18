@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
-import { useI18n } from "@/contexts/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,7 +26,6 @@ import {
   Play,
   BarChart3,
   Trophy,
-  Clock,
   CheckCircle,
   XCircle,
   Lightbulb,
@@ -61,7 +59,6 @@ interface AnalysisResult {
 }
 
 export default function ABTesting() {
-  const { t } = useI18n();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
