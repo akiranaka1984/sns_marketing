@@ -54,12 +54,14 @@ export async function postToSNS(
   }
 
   // Determine posting method from account settings
-  const account = await db.query.accounts.findFirst({
-    where: eq(accounts.id, accountId),
-    columns: { postingMethod: true },
-  });
-
-  const method = account?.postingMethod || 'playwright';
+  let method = 'playwright';
+  try {
+    const [rows] = await db.select({ postingMethod: accounts.postingMethod }).from(accounts).where(eq(accounts.id, accountId)).limit(1);
+    method = rows?.postingMethod || 'playwright';
+  } catch {
+    // Column may not exist yet — default to playwright
+    logger.warn({ accountId }, 'postingMethod column not available, defaulting to playwright');
+  }
 
   // ── Route: X API v2 (new, stable) ──────────────────────────────
   if (method === 'api_v2') {

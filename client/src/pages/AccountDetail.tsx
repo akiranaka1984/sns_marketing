@@ -131,8 +131,8 @@ export default function AccountDetail() {
       toast.success("投稿方式を変更しました");
       utils.accounts.byId.invalidate({ id: accountId });
     },
-    onError: (error) => {
-      toast.error(`変更失敗: ${error.message}`);
+    onError: () => {
+      toast.error("投稿方式の変更に失敗しました。しばらく待ってから再試行してください。");
     },
   });
 
