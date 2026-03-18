@@ -3,6 +3,9 @@ import { postUrls, interactions, interactionSettings, accounts, accountRelations
 import { eq, and, ne, isNotNull, inArray } from "drizzle-orm";
 import { getPostUrlAfterPublish } from "./x-api-service";
 import { scheduleTrackingJobs } from "./services/performance-tracking-scheduler";
+import { createLogger } from "./utils/logger";
+
+const logger = createLogger("post-success-hook");
 
 /** Convert Date to MySQL-compatible timestamp string */
 function toMySQLTimestamp(date: Date): string {
@@ -40,7 +43,7 @@ export async function onPostSuccess(
   scheduledPostId?: number
 ): Promise<{ success: boolean; postUrl?: string; tasksCreated?: number; error?: string }> {
   try {
-    console.log(`[PostSuccessHook] Processing post for @${username}`);
+    logger.info(`[PostSuccessHook] Processing post for @${username}`);
 
     // 1. 相互連携設定を確認
     const settings = await db.query.interactionSettings.findFirst({
@@ -48,18 +51,18 @@ export async function onPostSuccess(
     });
 
     if (!settings?.isEnabled) {
-      console.log("[PostSuccessHook] Interaction is disabled for this project");
+      logger.info("[PostSuccessHook] Interaction is disabled for this project");
       return { success: true, tasksCreated: 0 };
     }
 
     // 2. X APIで投稿URLを取得
     const postUrl = await getPostUrlAfterPublish(username, postContent);
     if (!postUrl) {
-      console.warn("[PostSuccessHook] Failed to get post URL");
+      logger.warn("[PostSuccessHook] Failed to get post URL");
       return { success: false, error: "投稿URLの取得に失敗しました" };
     }
 
-    console.log(`[PostSuccessHook] Got post URL: ${postUrl}`);
+    logger.info(`[PostSuccessHook] Got post URL: ${postUrl}`);
 
     // 3. post_urlsテーブルに保存
     const [postUrlResult] = await db.insert(postUrls).values({
@@ -83,12 +86,12 @@ export async function onPostSuccess(
         projectId
       );
       if (trackingResult.success) {
-        console.log(`[PostSuccessHook] Scheduled ${trackingResult.jobsCreated} tracking jobs for post`);
+        logger.info(`[PostSuccessHook] Scheduled ${trackingResult.jobsCreated} tracking jobs for post`);
       } else {
-        console.warn(`[PostSuccessHook] Failed to schedule tracking jobs: ${trackingResult.error}`);
+        logger.warn(`[PostSuccessHook] Failed to schedule tracking jobs: ${trackingResult.error}`);
       }
     } catch (trackingError) {
-      console.error("[PostSuccessHook] Error scheduling tracking jobs:", trackingError);
+      logger.error("[PostSuccessHook] Error scheduling tracking jobs:", trackingError);
       // Don't fail the entire hook if tracking fails
     }
 
@@ -107,7 +110,7 @@ export async function onPostSuccess(
       );
 
     if (otherAccounts.length === 0) {
-      console.log("[PostSuccessHook] No other accounts to create tasks for");
+      logger.info("[PostSuccessHook] No other accounts to create tasks for");
       return { success: true, postUrl, tasksCreated: 0 };
     }
 
@@ -162,10 +165,10 @@ export async function onPostSuccess(
       selectedAccounts = selectedAccounts.slice(0, maxReactingAccounts);
     }
 
-    console.log(`[PostSuccessHook] Selected ${selectedAccounts.length}/${otherAccounts.length} accounts (base probability: ${baseReactionProbability}%, max: ${maxReactingAccounts || 'unlimited'})`);
+    logger.info(`[PostSuccessHook] Selected ${selectedAccounts.length}/${otherAccounts.length} accounts (base probability: ${baseReactionProbability}%, max: ${maxReactingAccounts || 'unlimited'})`);
 
     if (selectedAccounts.length === 0) {
-      console.log("[PostSuccessHook] No accounts selected for reaction");
+      logger.info("[PostSuccessHook] No accounts selected for reaction");
       return { success: true, postUrl, tasksCreated: 0 };
     }
 
@@ -197,7 +200,7 @@ export async function onPostSuccess(
         const relationInfo = relationship
           ? `(intimacy: ${relationship.intimacyLevel}, type: ${relationship.relationshipType})`
           : '(no relationship data)';
-        console.log(`[PostSuccessHook] Created like task for @${account.username} ${relationInfo} at ${likeScheduledAt.toISOString()}`);
+        logger.info(`[PostSuccessHook] Created like task for @${account.username} ${relationInfo} at ${likeScheduledAt.toISOString()}`);
       }
 
       // コメントタスク
@@ -224,7 +227,7 @@ export async function onPostSuccess(
         const relationInfo = relationship
           ? `(intimacy: ${relationship.intimacyLevel}, style: ${relationship.commentStyle})`
           : '(no relationship data)';
-        console.log(`[PostSuccessHook] Created comment task for @${account.username} ${relationInfo} at ${commentScheduledAt.toISOString()}`);
+        logger.info(`[PostSuccessHook] Created comment task for @${account.username} ${relationInfo} at ${commentScheduledAt.toISOString()}`);
       }
 
       // リツイートタスク（関係性で許可されている場合のみ）
@@ -242,7 +245,7 @@ export async function onPostSuccess(
         });
         tasksCreated++;
 
-        console.log(`[PostSuccessHook] Created retweet task for @${account.username} at ${retweetScheduledAt.toISOString()}`);
+        logger.info(`[PostSuccessHook] Created retweet task for @${account.username} at ${retweetScheduledAt.toISOString()}`);
       }
 
       // フォロータスク（投稿者をフォロー）
@@ -261,7 +264,7 @@ export async function onPostSuccess(
         });
         tasksCreated++;
 
-        console.log(`[PostSuccessHook] Created follow task for @${account.username} -> @${username} at ${followScheduledAt.toISOString()}`);
+        logger.info(`[PostSuccessHook] Created follow task for @${account.username} -> @${username} at ${followScheduledAt.toISOString()}`);
       }
     }
 
@@ -294,19 +297,19 @@ export async function onPostSuccess(
               });
               tasksCreated++;
 
-              console.log(`[PostSuccessHook] Created external follow task for @${account.username} -> @${cleanUsername} at ${followScheduledAt.toISOString()}`);
+              logger.info(`[PostSuccessHook] Created external follow task for @${account.username} -> @${cleanUsername} at ${followScheduledAt.toISOString()}`);
             }
           }
         }
       } catch (parseError) {
-        console.warn("[PostSuccessHook] Failed to parse followTargetUsers:", parseError);
+        logger.warn("[PostSuccessHook] Failed to parse followTargetUsers:", parseError);
       }
     }
 
-    console.log(`[PostSuccessHook] Created ${tasksCreated} interaction tasks`);
+    logger.info(`[PostSuccessHook] Created ${tasksCreated} interaction tasks`);
     return { success: true, postUrl, tasksCreated };
   } catch (error) {
-    console.error("[PostSuccessHook] Error:", error);
+    logger.error("[PostSuccessHook] Error:", error);
     return { success: false, error: String(error) };
   }
 }
