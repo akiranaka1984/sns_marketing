@@ -179,6 +179,24 @@ export async function getAccountsByUserId(userId: number) {
       lastLoginAt: schema.accounts.lastLoginAt,
       createdAt: schema.accounts.createdAt,
       updatedAt: schema.accounts.updatedAt,
+      // Persona settings
+      persona: schema.accounts.persona,
+      personaRole: schema.accounts.personaRole,
+      personaTone: schema.accounts.personaTone,
+      personaCharacteristics: schema.accounts.personaCharacteristics,
+      // Plan / posting method
+      planType: schema.accounts.planType,
+      postingMethod: schema.accounts.postingMethod,
+      // Session state
+      sessionStatus: schema.accounts.sessionStatus,
+      // Growth system
+      experiencePoints: schema.accounts.experiencePoints,
+      level: schema.accounts.level,
+      totalLearningsCount: schema.accounts.totalLearningsCount,
+      // OAuth
+      oauthTokenStatus: schema.accounts.oauthTokenStatus,
+      oauthConnectedAt: schema.accounts.oauthConnectedAt,
+      oauthUsername: schema.accounts.oauthUsername,
       proxy: schema.proxies,
     })
     .from(schema.accounts)
@@ -1043,4 +1061,107 @@ export async function getModelPatternsForProject(
     emojiUsageRate: Number(p.emojiUsageRate) || 0,
     hashtagAvgCount: Number(p.hashtagAvgCount) || 0,
   }));
+}
+
+// ─── Startup migrations ────────────────────────────────────────────────────
+//
+// These ALTER TABLE statements are idempotent (IF NOT EXISTS / MODIFY with
+// current defaults).  They run automatically on every server boot so that
+// newly-added columns are present before any request reaches the application,
+// even when `db:push` has not yet been executed manually.
+
+const STARTUP_MIGRATIONS: string[] = [
+  // postingMethod column (0038)
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`postingMethod\`
+       enum('duoplus','playwright','api_v2') NOT NULL DEFAULT 'playwright'`,
+
+  // sessionStatus column
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`sessionStatus\`
+       enum('active','expired','needs_login') NOT NULL DEFAULT 'needs_login'`,
+
+  // Growth system columns
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`experiencePoints\` int NOT NULL DEFAULT 0`,
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`level\` int NOT NULL DEFAULT 1`,
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`totalLearningsCount\` int NOT NULL DEFAULT 0`,
+
+  // Per-account OAuth columns (0035)
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`oauthAccessToken\` varchar(500) NULL`,
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`oauthAccessTokenSecret\` varchar(500) NULL`,
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`oauthTokenStatus\`
+       enum('not_connected','active','expired','revoked') NOT NULL DEFAULT 'not_connected'`,
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`oauthConnectedAt\` timestamp NULL`,
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`oauthUsername\` varchar(100) NULL`,
+
+  // Persona columns
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`personaRole\` varchar(255) NULL`,
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`personaTone\`
+       enum('formal','casual','friendly','professional','humorous') NULL`,
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`personaCharacteristics\` text NULL`,
+
+  // planType column
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`planType\`
+       enum('free','premium','premium_plus') NOT NULL DEFAULT 'free'`,
+
+  // xHandle column
+  `ALTER TABLE \`accounts\`
+     ADD COLUMN IF NOT EXISTS \`xHandle\` varchar(255) NULL`,
+
+  // api_usage_tracking table (0035)
+  `CREATE TABLE IF NOT EXISTS \`api_usage_tracking\` (
+    \`id\` int NOT NULL AUTO_INCREMENT,
+    \`accountId\` int NOT NULL,
+    \`month\` varchar(7) NOT NULL,
+    \`tweetCount\` int NOT NULL DEFAULT 0,
+    \`lastPostedAt\` timestamp NULL,
+    \`createdAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (\`id\`),
+    UNIQUE KEY \`idx_api_usage_tracking_accountId_month_unique\` (\`accountId\`, \`month\`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+
+  // admin_settings table (0036)
+  `CREATE TABLE IF NOT EXISTS \`admin_settings\` (
+    \`id\` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    \`passwordHash\` varchar(255) NOT NULL,
+    \`createdAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    \`updatedAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+];
+
+/**
+ * Run idempotent startup migrations to ensure all columns exist in the DB.
+ * Each statement uses IF NOT EXISTS so it is safe to run on every boot.
+ * Errors on individual statements are logged but do not abort startup.
+ */
+export async function runStartupMigrations(): Promise<void> {
+  logger.info('Running startup migrations...');
+
+  for (const sql of STARTUP_MIGRATIONS) {
+    try {
+      await connection.query(sql);
+    } catch (err: any) {
+      // Duplicate column / key errors (MySQL error 1060, 1061) are harmless —
+      // the column / key already exists (e.g. old MySQL version without IF NOT EXISTS).
+      if (err?.errno === 1060 || err?.errno === 1061) {
+        // Already exists — this is fine; continue silently.
+      } else {
+        logger.warn({ err: err?.message, sql: sql.slice(0, 80) }, 'Startup migration statement failed (non-fatal)');
+      }
+    }
+  }
+
+  logger.info('Startup migrations complete');
 }

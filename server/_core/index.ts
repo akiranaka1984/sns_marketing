@@ -10,7 +10,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { startScheduledPostsEnqueuer } from "../scheduled-posts";
 import { registerAutoEngagementJob } from "../auto-engagement";
-import { getSetting } from "../db";
+import { getSetting, runStartupMigrations } from "../db";
 import uploadRouter from "../upload";
 import { startInteractionEnqueuer } from "../interaction-scheduler";
 import { registerQueueProcessors } from "../queue-processors";
@@ -44,6 +44,12 @@ async function startServer() {
 
   // Wait for database connection to be ready
   await new Promise(resolve => setTimeout(resolve, 2000));
+
+  // Ensure all required columns exist before any request reaches the application.
+  // This is idempotent and safe to run on every boot.
+  await runStartupMigrations().catch((err) => {
+    logger.error({ err }, 'Startup migrations failed — continuing, but DB may be missing columns');
+  });
 
   try {
     const openaiApiKey = await getSetting('OPENAI_API_KEY');
