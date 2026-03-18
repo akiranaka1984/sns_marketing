@@ -319,6 +319,105 @@ export async function generateLearningEntry(
   };
 }
 
+export interface ViralScorePrediction {
+  score: number; // 0-100
+  factors: {
+    hookStrength: number;
+    emotionalImpact: number;
+    shareability: number;
+    relevance: number;
+    readability: number;
+  };
+  suggestions: string[];
+}
+
+/**
+ * Predict virality score BEFORE posting
+ */
+export async function predictViralScore(
+  content: string,
+  hasMedia: boolean = false
+): Promise<ViralScorePrediction> {
+  const systemPrompt = `You are an expert social media virality analyst. Evaluate the given post content and predict its viral potential BEFORE it is published.
+
+Score each factor from 0 to 100:
+- hookStrength: How compelling is the opening line? Does it make the reader want to continue?
+- emotionalImpact: Does it trigger strong emotions (curiosity, surprise, inspiration, humor, anger)?
+- shareability: Would people want to share this with their followers?
+- relevance: Is the topic timely, relatable, or aligned with trending discussions?
+- readability: Is it easy to read? Good formatting, appropriate length, clear message?
+
+The overall score (0-100) should reflect the weighted average with shareability and hookStrength weighted higher.
+
+Provide 2-4 concrete, actionable suggestions to improve the score.
+
+Respond in JSON format only.`;
+
+  const mediaContext = hasMedia ? "The post includes media (image or video)." : "The post is text only.";
+
+  const userPrompt = `Predict the viral potential of this social media post:
+
+Content: "${content}"
+${mediaContext}
+
+Respond with JSON:
+{
+  "score": 0-100,
+  "factors": {
+    "hookStrength": 0-100,
+    "emotionalImpact": 0-100,
+    "shareability": 0-100,
+    "relevance": 0-100,
+    "readability": 0-100
+  },
+  "suggestions": ["actionable suggestion 1", "actionable suggestion 2"]
+}`;
+
+  try {
+    const result = await invokeLLM({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
+      responseFormat: { type: "json_object" },
+      maxTokens: 800,
+    });
+
+    const responseText = typeof result.choices[0]?.message?.content === 'string'
+      ? result.choices[0].message.content
+      : '';
+
+    const data = JSON.parse(responseText);
+
+    const clamp = (v: any) => Math.min(100, Math.max(0, Number(v) || 0));
+
+    return {
+      score: clamp(data.score),
+      factors: {
+        hookStrength: clamp(data.factors?.hookStrength),
+        emotionalImpact: clamp(data.factors?.emotionalImpact),
+        shareability: clamp(data.factors?.shareability),
+        relevance: clamp(data.factors?.relevance),
+        readability: clamp(data.factors?.readability),
+      },
+      suggestions: Array.isArray(data.suggestions) ? data.suggestions.slice(0, 4) : [],
+    };
+  } catch (error) {
+    logger.error({ err: error }, "[BuzzAnalyzer] Error predicting viral score");
+    return {
+      score: 0,
+      factors: {
+        hookStrength: 0,
+        emotionalImpact: 0,
+        shareability: 0,
+        relevance: 0,
+        readability: 0,
+      },
+      suggestions: [],
+    };
+  }
+}
+
 // Helper functions
 
 function validateLearningType(type: string): BuzzPattern['learningType'] {

@@ -21,6 +21,8 @@ import {
   cohensD,
   interpretEffectSize,
   requiredSampleSize,
+  thompsonSelect,
+  thompsonAllocations,
   type StatisticalAnalysis
 } from "./utils/statistics";
 import { createLogger } from "./utils/logger";
@@ -618,6 +620,57 @@ export async function getAgentTests(agentId: number) {
     .from(abTests)
     .where(eq(abTests.agentId, agentId))
     .orderBy(desc(abTests.createdAt));
+}
+
+// ============================================
+// Thompson Sampling
+// ============================================
+
+/**
+ * Select the next variation to serve using Thompson Sampling.
+ * Returns the variation ID that the algorithm recommends showing next.
+ */
+export async function selectVariationThompson(testId: number): Promise<number | null> {
+  const variations = await db.select()
+    .from(abTestVariations)
+    .where(eq(abTestVariations.testId, testId));
+
+  if (variations.length === 0) return null;
+
+  const arms = variations.map(v => ({
+    successes: Math.max(0, v.likesCount + v.commentsCount + v.sharesCount),
+    trials: Math.max(1, v.viewsCount)
+  }));
+
+  const selectedIndex = thompsonSelect(arms);
+  return variations[selectedIndex].id;
+}
+
+/**
+ * Return Thompson Sampling allocation percentages for each variation.
+ * Each value represents the probability (0-100) that the variation is optimal.
+ */
+export async function getThompsonAllocations(
+  testId: number
+): Promise<Array<{ variationId: number; variationName: string; allocation: number }>> {
+  const variations = await db.select()
+    .from(abTestVariations)
+    .where(eq(abTestVariations.testId, testId));
+
+  if (variations.length === 0) return [];
+
+  const arms = variations.map(v => ({
+    successes: Math.max(0, v.likesCount + v.commentsCount + v.sharesCount),
+    trials: Math.max(1, v.viewsCount)
+  }));
+
+  const allocations = thompsonAllocations(arms);
+
+  return variations.map((v, i) => ({
+    variationId: v.id,
+    variationName: v.variationName,
+    allocation: allocations[i]
+  }));
 }
 
 // エクスポート

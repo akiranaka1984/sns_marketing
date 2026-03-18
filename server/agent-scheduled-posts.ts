@@ -59,6 +59,47 @@ interface GenerateScheduledPostsResult {
 // ============================================
 
 /**
+ * コンテンツのピラーをキーワードヒューリスティックで分類
+ */
+export function classifyContentPillar(content: string): string {
+  const lower = content.toLowerCase();
+
+  if (
+    lower.includes('方法') ||
+    lower.includes('やり方') ||
+    lower.includes('解説') ||
+    lower.includes('ポイント') ||
+    lower.includes('tips')
+  ) {
+    return 'educational';
+  }
+  if (
+    lower.includes('キャンペーン') ||
+    lower.includes('セール') ||
+    lower.includes('限定') ||
+    lower.includes('お知らせ')
+  ) {
+    return 'promotional';
+  }
+  if (
+    lower.includes('?') ||
+    lower.includes('？') ||
+    lower.includes('あなたは') ||
+    lower.includes('みんな')
+  ) {
+    return 'engagement';
+  }
+  if (
+    lower.includes('面白い') ||
+    lower.includes('笑') ||
+    lower.includes('ネタ')
+  ) {
+    return 'entertainment';
+  }
+  return 'curation';
+}
+
+/**
  * エージェントが生成したコンテンツをスケジュール投稿として登録
  */
 export async function createAgentScheduledPost(input: ScheduledPostInput): Promise<number> {
@@ -72,6 +113,9 @@ export async function createAgentScheduledPost(input: ScheduledPostInput): Promi
 
   // フルオートモードの場合は自動承認
   const reviewStatus = project?.executionMode === 'fullAuto' ? 'approved' : 'pending_review';
+
+  // コンテンツピラーを分類
+  const contentPillar = classifyContentPillar(input.content);
 
   const [result] = await db.insert(scheduledPosts).values({
     projectId: input.projectId,
@@ -88,6 +132,7 @@ export async function createAgentScheduledPost(input: ScheduledPostInput): Promi
     reviewStatus,
     contentConfidence: input.confidence,
     usedLearningIds: input.usedLearningIds ? JSON.stringify(input.usedLearningIds) : null,
+    contentPillar,
   });
 
   logger.info({ postId: result.insertId, agentId: input.agentId, reviewStatus, learningCount: input.usedLearningIds?.length || 0 }, "Created scheduled post");

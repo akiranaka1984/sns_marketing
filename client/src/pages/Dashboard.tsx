@@ -14,6 +14,9 @@ import {
   CheckCircle2,
   XCircle,
   Send,
+  TrendingUp,
+  TrendingDown,
+  Minus,
 } from "lucide-react";
 import { Link } from "wouter";
 import type { LucideIcon } from "lucide-react";
@@ -141,12 +144,18 @@ export default function Dashboard() {
   const totalAccounts = accounts?.length || 0;
   const scheduledTotal = postStats?.total || 0;
 
+  // TODO: Replace mock deltas with real previous-period data from the backend.
+  // When the backend exposes a `previousPeriod` object in getStats / accounts list,
+  // compute deltas as: Math.round(((current - prev) / Math.max(prev, 1)) * 100)
+  const mockDeltas = { totalAccounts: 8, activeAccounts: 12, pendingAccounts: -3, scheduledTotal: 5 };
+
   const metrics: Array<{
     label: string;
     value: number;
     sub: string;
     icon: LucideIcon;
     iconColor: string;
+    delta: number;
   }> = [
     {
       label: "アカウント総数",
@@ -154,6 +163,7 @@ export default function Dashboard() {
       sub: "登録済みアカウント",
       icon: Users,
       iconColor: "text-neutral-400",
+      delta: mockDeltas.totalAccounts,
     },
     {
       label: "アクティブ",
@@ -161,6 +171,7 @@ export default function Dashboard() {
       sub: "稼働中のアカウント",
       icon: Activity,
       iconColor: "text-emerald-400",
+      delta: mockDeltas.activeAccounts,
     },
     {
       label: "保留中",
@@ -168,6 +179,7 @@ export default function Dashboard() {
       sub: "認証待ちアカウント",
       icon: Clock,
       iconColor: "text-amber-400",
+      delta: mockDeltas.pendingAccounts,
     },
     {
       label: "スケジュール投稿",
@@ -175,6 +187,7 @@ export default function Dashboard() {
       sub: `成功率 ${postStats?.successRate ?? 0}%（30日間）`,
       icon: CalendarCheck,
       iconColor: "text-cyan-400",
+      delta: mockDeltas.scheduledTotal,
     },
   ];
 
@@ -235,6 +248,17 @@ export default function Dashboard() {
                 {m.value}
               </p>
               <p className="text-[11px] text-neutral-600 leading-none">{m.sub}</p>
+              {m.delta !== undefined && (
+                <div className={`flex items-center gap-1 text-xs mt-1.5 ${
+                  m.delta > 0 ? "text-emerald-400" :
+                  m.delta < 0 ? "text-red-400" : "text-muted-foreground"
+                }`}>
+                  {m.delta > 0 ? <TrendingUp className="w-3 h-3" /> :
+                   m.delta < 0 ? <TrendingDown className="w-3 h-3" /> :
+                   <Minus className="w-3 h-3" />}
+                  <span>{m.delta > 0 ? "+" : ""}{m.delta}% vs 先月</span>
+                </div>
+              )}
             </div>
           );
         })}

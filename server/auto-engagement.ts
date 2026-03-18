@@ -17,6 +17,7 @@ import {
   retweetPostViaPlaywright,
   getEngagementRateLimits,
 } from "./playwright/engagement-actions";
+import { humanPause } from "./utils/human-delay";
 
 /**
  * Execute pending engagement tasks
@@ -214,11 +215,8 @@ async function executeLike(
   // Get rate limit settings
   const rateLimits = await getEngagementRateLimits(task.projectId);
 
-  // Add random delay for human-like behavior
-  const delay =
-    Math.random() * (rateLimits.likeDelayMax - rateLimits.likeDelayMin) +
-    rateLimits.likeDelayMin;
-  await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
+  // Add human-like delay before action
+  await humanPause(rateLimits.likeDelayMin * 60 * 1000, rateLimits.likeDelayMax * 60 * 1000);
 
   // Execute via Playwright
   const result = await likePostViaPlaywright(account.id, task.targetPost);
@@ -243,11 +241,8 @@ async function executeFollow(
   // Get rate limit settings
   const rateLimits = await getEngagementRateLimits(task.projectId);
 
-  // Add random delay for human-like behavior
-  const delay =
-    Math.random() * (rateLimits.followDelayMax - rateLimits.followDelayMin) +
-    rateLimits.followDelayMin;
-  await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
+  // Add human-like delay before action
+  await humanPause(rateLimits.followDelayMin * 60 * 1000, rateLimits.followDelayMax * 60 * 1000);
 
   // Execute via Playwright
   const result = await followUserViaPlaywright(account.id, task.targetUser);
@@ -276,11 +271,8 @@ async function executeComment(
   // Get rate limit settings
   const rateLimits = await getEngagementRateLimits(task.projectId);
 
-  // Add random delay for human-like behavior
-  const delay =
-    Math.random() * (rateLimits.commentDelayMax - rateLimits.commentDelayMin) +
-    rateLimits.commentDelayMin;
-  await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
+  // Add human-like delay before action
+  await humanPause(rateLimits.commentDelayMin * 60 * 1000, rateLimits.commentDelayMax * 60 * 1000);
 
   // Execute via Playwright
   const result = await commentPostViaPlaywright(
@@ -309,11 +301,8 @@ async function executeUnfollow(
   // Get rate limit settings
   const rateLimits = await getEngagementRateLimits(task.projectId);
 
-  // Add random delay for human-like behavior
-  const delay =
-    Math.random() * (rateLimits.followDelayMax - rateLimits.followDelayMin) +
-    rateLimits.followDelayMin;
-  await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
+  // Add human-like delay before action
+  await humanPause(rateLimits.followDelayMin * 60 * 1000, rateLimits.followDelayMax * 60 * 1000);
 
   // Execute via Playwright
   const result = await unfollowUserViaPlaywright(account.id, task.targetUser);
@@ -338,11 +327,8 @@ async function executeRetweet(
   // Get rate limit settings
   const rateLimits = await getEngagementRateLimits(task.projectId);
 
-  // Add random delay for human-like behavior
-  const delay =
-    Math.random() * (rateLimits.retweetDelayMax - rateLimits.retweetDelayMin) +
-    rateLimits.retweetDelayMin;
-  await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
+  // Add human-like delay before action
+  await humanPause(rateLimits.retweetDelayMin * 60 * 1000, rateLimits.retweetDelayMax * 60 * 1000);
 
   // Execute via Playwright
   const result = await retweetPostViaPlaywright(account.id, task.targetPost);
@@ -358,10 +344,21 @@ import { createLogger } from "./utils/logger";
 const logger = createLogger("auto-engagement");
 
 /**
- * Start auto-engagement executor (runs every 5 minutes)
+ * Register auto-engagement as a BullMQ repeatable job.
+ * Call this once at server startup after registerQueueProcessors().
+ */
+export async function registerAutoEngagementJob(): Promise<void> {
+  const { registerAutoEngagementRepeatableJob } = await import('./queue-manager');
+  await registerAutoEngagementRepeatableJob();
+  logger.info("[AutoEngagement] Repeatable job registered via BullMQ");
+}
+
+/**
+ * @deprecated Use registerAutoEngagementJob() with BullMQ repeatable jobs instead.
+ * Kept for backward compatibility. Will be removed in a future release.
  */
 export function startAutoEngagementExecutor() {
-  logger.info("[AutoEngagement] Starting executor...");
+  logger.warn("[AutoEngagement] startAutoEngagementExecutor() is deprecated. Use registerAutoEngagementJob() with BullMQ instead.");
 
   // Run immediately
   executeEngagementTasks();

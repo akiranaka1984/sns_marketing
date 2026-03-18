@@ -28,6 +28,71 @@ export const POST_VERIFY_WAIT = 5_000;
 /** Default viewport size */
 export const VIEWPORT = { width: 1280, height: 800 } as const;
 
+/** Pool of modern Chrome user-agent strings (Chrome 131–133, Windows/Mac/Linux) */
+export const USER_AGENTS: readonly string[] = [
+  // Chrome 133 – Windows
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.6943.98 Safari/537.36',
+  // Chrome 132 – Windows
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.6834.160 Safari/537.36',
+  // Chrome 131 – Windows
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.6778.265 Safari/537.36',
+  // Chrome 133 – macOS
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_7_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.6943.98 Safari/537.36',
+  // Chrome 132 – macOS
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_6_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.6834.160 Safari/537.36',
+  // Chrome 131 – macOS
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+  // Chrome 133 – Linux
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
+  // Chrome 132 – Linux
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.6834.160 Safari/537.36',
+  // Chrome 131 – Linux
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+] as const;
+
+/**
+ * Deterministically pick a user-agent for an account using a simple hash.
+ * The same accountId always resolves to the same UA, but different accounts
+ * spread across the pool.
+ */
+export function getRandomUA(accountId: number): string {
+  // FNV-1a-inspired 32-bit hash for stable, well-distributed bucketing
+  let hash = 2166136261;
+  hash ^= accountId & 0xff;
+  hash = (Math.imul(hash, 16777619) >>> 0);
+  hash ^= (accountId >> 8) & 0xff;
+  hash = (Math.imul(hash, 16777619) >>> 0);
+  const index = hash % USER_AGENTS.length;
+  return USER_AGENTS[index];
+}
+
+/**
+ * Return a viewport for the given account with ±20 px jitter around 1280×800.
+ * The jitter is deterministic per account so repeated calls return the same size.
+ */
+export function getRandomViewport(accountId: number): { width: number; height: number } {
+  // Use a different seed from getRandomUA so width/height vary independently
+  let hw = 1_000_000_007 ^ accountId;
+  hw = (Math.imul(hw, 2654435761) >>> 0);
+  let hh = 1_000_000_009 ^ accountId;
+  hh = (Math.imul(hh, 2246822519) >>> 0);
+
+  // Map to [-20, +20] range
+  const dw = (hw % 41) - 20; // 41 values: -20 … +20
+  const dh = (hh % 41) - 20;
+
+  return {
+    width: VIEWPORT.width + dw,
+    height: VIEWPORT.height + dh,
+  };
+}
+
 /** X.com selectors */
 export const X_SELECTORS = {
   /** Compose tweet button in sidebar */

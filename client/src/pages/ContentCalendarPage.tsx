@@ -1,6 +1,7 @@
 import { Calendar } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import ContentCalendar, { type CalendarPost } from "@/components/ContentCalendar";
+import PillarDistribution from "@/components/PillarDistribution";
 import { useMemo } from "react";
 
 export default function ContentCalendarPage() {
@@ -16,6 +17,17 @@ export default function ContentCalendarPage() {
       status: post.status as CalendarPost["status"],
       accountId: post.accountId,
     }));
+  }, [postsQuery.data]);
+
+  // Compute pillar distribution from the raw post data
+  const pillarCounts = useMemo<Record<string, number>>(() => {
+    if (!postsQuery.data) return {};
+    const counts: Record<string, number> = {};
+    for (const post of postsQuery.data) {
+      const pillar = (post as { contentPillar?: string | null }).contentPillar ?? 'curation';
+      counts[pillar] = (counts[pillar] ?? 0) + 1;
+    }
+    return counts;
   }, [postsQuery.data]);
 
   return (
@@ -35,6 +47,11 @@ export default function ContentCalendarPage() {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Pillar Distribution */}
+      <div className="fade-in-up mb-4">
+        <PillarDistribution data={pillarCounts} />
       </div>
 
       {/* Calendar */}

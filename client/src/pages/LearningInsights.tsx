@@ -3,6 +3,18 @@ import { trpc } from "@/lib/trpc";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Brain, Activity, Users, BarChart3, TrendingUp } from "lucide-react";
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  BarChart,
+  Bar,
+  Cell,
+} from "recharts";
 
 function getConfidenceBadgeClass(confidence: number): string {
   if (confidence >= 70) return "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
@@ -90,6 +102,64 @@ export default function LearningInsights() {
 
         {/* Tab 1: Unified View */}
         <TabsContent value="unified">
+          {/* Learning Type Distribution Bar Chart */}
+          {unifiedView && (
+            <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4 mb-4">
+              <h3 className="font-bold text-sm text-white mb-1">学習タイプ別分布</h3>
+              <p className="text-xs text-neutral-500 font-bold mb-4">各レイヤーの学習件数</p>
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart
+                  data={[
+                    {
+                      name: "アカウント学習",
+                      count: unifiedView.accountLearnings?.length ?? 0,
+                    },
+                    {
+                      name: "バズ学習",
+                      count: unifiedView.buzzLearnings?.length ?? 0,
+                    },
+                    {
+                      name: "エージェント知識",
+                      count: unifiedView.agentKnowledge?.length ?? 0,
+                    },
+                  ]}
+                  margin={{ top: 4, right: 16, left: 0, bottom: 4 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+                  <XAxis
+                    dataKey="name"
+                    stroke="#6b7280"
+                    tick={{ fill: "#9ca3af", fontSize: 11 }}
+                    tickLine={false}
+                    axisLine={{ stroke: "#374151" }}
+                  />
+                  <YAxis
+                    stroke="#6b7280"
+                    tick={{ fill: "#9ca3af", fontSize: 11 }}
+                    tickLine={false}
+                    axisLine={false}
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#1f2937",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: "8px",
+                      fontSize: "12px",
+                    }}
+                    labelStyle={{ color: "#e5e7eb", fontWeight: "bold" }}
+                    formatter={(value: number) => [value, "件数"]}
+                  />
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                    <Cell fill="#10b981" />
+                    <Cell fill="#6366f1" />
+                    <Cell fill="#f59e0b" />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
           <div className="grid gap-4 md:grid-cols-3">
             {/* Account Learnings */}
             <div className="fade-in-up bg-neutral-950 rounded-lg border border-white/[0.06] p-4">
@@ -279,6 +349,95 @@ export default function LearningInsights() {
                 <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
               </div>
             ) : confidenceHistory && confidenceHistory.length > 0 ? (
+              <>
+                {/* Confidence Area Chart */}
+                <div className="mb-4">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={confidenceHistory} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
+                      <defs>
+                        <linearGradient id="confidenceGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="countGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#6366f1" stopOpacity={0.25} />
+                          <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                      <XAxis
+                        dataKey="date"
+                        stroke="#6b7280"
+                        tick={{ fill: "#9ca3af", fontSize: 11 }}
+                        tickLine={false}
+                        axisLine={{ stroke: "#374151" }}
+                      />
+                      <YAxis
+                        yAxisId="confidence"
+                        stroke="#6b7280"
+                        tick={{ fill: "#9ca3af", fontSize: 11 }}
+                        tickLine={false}
+                        axisLine={false}
+                        domain={[0, 100]}
+                        tickFormatter={(v: number) => `${v}%`}
+                      />
+                      <YAxis
+                        yAxisId="count"
+                        orientation="right"
+                        stroke="#6b7280"
+                        tick={{ fill: "#9ca3af", fontSize: 11 }}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#1f2937",
+                          border: "1px solid rgba(255,255,255,0.1)",
+                          borderRadius: "8px",
+                          fontSize: "12px",
+                        }}
+                        labelStyle={{ color: "#e5e7eb", fontWeight: "bold", marginBottom: "4px" }}
+                        formatter={(value: number, name: string) => {
+                          if (name === "avgConfidence") return [`${value.toFixed(1)}%`, "平均Confidence"];
+                          if (name === "learningCount") return [value, "学習数"];
+                          return [value, name];
+                        }}
+                      />
+                      <Area
+                        yAxisId="confidence"
+                        type="monotone"
+                        dataKey="avgConfidence"
+                        stroke="#10b981"
+                        fill="url(#confidenceGradient)"
+                        strokeWidth={2}
+                        dot={false}
+                        activeDot={{ r: 4, strokeWidth: 0 }}
+                      />
+                      <Area
+                        yAxisId="count"
+                        type="monotone"
+                        dataKey="learningCount"
+                        stroke="#6366f1"
+                        fill="url(#countGradient)"
+                        strokeWidth={2}
+                        dot={false}
+                        activeDot={{ r: 4, strokeWidth: 0 }}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                  <div className="flex items-center gap-4 mt-2 px-1">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3 h-0.5 bg-emerald-400 rounded-full" />
+                      <span className="text-[11px] text-neutral-500 font-bold">平均Confidence（左軸）</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3 h-0.5 bg-indigo-400 rounded-full" />
+                      <span className="text-[11px] text-neutral-500 font-bold">学習数（右軸）</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Existing table */}
               <div className="border border-white/[0.06] rounded-lg overflow-hidden">
                 <div className="grid grid-cols-3 gap-0 bg-emerald-500/10 text-[11px] font-bold text-emerald-400 uppercase tracking-wide border-b border-white/[0.06]">
                   <div className="px-3 py-2">日付</div>
@@ -309,6 +468,7 @@ export default function LearningInsights() {
                   </div>
                 ))}
               </div>
+              </>
             ) : (
               <div className="text-center py-12">
                 <BarChart3 className="h-12 w-12 text-neutral-500 mx-auto mb-4" />

@@ -9,13 +9,13 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { startScheduledPostsEnqueuer } from "../scheduled-posts";
-import { startAutoEngagementExecutor } from "../auto-engagement";
+import { registerAutoEngagementJob } from "../auto-engagement";
 import { getSetting } from "../db";
 import uploadRouter from "../upload";
 import { startInteractionEnqueuer } from "../interaction-scheduler";
 import { registerQueueProcessors } from "../queue-processors";
-import { closeQueues } from "../queue-manager";
-import { startScheduler } from "../agent-scheduler";
+import { closeQueues, registerGrowthLoopRepeatableJob } from "../queue-manager";
+import { registerAgentSchedulerJob } from "../agent-scheduler";
 import { attachWebSocketServer } from "../playwright/ws-preview";
 import { attachEventBus } from "../utils/event-bus";
 import { logger } from "../utils/logger";
@@ -164,15 +164,25 @@ async function startServer() {
     // Start scheduled posts enqueuer (adds pending posts to queue)
     startScheduledPostsEnqueuer();
 
-    // Start auto-engagement executor
-    startAutoEngagementExecutor();
+    // Register auto-engagement as a BullMQ repeatable job (every 300s)
+    registerAutoEngagementJob().catch((err) => {
+      logger.error({ err }, 'Failed to register auto-engagement repeatable job');
+    });
 
     // Start interaction enqueuer (adds pending interactions to queue)
     startInteractionEnqueuer();
 
-    // Start agent scheduler (runs scheduled agents automatically)
-    startScheduler();
-    logger.info('Agent scheduler started');
+    // Register agent scheduler as a BullMQ repeatable job (every 60s)
+    registerAgentSchedulerJob().catch((err) => {
+      logger.error({ err }, 'Failed to register agent scheduler repeatable job');
+    });
+    logger.info('Agent scheduler repeatable job registration initiated');
+
+    // Register growth loop as a Bull repeatable job (every 6 hours)
+    registerGrowthLoopRepeatableJob().catch((err) => {
+      logger.error({ err }, 'Failed to register growth loop repeatable job');
+    });
+    logger.info('Growth loop repeatable job registration initiated');
 
     logger.info('All background executors started');
   });

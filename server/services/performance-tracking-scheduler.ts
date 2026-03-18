@@ -10,6 +10,7 @@ import { engagementTrackingJobs, postUrls, postAnalytics, scheduledPosts } from 
 import { eq, and, lte, desc } from "drizzle-orm";
 import { getTweetMetrics, extractTweetIdFromUrl, TweetMetrics } from "../x-api-service";
 import { triggerLearningFromMetrics, evaluatePerformance, updateUsedLearningsFromPerformance } from "./learning-trigger-service";
+import { learnFromPostPerformance } from "./account-learning-service";
 
 import { createLogger } from "../utils/logger";
 
@@ -160,6 +161,32 @@ export async function processTrackingJob(jobId: number): Promise<{
         const feedbackResult = await updateUsedLearningsFromPerformance(job.postUrlId, evaluation);
         if (feedbackResult.updated > 0) {
           logger.info(`[PerformanceTracker] Feedback loop: updated ${feedbackResult.updated} learnings for post ${job.postUrlId}`);
+        }
+
+        // 3-layer learning: persist success/failure patterns for future content generation
+        try {
+          const [postUrlRow] = await db
+            .select()
+            .from(postUrls)
+            .where(eq(postUrls.id, job.postUrlId));
+
+          if (postUrlRow?.scheduledPostId) {
+            const learningId = await learnFromPostPerformance(
+              postUrlRow.scheduledPostId,
+              job.accountId,
+              {
+                likes: metrics.likeCount,
+                comments: metrics.replyCount,
+                shares: metrics.retweetCount,
+                views: metrics.impressionCount,
+              }
+            );
+            if (learningId !== null) {
+              logger.info(`[PerformanceTracker] Account learning saved (id=${learningId}) for post ${postUrlRow.scheduledPostId}`);
+            }
+          }
+        } catch (accountLearningError) {
+          logger.error(`[PerformanceTracker] Account learning failed:`, accountLearningError);
         }
       } catch (learningError) {
         logger.error(`[PerformanceTracker] Learning trigger failed:`, learningError);

@@ -14,13 +14,76 @@ import {
   MAX_CONCURRENT_BROWSERS,
   NAVIGATION_TIMEOUT,
   ACTION_TIMEOUT,
-  VIEWPORT,
+  getRandomUA,
+  getRandomViewport,
   X_URLS,
   X_SELECTORS,
 } from './config';
 import { db } from '../db';
 import { accounts } from '../../drizzle/schema';
 import { eq } from 'drizzle-orm';
+
+/**
+ * Inject anti-detection scripts into every page opened by this context.
+ * Overrides common automation signals without requiring external packages.
+ */
+async function addStealthScripts(context: BrowserContext): Promise<void> {
+  await context.addInitScript(() => {
+    // Hide webdriver flag
+    Object.defineProperty(navigator, 'webdriver', {
+      get: () => undefined,
+      configurable: true,
+    });
+
+    // Add minimal fake plugin list (empty PluginArray is a bot signal)
+    const fakePlugins = [
+      { name: 'Chrome PDF Plugin', filename: 'internal-pdf-viewer', description: 'Portable Document Format' },
+      { name: 'Chrome PDF Viewer', filename: 'mhjfbmdgcfjbbpaeojofohoefgiehjai', description: '' },
+      { name: 'Native Client', filename: 'internal-nacl-plugin', description: '' },
+    ];
+    Object.defineProperty(navigator, 'plugins', {
+      get: () => {
+        const arr = fakePlugins as unknown as Plugin[];
+        Object.setPrototypeOf(arr, PluginArray.prototype);
+        return arr;
+      },
+      configurable: true,
+    });
+
+    // Prefer Japanese locale to match the platform's target audience
+    Object.defineProperty(navigator, 'languages', {
+      get: () => ['ja-JP', 'ja', 'en-US', 'en'],
+      configurable: true,
+    });
+
+    // Expose a minimal chrome runtime object (absent in headless without this)
+    if (!('chrome' in window)) {
+      Object.defineProperty(window, 'chrome', {
+        value: {
+          runtime: {
+            id: undefined,
+            connect: () => {},
+            sendMessage: () => {},
+          },
+        },
+        writable: false,
+        configurable: true,
+      });
+    }
+
+    // Override permissions.query to avoid headless-specific 'denied' responses
+    const originalQuery = window.navigator.permissions?.query?.bind(navigator.permissions);
+    if (originalQuery) {
+      Object.defineProperty(navigator.permissions, 'query', {
+        value: (parameters: PermissionDescriptor) =>
+          parameters.name === 'notifications'
+            ? Promise.resolve({ state: 'denied', onchange: null } as PermissionStatus)
+            : originalQuery(parameters),
+        configurable: true,
+      });
+    }
+  });
+}
 
 interface ManagedContext {
   context: BrowserContext;
@@ -159,9 +222,8 @@ export async function acquireContext(
   }
 
   const contextOptions: Parameters<Browser['newContext']>[0] = {
-    viewport: VIEWPORT,
-    userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+    viewport: getRandomViewport(accountId),
+    userAgent: getRandomUA(accountId),
     ...(storageState ? { storageState } : {}),
     ...(proxyConfig ? { proxy: proxyConfig } : {}),
   };
@@ -169,6 +231,7 @@ export async function acquireContext(
   const context = await b.newContext(contextOptions);
   context.setDefaultNavigationTimeout(NAVIGATION_TIMEOUT);
   context.setDefaultTimeout(ACTION_TIMEOUT);
+  await addStealthScripts(context);
 
   activeContexts.set(accountId, {
     context,

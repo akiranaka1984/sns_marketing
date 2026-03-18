@@ -9,9 +9,15 @@ import type { Job } from 'bull';
 import {
   getScheduledPostsQueue,
   getInteractionsQueue,
+  getAgentSchedulerQueue,
+  getAutoEngagementQueue,
+  getGrowthLoopQueue,
   type ScheduledPostJob,
   type InteractionJob,
 } from './queue-manager';
+import { checkAndRunScheduledAgents } from './agent-scheduler';
+import { executeEngagementTasks } from './auto-engagement';
+import { runGrowthLoopCycle } from './services/growth-loop-orchestrator';
 import { publishPost } from './scheduled-posts';
 import { db } from './db';
 import { interactions, postUrls, accounts, projectAccounts } from '../drizzle/schema';
@@ -307,4 +313,49 @@ export function registerQueueProcessors(): void {
 
   // Start engagement tracking processor (DB-based scheduler)
   startEngagementTrackingProcessor();
+
+  // Register agent scheduler processor (driven by repeatable job)
+  const agentSchedulerQueue = getAgentSchedulerQueue();
+  agentSchedulerQueue.process(1, async (_job) => {
+    try {
+      const result = await checkAndRunScheduledAgents();
+      logger.info({ executed: result.executed, failed: result.failed }, "Agent scheduler job completed");
+      return result;
+    } catch (error) {
+      logger.error({ err: error }, "Agent scheduler job error");
+      throw error;
+    }
+  });
+  logger.info("Agent scheduler processor registered");
+
+  // Register auto-engagement processor (driven by repeatable job)
+  const autoEngagementQueue = getAutoEngagementQueue();
+  autoEngagementQueue.process(1, async (_job) => {
+    try {
+      const results = await executeEngagementTasks();
+      logger.info({ count: results.length }, "Auto-engagement job completed");
+      return results;
+    } catch (error) {
+      logger.error({ err: error }, "Auto-engagement job error");
+      throw error;
+    }
+  });
+  logger.info("Auto-engagement processor registered");
+
+  // Register growth loop processor (driven by repeatable job every 6 hours)
+  const growthLoopQueue = getGrowthLoopQueue();
+  growthLoopQueue.process(1, async (_job) => {
+    try {
+      const result = await runGrowthLoopCycle();
+      logger.info(
+        { evaluated: result.evaluated, actionsGenerated: result.actionsGenerated },
+        "Growth loop job completed"
+      );
+      return result;
+    } catch (error) {
+      logger.error({ err: error }, "Growth loop job error");
+      throw error;
+    }
+  });
+  logger.info("Growth loop processor registered");
 }

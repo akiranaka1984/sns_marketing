@@ -1002,6 +1002,74 @@ JSON形式で回答してください:
 }
 
 // ============================================
+// Queue-triggered 6-Hour Cycle
+// ============================================
+
+/**
+ * Run one full growth loop evaluation across all active projects.
+ * Called by the GROWTH_LOOP Bull queue every 6 hours.
+ *
+ * For each active project this runs:
+ *  1. KPI check
+ *  2. Strategy evaluation
+ *  3. Strategy regeneration (only when score is poor)
+ */
+export async function runGrowthLoopCycle(): Promise<{
+  evaluated: number;
+  actionsGenerated: number;
+}> {
+  logger.info("Starting growth loop cycle (queue-triggered)");
+
+  const activeProjects = await db.query.projects.findMany({
+    where: eq(projects.status, "active"),
+  });
+
+  logger.info(`Growth loop cycle: ${activeProjects.length} active project(s)`);
+
+  let evaluated = 0;
+  let actionsGenerated = 0;
+
+  for (const project of activeProjects) {
+    const mode = project.executionMode as ExecutionMode;
+
+    try {
+      // Ensure loop state record exists
+      await ensureLoopState(project.id);
+
+      // Count actions before this run
+      const before = await db.query.growthLoopActions.findMany({
+        where: eq(growthLoopActions.projectId, project.id),
+      });
+
+      await runKpiCheck(project.id, mode);
+      await runStrategyEvaluation(project.id, mode);
+      await runStrategyRegeneration(project.id, mode);
+
+      const after = await db.query.growthLoopActions.findMany({
+        where: eq(growthLoopActions.projectId, project.id),
+      });
+
+      evaluated++;
+      actionsGenerated += Math.max(0, after.length - before.length);
+
+      logger.info(
+        { projectId: project.id, mode },
+        "Growth loop cycle completed for project"
+      );
+    } catch (error) {
+      logger.error(
+        { err: error, projectId: project.id },
+        "Growth loop cycle failed for project"
+      );
+      // Continue with remaining projects
+    }
+  }
+
+  logger.info({ evaluated, actionsGenerated }, "Growth loop cycle finished");
+  return { evaluated, actionsGenerated };
+}
+
+// ============================================
 // 24-Hour Cycle: Full Review
 // ============================================
 

@@ -407,22 +407,40 @@ export async function getAllScheduledExecutions(): Promise<{
 }
 
 // ============================================
-// Cron Job Setup (for external scheduler)
+// BullMQ Repeatable Job Registration
 // ============================================
 
 /**
- * スケジューラーを開始（1分ごとにチェック）
+ * Register the agent scheduler as a BullMQ repeatable job.
+ * Call this once at server startup after registerQueueProcessors().
+ */
+export async function registerAgentSchedulerJob(): Promise<void> {
+  const { registerAgentSchedulerRepeatableJob } = await import('./queue-manager');
+  await registerAgentSchedulerRepeatableJob();
+  logger.info("Agent scheduler repeatable job registered via BullMQ");
+}
+
+// ============================================
+// Legacy setInterval API (deprecated)
+// ============================================
+
+/**
+ * @deprecated Use registerAgentSchedulerJob() with BullMQ repeatable jobs instead.
+ * Kept for backward compatibility. Will be removed in a future release.
  */
 let schedulerInterval: NodeJS.Timeout | null = null;
 
+/** @deprecated Use registerAgentSchedulerJob() instead. */
 export function startScheduler(): void {
+  logger.warn("startScheduler() is deprecated. Use registerAgentSchedulerJob() with BullMQ instead.");
+
   if (schedulerInterval) {
     logger.info("Scheduler already running");
     return;
   }
 
-  logger.info("Starting scheduler...");
-  
+  logger.info("Starting scheduler (legacy setInterval)...");
+
   // 1分ごとにチェック
   schedulerInterval = setInterval(async () => {
     try {
@@ -436,6 +454,7 @@ export function startScheduler(): void {
   checkAndRunScheduledAgents().catch((err) => logger.error({ err }, "Initial scheduler run failed"));
 }
 
+/** @deprecated No longer necessary when using BullMQ repeatable jobs. */
 export function stopScheduler(): void {
   if (schedulerInterval) {
     clearInterval(schedulerInterval);
@@ -444,6 +463,7 @@ export function stopScheduler(): void {
   }
 }
 
+/** @deprecated No longer relevant when using BullMQ repeatable jobs. */
 export function isSchedulerRunning(): boolean {
   return schedulerInterval !== null;
 }

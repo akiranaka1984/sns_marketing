@@ -21,7 +21,9 @@ import {
   getAgentTests,
   linkPostToVariation,
   updateVariationEngagement,
-  generateContentVariations
+  generateContentVariations,
+  selectVariationThompson,
+  getThompsonAllocations
 } from "./ab-testing";
 
 export const abTestingRouter = router({
@@ -177,6 +179,26 @@ export const abTestingRouter = router({
       return await db.select()
         .from(abTestLearnings)
         .orderBy(desc(abTestLearnings.createdAt));
+    }),
+
+  // Thompson Sampling: 適応配分の割合を取得
+  getAdaptiveAllocations: protectedProcedure
+    .input(z.object({
+      testId: z.number()
+    }))
+    .query(async ({ input }) => {
+      const allocations = await getThompsonAllocations(input.testId);
+      return { allocations };
+    }),
+
+  // Thompson Sampling: 次に表示すべきバリエーションを選択
+  selectAdaptiveVariation: protectedProcedure
+    .input(z.object({
+      testId: z.number()
+    }))
+    .mutation(async ({ input }) => {
+      const variationId = await selectVariationThompson(input.testId);
+      return { variationId };
     }),
 
   // 学習を適用済みにマーク

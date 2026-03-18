@@ -116,6 +116,7 @@ export const agentsRouter = router({
         postingFrequency: z.enum(["daily", "twice_daily", "three_times_daily", "weekly", "custom"]).optional(),
         postingTimeSlots: z.array(z.string()).optional(),
         skipReview: z.boolean().optional(),
+        imageGenerationEnabled: z.boolean().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -133,6 +134,7 @@ export const agentsRouter = router({
           postingFrequency: input.postingFrequency || "daily",
           postingTimeSlots: input.postingTimeSlots ? JSON.stringify(input.postingTimeSlots) : JSON.stringify(["09:00"]),
           skipReview: input.skipReview ? 1 : 0,
+          imageGenerationEnabled: input.imageGenerationEnabled ? 1 : 0,
         })
         .$returningId();
 
@@ -154,6 +156,7 @@ export const agentsRouter = router({
         postingFrequency: z.enum(["daily", "twice_daily", "three_times_daily", "weekly", "custom"]).optional(),
         postingTimeSlots: z.array(z.string()).optional(),
         skipReview: z.boolean().optional(),
+        imageGenerationEnabled: z.boolean().optional(),
         isActive: z.boolean().optional(),
       })
     )

@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { ViralScorePreview } from "@/components/ViralScorePreview";
 import {
   CheckCircle,
   XCircle,
@@ -15,7 +16,9 @@ import {
   User,
   Calendar,
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  TrendingUp,
+  Loader2
 } from "lucide-react";
 
 export default function PostReview() {
@@ -26,6 +29,8 @@ export default function PostReview() {
   const [editContent, setEditContent] = useState("");
   const [rejectReason, setRejectReason] = useState("");
   const [rejectingPostId, setRejectingPostId] = useState<number | null>(null);
+  const [predictingPostId, setPredictingPostId] = useState<number | null>(null);
+  const [viralPredictions, setViralPredictions] = useState<Record<number, any>>({});
 
   const { data: pendingPosts, isLoading } = trpc.agentScheduledPosts.getPendingReview.useQuery({
     limit: 100,
@@ -70,6 +75,38 @@ export default function PostReview() {
       setSelectedPosts([]);
     },
   });
+
+  const predictScoreMutation = trpc.buzzAnalysis.predictScore.useMutation({
+    onSuccess: (data, variables) => {
+      // variables is the input; we need to correlate via predictingPostId
+      if (predictingPostId !== null) {
+        setViralPredictions(prev => ({ ...prev, [predictingPostId]: data }));
+        setPredictingPostId(null);
+      }
+    },
+    onError: (error) => {
+      toast.error(`バイラル予測失敗: ${error.message}`);
+      setPredictingPostId(null);
+    },
+  });
+
+  const handlePredictScore = (post: any) => {
+    if (predictingPostId !== null) return;
+    // Toggle off if prediction is already shown
+    if (viralPredictions[post.id]) {
+      setViralPredictions(prev => {
+        const next = { ...prev };
+        delete next[post.id];
+        return next;
+      });
+      return;
+    }
+    setPredictingPostId(post.id);
+    predictScoreMutation.mutate({
+      content: post.content,
+      hasMedia: false,
+    });
+  };
 
   const handleSelectAll = () => {
     if (selectedPosts.length === pendingPosts?.length) {
@@ -246,7 +283,7 @@ export default function PostReview() {
                       </div>
 
                       {/* Actions */}
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap">
                         <button
                           className="inline-flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/20 px-3 py-2 text-sm font-bold text-emerald-400 transition-all hover:bg-emerald-500/30"
                           onClick={() => approveMutation.mutate({ postId: post.id })}
@@ -272,7 +309,30 @@ export default function PostReview() {
                           <XCircle className="h-4 w-4" />
                           却下
                         </button>
+                        <button
+                          className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-bold transition-all ${
+                            viralPredictions[post.id]
+                              ? "border-violet-500/30 bg-violet-500/20 text-violet-400 hover:bg-violet-500/30"
+                              : "border-white/[0.06] bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
+                          }`}
+                          onClick={() => handlePredictScore(post)}
+                          disabled={predictingPostId === post.id}
+                        >
+                          {predictingPostId === post.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <TrendingUp className="h-4 w-4" />
+                          )}
+                          バイラル予測
+                        </button>
                       </div>
+
+                      {/* Viral Score Preview */}
+                      {viralPredictions[post.id] && (
+                        <div className="mt-3">
+                          <ViralScorePreview prediction={viralPredictions[post.id]} />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

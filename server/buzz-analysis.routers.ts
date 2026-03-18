@@ -3,7 +3,7 @@ import { router, protectedProcedure } from "./_core/trpc";
 import { db } from "./db";
 import { buzzPosts, buzzLearnings, agentKnowledge, accounts, learningSyncLog } from "../drizzle/schema";
 import { eq, and, desc, gte, sql } from "drizzle-orm";
-import { analyzeBuzzPost, extractBuzzPatterns, generateLearningEntry } from "./services/buzz-analyzer";
+import { analyzeBuzzPost, extractBuzzPatterns, generateLearningEntry, predictViralScore } from "./services/buzz-analyzer";
 import { classifyPost } from "./services/category-classifier";
 import { syncLearningsToLinkedProjects } from "./project-model-accounts.routers";
 import { applyBuzzLearningToAccount } from "./services/account-learning-service";
@@ -656,5 +656,18 @@ export const buzzAnalysisRouter = router({
         detected: detected.length,
         posts: detected,
       };
+    }),
+
+  // ============================================
+  // Pre-publish Viral Score Prediction
+  // ============================================
+
+  predictScore: protectedProcedure
+    .input(z.object({
+      content: z.string(),
+      hasMedia: z.boolean().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      return predictViralScore(input.content, input.hasMedia ?? false);
     }),
 });

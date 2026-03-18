@@ -495,6 +495,76 @@ export function calculateProportionSampleSize(
 }
 
 // ============================================
+// Thompson Sampling (Multi-Armed Bandit)
+// ============================================
+
+/**
+ * Sample from Beta distribution using Gamma distribution sampling.
+ * Used for Thompson Sampling in A/B tests.
+ */
+export function sampleBeta(alpha: number, beta: number): number {
+  if (alpha <= 0) alpha = 1;
+  if (beta <= 0) beta = 1;
+
+  const gammaA = sampleGamma(alpha);
+  const gammaB = sampleGamma(beta);
+  return gammaA / (gammaA + gammaB);
+}
+
+function sampleGamma(shape: number): number {
+  // Marsaglia and Tsang's method
+  if (shape < 1) {
+    return sampleGamma(shape + 1) * Math.pow(Math.random(), 1 / shape);
+  }
+  const d = shape - 1 / 3;
+  const c = 1 / Math.sqrt(9 * d);
+  while (true) {
+    let x: number, v: number;
+    do {
+      x = normalRandom();
+      v = 1 + c * x;
+    } while (v <= 0);
+    v = v * v * v;
+    const u = Math.random();
+    if (u < 1 - 0.0331 * (x * x) * (x * x)) return d * v;
+    if (Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v;
+  }
+}
+
+function normalRandom(): number {
+  const u1 = Math.random();
+  const u2 = Math.random();
+  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}
+
+/**
+ * Thompson Sampling: select the best variation based on posterior Beta distributions.
+ * Returns the index of the selected variation.
+ */
+export function thompsonSelect(variations: Array<{ successes: number; trials: number }>): number {
+  const samples = variations.map(v =>
+    sampleBeta(v.successes + 1, v.trials - v.successes + 1)
+  );
+  return samples.indexOf(Math.max(...samples));
+}
+
+/**
+ * Get allocation percentages for each variation using Thompson Sampling.
+ * Runs N simulations and returns the fraction of times each variation wins (0-100).
+ */
+export function thompsonAllocations(
+  variations: Array<{ successes: number; trials: number }>,
+  simulations: number = 10000
+): number[] {
+  const wins = new Array(variations.length).fill(0);
+  for (let i = 0; i < simulations; i++) {
+    const winner = thompsonSelect(variations);
+    wins[winner]++;
+  }
+  return wins.map(w => Math.round((w / simulations) * 100));
+}
+
+// ============================================
 // Complete Analysis
 // ============================================
 

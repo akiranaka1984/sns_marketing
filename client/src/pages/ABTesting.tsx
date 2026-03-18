@@ -67,6 +67,7 @@ export default function ABTesting() {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [previewVariations, setPreviewVariations] = useState<any[]>([]);
+  const [adaptiveTestId, setAdaptiveTestId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     agentId: 0,
     name: "",
@@ -76,6 +77,10 @@ export default function ABTesting() {
   });
 
   const utils = trpc.useUtils();
+  const { data: adaptiveData } = trpc.abTesting.getAdaptiveAllocations.useQuery(
+    { testId: adaptiveTestId! },
+    { enabled: adaptiveTestId !== null }
+  );
   const { data: tests = [] } = trpc.abTesting.list.useQuery();
   const { data: agents = [] } = trpc.agents.list.useQuery();
   const { data: learnings = [] } = trpc.abTesting.getLearnings.useQuery();
@@ -103,8 +108,9 @@ export default function ABTesting() {
   });
 
   const analyzeMutation = trpc.abTesting.analyze.useMutation({
-    onSuccess: (result) => {
+    onSuccess: (result, variables) => {
       setAnalysisResult(result as AnalysisResult);
+      setAdaptiveTestId(variables.testId);
       setIsAnalysisOpen(true);
       if (result.winnerId) {
         toast.success(`分析完了！信頼度: ${result.confidence}%`);
@@ -636,6 +642,36 @@ export default function ABTesting() {
                       </ul>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Adaptive Allocation Section */}
+              {adaptiveData && adaptiveData.allocations.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="font-bold flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-sky-400" />
+                    適応配分
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">
+                      Thompson Sampling
+                    </span>
+                  </h4>
+                  <div className="border border-white/[0.06] rounded-lg bg-neutral-900 p-3 space-y-2">
+                    <p className="text-[11px] text-neutral-500 font-bold">各バリエーションが最適である確率（モンテカルロシミュレーション）</p>
+                    {adaptiveData.allocations.map((item) => (
+                      <div key={item.variationId} className="space-y-1">
+                        <div className="flex justify-between text-xs font-bold">
+                          <span className="text-neutral-300">バリエーション {item.variationName}</span>
+                          <span className="text-sky-400">{item.allocation}%</span>
+                        </div>
+                        <div className="h-2 rounded-full bg-neutral-800 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-sky-500 transition-all duration-500"
+                            style={{ width: `${item.allocation}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

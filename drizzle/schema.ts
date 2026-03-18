@@ -240,6 +240,7 @@ export const agents = mysqlTable("agents", {
 	postingTimeSlots: text(),
 	skipReview: tinyint().default(0).notNull(),
 	autoOptimizationSettings: text(), // JSON: { enabled, minEngagementRateThreshold, checkIntervalHours, etc. }
+	imageGenerationEnabled: tinyint().default(0).notNull(), // DALL-E 3 image generation ($0.04-0.08/image)
 },
 (table) => [
 	index("idx_agents_userId").on(table.userId),
@@ -810,6 +811,7 @@ export const scheduledPosts = mysqlTable("scheduled_posts", {
 	postUrl: text(),
 	screenshotUrl: text(),
 	usedLearningIds: text(), // JSON array of learning IDs used for content generation
+	contentPillar: varchar('contentPillar', { length: 50 }), // educational, promotional, engagement, entertainment, curation
 },
 (table) => [
 	index("idx_scheduled_posts_projectId").on(table.projectId),

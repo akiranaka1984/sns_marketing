@@ -46,6 +46,7 @@ import {
   findHighEngagementHashtags,
   extractHashtagsFromUser,
 } from "./x-api-service";
+import { generatePostImage } from "./services/openai";
 // Device readiness check removed (Playwright-based now)
 const ensureDeviceReady = async (_deviceId: string) => ({ ready: true, message: 'Playwright mode' });
 
@@ -969,7 +970,8 @@ ${closingInstruction}`;
 export async function executePost(
   context: AgentContext,
   content: GeneratedContent,
-  accountId: number
+  accountId: number,
+  mediaUrls?: string[]
 ): Promise<PostResult> {
   const { agent } = context;
 
@@ -1026,7 +1028,8 @@ export async function executePost(
       const result = await postToSNS(
         account.platform,
         fullContent,
-        accountId
+        accountId,
+        mediaUrls
       );
 
       if (result.success) {
@@ -1129,8 +1132,18 @@ export async function runAgent(agentId: number, accountId?: number): Promise<{
     // コンテンツを生成（アカウント学習を考慮）
     const content = await generateContent(context, undefined, targetAccountId);
 
+    // 画像生成（imageGenerationEnabled が有効な場合のみ実行）
+    // Cost: DALL-E 3 $0.04-0.08/image — opt-in only
+    let imageUrl: string | null = null;
+    if (context.agent.imageGenerationEnabled) {
+      imageUrl = await generatePostImage(content.content);
+      if (imageUrl) {
+        logger.info({ module: 'agent-engine', agentId: context.agent.id }, 'Image generated for post');
+      }
+    }
+
     // 投稿を実行
-    const result = await executePost(context, content, targetAccountId);
+    const result = await executePost(context, content, targetAccountId, imageUrl ? [imageUrl] : undefined);
 
     // ログを更新
     await db.update(agentExecutionLogs)

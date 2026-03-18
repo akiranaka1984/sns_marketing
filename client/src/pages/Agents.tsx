@@ -36,6 +36,7 @@ type AgentFormData = {
   postingFrequency?: "daily" | "twice_daily" | "three_times_daily" | "weekly" | "custom";
   postingTimeSlots?: string[];
   skipReview?: boolean;
+  imageGenerationEnabled?: boolean;
 };
 
 const initialFormData: AgentFormData = {
@@ -48,6 +49,7 @@ const initialFormData: AgentFormData = {
   postingFrequency: "daily",
   postingTimeSlots: ["09:00"],
   skipReview: false,
+  imageGenerationEnabled: false,
 };
 
 export default function Agents() {
@@ -151,6 +153,7 @@ export default function Agents() {
       postingFrequency: agent.postingFrequency || "daily",
       postingTimeSlots: timeSlots,
       skipReview: agent.skipReview || false,
+      imageGenerationEnabled: agent.imageGenerationEnabled || false,
     });
     setIsEditDialogOpen(true);
   };
@@ -322,6 +325,16 @@ export default function Agents() {
             <Switch
               checked={formData.skipReview || false}
               onCheckedChange={(checked) => setFormData({ ...formData, skipReview: checked })}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="font-bold text-white">画像自動生成</Label>
+              <p className="text-xs text-neutral-500 font-bold">DALL-E 3で投稿画像を自動生成（1枚 $0.04〜$0.08）</p>
+            </div>
+            <Switch
+              checked={formData.imageGenerationEnabled || false}
+              onCheckedChange={(checked) => setFormData({ ...formData, imageGenerationEnabled: checked })}
             />
           </div>
           <div className="grid gap-2">

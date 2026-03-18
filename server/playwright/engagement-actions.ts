@@ -21,6 +21,7 @@ import { accounts, proxies, interactionSettings } from '../../drizzle/schema';
 import { eq } from 'drizzle-orm';
 
 import { createLogger } from "../utils/logger";
+import { humanPause } from "../utils/human-delay";
 
 const logger = createLogger("engagement-actions");
 
@@ -30,7 +31,10 @@ export interface EngagementResult {
   error?: string;
 }
 
-// Random delay for human-like behavior
+/**
+ * @deprecated Use humanPause from '../utils/human-delay' instead.
+ * Kept for backward compatibility.
+ */
 function randomDelay(minMs: number, maxMs: number): Promise<void> {
   const delay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
   return new Promise(resolve => setTimeout(resolve, delay));
@@ -132,7 +136,7 @@ export async function likePostViaPlaywright(
       // Click like button
       setOperationStatus(accountId, 'like', 'clicking_like');
       await likeBtn.waitFor({ state: 'visible', timeout: 5_000 });
-      await randomDelay(300, 800);
+      await humanPause(300, 800);
       await likeBtn.click();
       await page.waitForTimeout(INTER_ACTION_DELAY);
 
@@ -197,7 +201,7 @@ export async function commentPostViaPlaywright(
       setOperationStatus(accountId, 'comment', 'clicking_reply');
       const replyBtn = page.locator(`${X_SELECTORS.tweetArticle} ${X_SELECTORS.replyButton}`).first();
       await replyBtn.waitFor({ state: 'visible', timeout: 5_000 });
-      await randomDelay(300, 800);
+      await humanPause(300, 800);
       await replyBtn.click();
       await page.waitForTimeout(INTER_ACTION_DELAY);
 
@@ -214,7 +218,7 @@ export async function commentPostViaPlaywright(
       setOperationStatus(accountId, 'comment', 'submitting_comment');
       const submitBtn = page.locator(X_SELECTORS.replySubmitButton);
       await submitBtn.waitFor({ state: 'visible', timeout: 5_000 });
-      await randomDelay(300, 800);
+      await humanPause(300, 800);
       await submitBtn.click();
 
       // Wait for the dialog to close or toast to appear
@@ -294,7 +298,7 @@ export async function followUserViaPlaywright(
       setOperationStatus(accountId, 'follow', 'clicking_follow');
       const followBtn = page.locator(X_SELECTORS.followButton).first();
       await followBtn.waitFor({ state: 'visible', timeout: 5_000 });
-      await randomDelay(500, 1200);
+      await humanPause(500, 1200);
       await followBtn.click();
       await page.waitForTimeout(INTER_ACTION_DELAY);
 
@@ -368,14 +372,14 @@ export async function unfollowUserViaPlaywright(
 
       // Click unfollow button (this shows a confirmation modal)
       setOperationStatus(accountId, 'unfollow', 'clicking_unfollow');
-      await randomDelay(500, 1200);
+      await humanPause(500, 1200);
       await unfollowBtn.click();
       await page.waitForTimeout(INTER_ACTION_DELAY);
 
       // Click confirm in the modal
       const confirmBtn = page.locator(X_SELECTORS.unfollowConfirm);
       await confirmBtn.waitFor({ state: 'visible', timeout: 5_000 });
-      await randomDelay(300, 600);
+      await humanPause(300, 600);
       await confirmBtn.click();
       await page.waitForTimeout(INTER_ACTION_DELAY);
 
@@ -449,14 +453,14 @@ export async function retweetPostViaPlaywright(
       setOperationStatus(accountId, 'retweet', 'clicking_retweet');
       const retweetBtn = page.locator(`${X_SELECTORS.tweetArticle} ${X_SELECTORS.retweetButton}`).first();
       await retweetBtn.waitFor({ state: 'visible', timeout: 5_000 });
-      await randomDelay(300, 800);
+      await humanPause(300, 800);
       await retweetBtn.click();
       await page.waitForTimeout(INTER_ACTION_DELAY);
 
       // Click confirm retweet in the menu
       const confirmBtn = page.locator(X_SELECTORS.retweetConfirm);
       await confirmBtn.waitFor({ state: 'visible', timeout: 5_000 });
-      await randomDelay(200, 500);
+      await humanPause(200, 500);
       await confirmBtn.click();
       await page.waitForTimeout(INTER_ACTION_DELAY);
 
