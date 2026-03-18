@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
+import { ApiErrorFallback } from "@/components/ApiErrorFallback";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Plus,
@@ -121,14 +122,30 @@ function DashboardSkeleton() {
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { data: accounts, isLoading: accountsLoading } = trpc.accounts.list.useQuery(undefined, {
+  const {
+    data: accounts,
+    isLoading: accountsLoading,
+    isError: accountsError,
+    error: accountsErr,
+    refetch: refetchAccounts,
+  } = trpc.accounts.list.useQuery(undefined, {
     refetchInterval: 60000,
   });
-  const { data: recentLogs, isLoading: logsLoading } = trpc.logs.recent.useQuery(
+  const {
+    data: recentLogs,
+    isLoading: logsLoading,
+    isError: logsError,
+    refetch: refetchLogs,
+  } = trpc.logs.recent.useQuery(
     { limit: 10 },
     { refetchInterval: 60000 }
   );
-  const { data: postStats, isLoading: statsLoading } = trpc.scheduledPosts.getStats.useQuery(
+  const {
+    data: postStats,
+    isLoading: statsLoading,
+    isError: statsError,
+    refetch: refetchStats,
+  } = trpc.scheduledPosts.getStats.useQuery(
     { days: 30 },
     { refetchInterval: 60000 }
   );
@@ -137,6 +154,22 @@ export default function Dashboard() {
 
   if (isLoading) {
     return <DashboardSkeleton />;
+  }
+
+  // All three queries failed — show a full-page error fallback
+  if (accountsError && logsError && statsError) {
+    return (
+      <div className="min-h-full max-w-[1100px]">
+        <ApiErrorFallback
+          error={accountsErr}
+          onRetry={() => {
+            void refetchAccounts();
+            void refetchLogs();
+            void refetchStats();
+          }}
+        />
+      </div>
+    );
   }
 
   const activeAccounts = accounts?.filter(a => a.status === "active").length || 0;
@@ -305,6 +338,13 @@ export default function Dashboard() {
                   </div>
                 ))}
               </div>
+            ) : accountsError ? (
+              <ApiErrorFallback
+                title="アカウントを読み込めませんでした"
+                error={accountsErr}
+                onRetry={() => void refetchAccounts()}
+                size="compact"
+              />
             ) : accounts && accounts.length > 0 ? (
               <div className="divide-y divide-white/[0.04]">
                 {accounts.slice(0, 6).map((account) => (
@@ -386,6 +426,12 @@ export default function Dashboard() {
                     </div>
                   ))}
                 </div>
+              ) : logsError ? (
+                <ApiErrorFallback
+                  title="アクティビティを読み込めませんでした"
+                  onRetry={() => void refetchLogs()}
+                  size="compact"
+                />
               ) : recentLogs && recentLogs.length > 0 ? (
                 <div className="divide-y divide-white/[0.04]">
                   {recentLogs.slice(0, 5).map((log) => {

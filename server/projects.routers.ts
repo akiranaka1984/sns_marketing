@@ -335,14 +335,16 @@ export const projectsRouter = router({
       mediaUrls: z.string().optional(),
       hashtags: z.string().optional(),
       scheduledAt: z.string().optional(),
-      status: z.enum(['draft', 'scheduled', 'published', 'failed']).optional(),
+      // Status values must match the scheduledPosts table enum
+      status: z.enum(['pending', 'posted', 'failed', 'cancelled']).optional(),
     }))
     .mutation(async ({ input }) => {
-      const { id, ...data } = input;
-      
+      const { id, scheduledAt, ...data } = input;
+
       const updateData: any = { ...data };
-      if (data.scheduledAt) {
-        updateData.scheduledAt = new Date(data.scheduledAt);
+      // Map scheduledAt input to the correct column name: scheduledTime
+      if (scheduledAt) {
+        updateData.scheduledTime = scheduledAt;
       }
 
       await db.updatePost(id, updateData);
