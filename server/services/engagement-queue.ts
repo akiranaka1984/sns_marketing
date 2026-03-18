@@ -343,7 +343,7 @@ export async function addToQueue(task: {
     isActive: 1,
   });
 
-  return (result as any).insertId;
+  return result.insertId;
 }
 
 /**
@@ -391,7 +391,7 @@ export async function cleanupOldTasks(daysOld: number = 7): Promise<number> {
       )
     );
 
-  return (result as any)[0]?.affectedRows || 0;
+  return (result as { affectedRows?: number }[])[0]?.affectedRows || 0;
 }
 
 /**
