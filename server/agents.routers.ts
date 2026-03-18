@@ -889,7 +889,9 @@ Make each persona unique and engaging. Consider different niches, demographics, 
             ...DEFAULT_AUTO_OPTIMIZATION_SETTINGS,
             ...JSON.parse(agentData.autoOptimizationSettings),
           };
-        } catch (e) {}
+        } catch {
+          // Invalid JSON in autoOptimizationSettings — use defaults
+        }
       }
 
       const newSettings: AutoOptimizationSettings = {
