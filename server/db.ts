@@ -165,43 +165,63 @@ export async function getAllAccounts(userId: number) {
 }
 
 export async function getAccountsByUserId(userId: number) {
-  return await db
-    .select({
-      id: schema.accounts.id,
-      userId: schema.accounts.userId,
-      platform: schema.accounts.platform,
-      username: schema.accounts.username,
-      password: schema.accounts.password,
-      xHandle: schema.accounts.xHandle,
-      status: schema.accounts.status,
-      deviceId: schema.accounts.deviceId,
-      proxyId: schema.accounts.proxyId,
-      lastLoginAt: schema.accounts.lastLoginAt,
-      createdAt: schema.accounts.createdAt,
-      updatedAt: schema.accounts.updatedAt,
-      // Persona settings
-      persona: schema.accounts.persona,
-      personaRole: schema.accounts.personaRole,
-      personaTone: schema.accounts.personaTone,
-      personaCharacteristics: schema.accounts.personaCharacteristics,
-      // Plan / posting method
-      planType: schema.accounts.planType,
-      postingMethod: schema.accounts.postingMethod,
-      // Session state
-      sessionStatus: schema.accounts.sessionStatus,
-      // Growth system
-      experiencePoints: schema.accounts.experiencePoints,
-      level: schema.accounts.level,
-      totalLearningsCount: schema.accounts.totalLearningsCount,
-      // OAuth
-      oauthTokenStatus: schema.accounts.oauthTokenStatus,
-      oauthConnectedAt: schema.accounts.oauthConnectedAt,
-      oauthUsername: schema.accounts.oauthUsername,
-      proxy: schema.proxies,
-    })
-    .from(schema.accounts)
-    .leftJoin(schema.proxies, eq(schema.accounts.proxyId, schema.proxies.id))
-    .where(eq(schema.accounts.userId, userId));
+  try {
+    // Try full select with all columns (works after migrations)
+    return await db
+      .select({
+        id: schema.accounts.id,
+        userId: schema.accounts.userId,
+        platform: schema.accounts.platform,
+        username: schema.accounts.username,
+        password: schema.accounts.password,
+        xHandle: schema.accounts.xHandle,
+        status: schema.accounts.status,
+        deviceId: schema.accounts.deviceId,
+        proxyId: schema.accounts.proxyId,
+        lastLoginAt: schema.accounts.lastLoginAt,
+        createdAt: schema.accounts.createdAt,
+        updatedAt: schema.accounts.updatedAt,
+        persona: schema.accounts.persona,
+        personaRole: schema.accounts.personaRole,
+        personaTone: schema.accounts.personaTone,
+        personaCharacteristics: schema.accounts.personaCharacteristics,
+        planType: schema.accounts.planType,
+        postingMethod: schema.accounts.postingMethod,
+        sessionStatus: schema.accounts.sessionStatus,
+        experiencePoints: schema.accounts.experiencePoints,
+        level: schema.accounts.level,
+        totalLearningsCount: schema.accounts.totalLearningsCount,
+        oauthTokenStatus: schema.accounts.oauthTokenStatus,
+        oauthConnectedAt: schema.accounts.oauthConnectedAt,
+        oauthUsername: schema.accounts.oauthUsername,
+        proxy: schema.proxies,
+      })
+      .from(schema.accounts)
+      .leftJoin(schema.proxies, eq(schema.accounts.proxyId, schema.proxies.id))
+      .where(eq(schema.accounts.userId, userId));
+  } catch (err: any) {
+    if (err?.message?.includes('Unknown column')) {
+      // Fallback: use raw SQL with only core columns that always exist
+      logger.warn('getAccountsByUserId: falling back to core columns (new columns not yet migrated)');
+      const [rows] = await connection.query(
+        `SELECT a.*, p.id as proxy_id, p.host as proxy_host, p.port as proxy_port, p.username as proxy_username, p.type as proxy_type
+         FROM accounts a LEFT JOIN proxies p ON a.proxyId = p.id WHERE a.userId = ?`,
+        [userId]
+      );
+      return (rows as any[]).map(row => ({
+        ...row,
+        postingMethod: row.postingMethod || 'playwright',
+        sessionStatus: row.sessionStatus || 'needs_login',
+        planType: row.planType || 'free',
+        experiencePoints: row.experiencePoints || 0,
+        level: row.level || 1,
+        totalLearningsCount: row.totalLearningsCount || 0,
+        oauthTokenStatus: row.oauthTokenStatus || 'not_connected',
+        proxy: row.proxy_id ? { id: row.proxy_id, host: row.proxy_host, port: row.proxy_port, username: row.proxy_username, type: row.proxy_type } : null,
+      }));
+    }
+    throw err;
+  }
 }
 
 export async function getAccountById(accountId: number) {
@@ -253,10 +273,24 @@ export async function updateAccount(accountId: number, data: Partial<schema.Inse
   if (securedData.password) {
     securedData.password = ensureEncrypted(securedData.password);
   }
-  await db
-    .update(schema.accounts)
-    .set({ ...securedData, updatedAt: new Date().toISOString() })
-    .where(eq(schema.accounts.id, accountId));
+  try {
+    await db
+      .update(schema.accounts)
+      .set({ ...securedData, updatedAt: new Date().toISOString() })
+      .where(eq(schema.accounts.id, accountId));
+  } catch (err: any) {
+    // If column doesn't exist yet, retry with only core fields
+    if (err?.message?.includes('Unknown column')) {
+      const { postingMethod, sessionStatus, planType, personaRole, personaTone, personaCharacteristics, experiencePoints, level, totalLearningsCount, oauthAccessToken, oauthAccessTokenSecret, oauthTokenStatus, oauthConnectedAt, oauthUsername, xHandle, ...coreData } = securedData;
+      await db
+        .update(schema.accounts)
+        .set({ ...coreData, updatedAt: new Date().toISOString() })
+        .where(eq(schema.accounts.id, accountId));
+      logger.warn(`updateAccount: retried without new columns for account ${accountId}`);
+    } else {
+      throw err;
+    }
+  }
 }
 
 export async function updateAccountStatus(accountId: number, status: 'pending' | 'active' | 'suspended' | 'failed', deviceId?: string) {
@@ -1142,23 +1176,73 @@ const STARTUP_MIGRATIONS: string[] = [
 ];
 
 /**
+ * Check if a column exists in a table using INFORMATION_SCHEMA.
+ */
+async function columnExists(table: string, column: string): Promise<boolean> {
+  const [rows] = await connection.query(
+    `SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?`,
+    [table, column]
+  );
+  return (rows as any)[0]?.cnt > 0;
+}
+
+/**
+ * Check if a table exists using INFORMATION_SCHEMA.
+ */
+async function tableExists(table: string): Promise<boolean> {
+  const [rows] = await connection.query(
+    `SELECT COUNT(*) as cnt FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?`,
+    [table]
+  );
+  return (rows as any)[0]?.cnt > 0;
+}
+
+/**
  * Run idempotent startup migrations to ensure all columns exist in the DB.
- * Each statement uses IF NOT EXISTS so it is safe to run on every boot.
- * Errors on individual statements are logged but do not abort startup.
+ * Uses INFORMATION_SCHEMA checks for MySQL compatibility (no IF NOT EXISTS needed).
  */
 export async function runStartupMigrations(): Promise<void> {
   logger.info('Running startup migrations...');
 
-  for (const sql of STARTUP_MIGRATIONS) {
+  // Add missing columns to accounts table
+  const accountColumns: [string, string][] = [
+    ['postingMethod', "enum('duoplus','playwright','api_v2') NOT NULL DEFAULT 'playwright'"],
+    ['sessionStatus', "enum('active','expired','needs_login') NOT NULL DEFAULT 'needs_login'"],
+    ['experiencePoints', "int NOT NULL DEFAULT 0"],
+    ['level', "int NOT NULL DEFAULT 1"],
+    ['totalLearningsCount', "int NOT NULL DEFAULT 0"],
+    ['oauthAccessToken', "varchar(500) NULL"],
+    ['oauthAccessTokenSecret', "varchar(500) NULL"],
+    ['oauthTokenStatus', "enum('not_connected','active','expired','revoked') NOT NULL DEFAULT 'not_connected'"],
+    ['oauthConnectedAt', "timestamp NULL"],
+    ['oauthUsername', "varchar(100) NULL"],
+    ['personaRole', "varchar(255) NULL"],
+    ['personaTone', "enum('formal','casual','friendly','professional','humorous') NULL"],
+    ['personaCharacteristics', "text NULL"],
+    ['planType', "enum('free','premium','premium_plus') NOT NULL DEFAULT 'free'"],
+    ['xHandle', "varchar(255) NULL"],
+  ];
+
+  for (const [col, def] of accountColumns) {
     try {
-      await connection.query(sql);
+      if (!(await columnExists('accounts', col))) {
+        await connection.query(`ALTER TABLE \`accounts\` ADD COLUMN \`${col}\` ${def}`);
+        logger.info(`Added column accounts.${col}`);
+      }
     } catch (err: any) {
-      // Duplicate column / key errors (MySQL error 1060, 1061) are harmless —
-      // the column / key already exists (e.g. old MySQL version without IF NOT EXISTS).
-      if (err?.errno === 1060 || err?.errno === 1061) {
-        // Already exists — this is fine; continue silently.
-      } else {
-        logger.warn({ err: err?.message, sql: sql.slice(0, 80) }, 'Startup migration statement failed (non-fatal)');
+      if (err?.errno !== 1060) {
+        logger.warn({ err: err?.message }, `Failed to add accounts.${col}`);
+      }
+    }
+  }
+
+  // Create tables if they don't exist
+  for (const stmt of STARTUP_MIGRATIONS.filter(s => s.trim().startsWith('CREATE'))) {
+    try {
+      await connection.query(stmt);
+    } catch (err: any) {
+      if (err?.errno !== 1050) { // 1050 = table already exists
+        logger.warn({ err: err?.message, sql: stmt.slice(0, 80) }, 'CREATE TABLE failed');
       }
     }
   }
