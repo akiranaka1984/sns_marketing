@@ -6,8 +6,8 @@
  */
 
 import { db } from "./db";
-import { engagementTasks, engagementLogs, accounts } from "../drizzle/schema";
-import { eq, and, lt, or, isNull } from "drizzle-orm";
+import { engagementTasks, engagementLogs, accounts, freezeDetections } from "../drizzle/schema";
+import { eq, and, lt, or, isNull, desc, gte } from "drizzle-orm";
 import { detectFreeze, handleFreeze } from "./freeze-detection";
 import {
   likePostViaPlaywright,
@@ -18,6 +18,9 @@ import {
   getEngagementRateLimits,
 } from "./playwright/engagement-actions";
 import { humanPause } from "./utils/human-delay";
+import { createLogger } from "./utils/logger";
+
+const logger = createLogger("auto-engagement");
 
 /**
  * Execute pending engagement tasks
@@ -52,6 +55,11 @@ export async function executeEngagementTasks() {
   return results;
 }
 
+/** Convert Date to MySQL-compatible timestamp string */
+function toMySQLTimestamp(date: Date): string {
+  return date.toISOString().slice(0, 19).replace("T", " ");
+}
+
 /**
  * Check if task should be executed based on frequency and last execution
  */
@@ -60,7 +68,7 @@ async function shouldExecuteTask(task: any): Promise<boolean> {
     return true; // Never executed, should execute
   }
 
-  // Get logs for today
+  // Get logs for today using MySQL-compatible timestamp format
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -68,7 +76,7 @@ async function shouldExecuteTask(task: any): Promise<boolean> {
     where: and(
       eq(engagementLogs.taskId, task.id),
       eq(engagementLogs.status, "success"),
-      gte(engagementLogs.createdAt, today.toISOString())
+      gte(engagementLogs.createdAt, toMySQLTimestamp(today))
     ),
   });
 
@@ -80,8 +88,10 @@ async function shouldExecuteTask(task: any): Promise<boolean> {
   // Check if enough time has passed since last execution
   // Distribute actions evenly throughout the day
   const minutesBetweenActions = (24 * 60) / task.frequency;
+  // lastExecutedAt is stored as a MySQL timestamp string; convert to Date first
+  const lastExecutedDate = new Date(task.lastExecutedAt);
   const minutesSinceLastExecution =
-    (Date.now() - task.lastExecutedAt.getTime()) / (60 * 1000);
+    (Date.now() - lastExecutedDate.getTime()) / (60 * 1000);
 
   return minutesSinceLastExecution >= minutesBetweenActions;
 }
@@ -150,7 +160,7 @@ async function executeTask(task: any): Promise<{
     // Update last executed time
     await db
       .update(engagementTasks)
-      .set({ lastExecutedAt: new Date().toISOString() })
+      .set({ lastExecutedAt: toMySQLTimestamp(new Date()) })
       .where(eq(engagementTasks.id, task.id));
 
     if (!result.success && result.error) {
@@ -334,14 +344,6 @@ async function executeRetweet(
   const result = await retweetPostViaPlaywright(account.id, task.targetPost);
   return { success: result.success, error: result.error };
 }
-
-// Import missing dependencies
-import { freezeDetections } from "../drizzle/schema";
-import { desc, gte } from "drizzle-orm";
-
-import { createLogger } from "./utils/logger";
-
-const logger = createLogger("auto-engagement");
 
 /**
  * Register auto-engagement as a BullMQ repeatable job.

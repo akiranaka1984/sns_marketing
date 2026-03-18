@@ -17,8 +17,12 @@ import {
   analytics,
 } from "../../drizzle/schema";
 import { eq, and, desc, gte, lt, sql, asc, isNull } from "drizzle-orm";
-
 import { createLogger } from "../utils/logger";
+
+/** Convert Date to MySQL-compatible timestamp string */
+function toMySQLTimestamp(date: Date): string {
+  return date.toISOString().slice(0, 19).replace("T", " ");
+}
 
 const logger = createLogger("engagement-queue");
 
@@ -75,7 +79,7 @@ export async function getNextTasks(
   const todayLogs = await db.query.engagementLogs.findMany({
     where: and(
       eq(engagementLogs.accountId, accountId),
-      gte(engagementLogs.createdAt, today.toISOString())
+      gte(engagementLogs.createdAt, toMySQLTimestamp(today))
     ),
   });
 
@@ -241,7 +245,7 @@ export async function getQueueStats(
   const todayLogs = await db.query.engagementLogs.findMany({
     where: and(
       eq(engagementLogs.accountId, accountId),
-      gte(engagementLogs.createdAt, today.toISOString())
+      gte(engagementLogs.createdAt, toMySQLTimestamp(today))
     ),
   });
 
@@ -275,7 +279,7 @@ export async function getFollowBackStats(
       eq(engagementLogs.accountId, accountId),
       eq(engagementLogs.taskType, "follow"),
       eq(engagementLogs.status, "success"),
-      gte(engagementLogs.createdAt, startDate.toISOString())
+      gte(engagementLogs.createdAt, toMySQLTimestamp(startDate))
     ),
   });
 
@@ -283,7 +287,7 @@ export async function getFollowBackStats(
   const analyticsData = await db.query.analytics.findMany({
     where: and(
       eq(analytics.accountId, accountId),
-      gte(analytics.recordedAt, startDate.toISOString())
+      gte(analytics.recordedAt, toMySQLTimestamp(startDate))
     ),
     orderBy: [asc(analytics.recordedAt)],
   });
@@ -387,11 +391,11 @@ export async function cleanupOldTasks(daysOld: number = 7): Promise<number> {
     .where(
       and(
         eq(engagementTasks.isActive, 0),
-        lt(engagementTasks.updatedAt, cutoff.toISOString())
+        lt(engagementTasks.updatedAt, toMySQLTimestamp(cutoff))
       )
     );
 
-  return (result as { affectedRows?: number }[])[0]?.affectedRows || 0;
+  return (result as unknown as { affectedRows?: number })?.affectedRows || 0;
 }
 
 /**
