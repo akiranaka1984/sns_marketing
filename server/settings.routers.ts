@@ -17,15 +17,24 @@ export const settingsRouter = router({
    * Get saved API keys from database
    */
   getApiKeys: protectedProcedure.query(async () => {
-    const openaiApiKey = await getSetting('OPENAI_API_KEY');
-    const anthropicApiKey = await getSetting('ANTHROPIC_API_KEY');
-    const llmProvider = await getSetting('LLM_PROVIDER');
+    try {
+      const openaiApiKey = await getSetting('OPENAI_API_KEY');
+      const anthropicApiKey = await getSetting('ANTHROPIC_API_KEY');
+      const llmProvider = await getSetting('LLM_PROVIDER');
 
-    return {
-      openaiApiKey: openaiApiKey || '',
-      anthropicApiKey: anthropicApiKey || '',
-      llmProvider: (llmProvider || 'openai') as 'openai' | 'anthropic',
-    };
+      return {
+        openaiApiKey: openaiApiKey || '',
+        anthropicApiKey: anthropicApiKey || '',
+        llmProvider: (llmProvider || 'openai') as 'openai' | 'anthropic',
+      };
+    } catch (error) {
+      logger.error('[Settings] Error fetching API keys:', error);
+      return {
+        openaiApiKey: '',
+        anthropicApiKey: '',
+        llmProvider: 'openai' as const,
+      };
+    }
   }),
 
   /**

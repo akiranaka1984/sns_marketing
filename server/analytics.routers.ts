@@ -1,11 +1,14 @@
 import { z } from "zod";
-import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { postAnalytics, accounts, scheduledPosts, hashtagPerformance, modelAccounts, modelAccountBehaviorPatterns } from "../drizzle/schema";
 import { db } from "./db";
-import { eq, and, gte, lte, desc, sql, inArray, asc } from "drizzle-orm";
-import { getTopHashtags, getHashtagCombinations, compareWithModelAccountHashtags } from "./services/hashtag-analyzer";
+import { eq, and, gte, lte, desc, sql, inArray } from "drizzle-orm";
+import { getTopHashtags, compareWithModelAccountHashtags } from "./services/hashtag-analyzer";
 import { getFunnelData, getPostFunnelContribution } from "./services/funnel-tracker";
+import { createLogger } from "./utils/logger";
+
+const logger = createLogger("analytics.routers");
 
 /** Convert Date to MySQL-compatible timestamp string */
 function toMySQLTimestamp(date: Date): string {
@@ -24,87 +27,87 @@ export const analyticsRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const userId = ctx.user.id;
+      try {
+        const userId = ctx.user.id;
 
-      // Get all user accounts
-      const userAccounts = await db
-        .select()
-        .from(accounts)
-        .where(eq(accounts.userId, userId));
+        // Get all user accounts
+        const userAccounts = await db
+          .select()
+          .from(accounts)
+          .where(eq(accounts.userId, userId));
 
-      const accountIds = userAccounts.map((acc) => acc.id);
+        const accountIds = userAccounts.map((acc) => acc.id);
 
-      if (accountIds.length === 0) {
-        return {
-          totalPosts: 0,
-          totalViews: 0,
-          totalLikes: 0,
-          totalComments: 0,
-          totalShares: 0,
-          avgEngagementRate: 0,
-          accountPerformance: [],
-        };
-      }
-
-      // Build date filter
-      let dateFilter = sql`1=1`;
-      if (input.startDate) {
-        dateFilter = and(
-          dateFilter,
-          gte(postAnalytics.recordedAt, toMySQLTimestamp(new Date(input.startDate)))
-        )!;
-      }
-      if (input.endDate) {
-        dateFilter = and(
-          dateFilter,
-          lte(postAnalytics.recordedAt, toMySQLTimestamp(new Date(input.endDate)))
-        )!;
-      }
-
-      // Get aggregated analytics
-      const analytics = await db
-        .select({
-          accountId: postAnalytics.accountId,
-          totalPosts: sql<number>`COUNT(*)`,
-          totalViews: sql<number>`SUM(${postAnalytics.viewsCount})`,
-          totalLikes: sql<number>`SUM(${postAnalytics.likesCount})`,
-          totalComments: sql<number>`SUM(${postAnalytics.commentsCount})`,
-          totalShares: sql<number>`SUM(${postAnalytics.sharesCount})`,
-          avgEngagementRate: sql<number>`AVG(${postAnalytics.engagementRate})`,
-        })
-        .from(postAnalytics)
-        .where(and(inArray(postAnalytics.accountId, accountIds), dateFilter))
-        .groupBy(postAnalytics.accountId);
-
-      // Calculate totals
-      const totals = analytics.reduce(
-        (acc, curr) => ({
-          totalPosts: acc.totalPosts + Number(curr.totalPosts),
-          totalViews: acc.totalViews + Number(curr.totalViews || 0),
-          totalLikes: acc.totalLikes + Number(curr.totalLikes || 0),
-          totalComments: acc.totalComments + Number(curr.totalComments || 0),
-          totalShares: acc.totalShares + Number(curr.totalShares || 0),
-          avgEngagementRate:
-            acc.avgEngagementRate + Number(curr.avgEngagementRate || 0),
-        }),
-        {
-          totalPosts: 0,
-          totalViews: 0,
-          totalLikes: 0,
-          totalComments: 0,
-          totalShares: 0,
-          avgEngagementRate: 0,
+        if (accountIds.length === 0) {
+          return {
+            totalPosts: 0,
+            totalViews: 0,
+            totalLikes: 0,
+            totalComments: 0,
+            totalShares: 0,
+            avgEngagementRate: 0,
+            accountPerformance: [],
+          };
         }
-      );
 
-      // Calculate average engagement rate
-      if (analytics.length > 0) {
-        totals.avgEngagementRate = totals.avgEngagementRate / analytics.length;
-      }
+        // Build date filter
+        let dateFilter = sql`1=1`;
+        if (input.startDate) {
+          dateFilter = and(
+            dateFilter,
+            gte(postAnalytics.recordedAt, toMySQLTimestamp(new Date(input.startDate)))
+          )!;
+        }
+        if (input.endDate) {
+          dateFilter = and(
+            dateFilter,
+            lte(postAnalytics.recordedAt, toMySQLTimestamp(new Date(input.endDate)))
+          )!;
+        }
 
-      // Get account performance details
-      const accountPerformance = await Promise.all(
-        analytics.map(async (analytic) => {
+        // Get aggregated analytics
+        const analytics = await db
+          .select({
+            accountId: postAnalytics.accountId,
+            totalPosts: sql<number>`COUNT(*)`,
+            totalViews: sql<number>`SUM(${postAnalytics.viewsCount})`,
+            totalLikes: sql<number>`SUM(${postAnalytics.likesCount})`,
+            totalComments: sql<number>`SUM(${postAnalytics.commentsCount})`,
+            totalShares: sql<number>`SUM(${postAnalytics.sharesCount})`,
+            avgEngagementRate: sql<number>`AVG(${postAnalytics.engagementRate})`,
+          })
+          .from(postAnalytics)
+          .where(and(inArray(postAnalytics.accountId, accountIds), dateFilter))
+          .groupBy(postAnalytics.accountId);
+
+        // Calculate totals
+        const totals = analytics.reduce(
+          (acc, curr) => ({
+            totalPosts: acc.totalPosts + Number(curr.totalPosts),
+            totalViews: acc.totalViews + Number(curr.totalViews || 0),
+            totalLikes: acc.totalLikes + Number(curr.totalLikes || 0),
+            totalComments: acc.totalComments + Number(curr.totalComments || 0),
+            totalShares: acc.totalShares + Number(curr.totalShares || 0),
+            avgEngagementRate:
+              acc.avgEngagementRate + Number(curr.avgEngagementRate || 0),
+          }),
+          {
+            totalPosts: 0,
+            totalViews: 0,
+            totalLikes: 0,
+            totalComments: 0,
+            totalShares: 0,
+            avgEngagementRate: 0,
+          }
+        );
+
+        // Calculate average engagement rate
+        if (analytics.length > 0) {
+          totals.avgEngagementRate = totals.avgEngagementRate / analytics.length;
+        }
+
+        // Get account performance details
+        const accountPerformance = analytics.map((analytic) => {
           const account = userAccounts.find((acc) => acc.id === analytic.accountId);
           return {
             accountId: analytic.accountId,
@@ -117,14 +120,25 @@ export const analyticsRouter = router({
             totalShares: Number(analytic.totalShares || 0),
             avgEngagementRate: Number(analytic.avgEngagementRate || 0) / 100, // Convert back to percentage
           };
-        })
-      );
+        });
 
-      return {
-        ...totals,
-        avgEngagementRate: totals.avgEngagementRate / 100, // Convert back to percentage
-        accountPerformance,
-      };
+        return {
+          ...totals,
+          avgEngagementRate: totals.avgEngagementRate / 100, // Convert back to percentage
+          accountPerformance,
+        };
+      } catch (error) {
+        logger.error('[Analytics] getOverview error:', error);
+        return {
+          totalPosts: 0,
+          totalViews: 0,
+          totalLikes: 0,
+          totalComments: 0,
+          totalShares: 0,
+          avgEngagementRate: 0,
+          accountPerformance: [],
+        };
+      }
     }),
 
   /**
@@ -140,60 +154,63 @@ export const analyticsRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const userId = ctx.user.id;
+      try {
+        const userId = ctx.user.id;
 
-      // Verify account ownership if accountId is provided
-      if (input.accountId) {
-        const account = await db
-          .select()
-          .from(accounts)
-          .where(and(eq(accounts.id, input.accountId), eq(accounts.userId, userId)))
-          .limit(1);
+        // Verify account ownership if accountId is provided
+        if (input.accountId) {
+          const account = await db
+            .select()
+            .from(accounts)
+            .where(and(eq(accounts.id, input.accountId), eq(accounts.userId, userId)))
+            .limit(1);
 
-        if (account.length === 0) {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Account not found or access denied",
-          });
+          if (account.length === 0) {
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: "Account not found or access denied",
+            });
+          }
         }
-      }
 
-      // Build query
-      // Build date column for grouping using proper SQL template
-      const dateColumn = sql<string>`DATE(\`recordedAt\`)`;
+        // Build date column for grouping using proper SQL template
+        const dateColumn = sql<string>`DATE(\`recordedAt\`)`;
 
-      let query = db
-        .select({
-          date: dateColumn,
-          views: sql<number>`SUM(\`viewsCount\`)`,
-          likes: sql<number>`SUM(\`likesCount\`)`,
-          comments: sql<number>`SUM(\`commentsCount\`)`,
-          shares: sql<number>`SUM(\`sharesCount\`)`,
-          engagementRate: sql<number>`AVG(\`engagementRate\`)`,
-        })
-        .from(postAnalytics)
-        .where(
-          and(
-            gte(postAnalytics.recordedAt, toMySQLTimestamp(new Date(input.startDate))),
-            lte(postAnalytics.recordedAt, toMySQLTimestamp(new Date(input.endDate))),
-            input.accountId
-              ? eq(postAnalytics.accountId, input.accountId)
-              : undefined
+        const results = await db
+          .select({
+            date: dateColumn,
+            views: sql<number>`SUM(\`viewsCount\`)`,
+            likes: sql<number>`SUM(\`likesCount\`)`,
+            comments: sql<number>`SUM(\`commentsCount\`)`,
+            shares: sql<number>`SUM(\`sharesCount\`)`,
+            engagementRate: sql<number>`AVG(\`engagementRate\`)`,
+          })
+          .from(postAnalytics)
+          .where(
+            and(
+              gte(postAnalytics.recordedAt, toMySQLTimestamp(new Date(input.startDate))),
+              lte(postAnalytics.recordedAt, toMySQLTimestamp(new Date(input.endDate))),
+              input.accountId
+                ? eq(postAnalytics.accountId, input.accountId)
+                : undefined
+            )
           )
-        )
-        .groupBy(dateColumn)
-        .orderBy(dateColumn);
+          .groupBy(dateColumn)
+          .orderBy(dateColumn);
 
-      const results = await query;
-
-      return results.map((row) => ({
-        date: row.date,
-        views: Number(row.views || 0),
-        likes: Number(row.likes || 0),
-        comments: Number(row.comments || 0),
-        shares: Number(row.shares || 0),
-        engagementRate: Number(row.engagementRate || 0) / 100,
-      }));
+        return results.map((row) => ({
+          date: row.date,
+          views: Number(row.views || 0),
+          likes: Number(row.likes || 0),
+          comments: Number(row.comments || 0),
+          shares: Number(row.shares || 0),
+          engagementRate: Number(row.engagementRate || 0) / 100,
+        }));
+      } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        logger.error('[Analytics] getTimeSeries error:', error);
+        return [];
+      }
     }),
 
   /**
@@ -208,100 +225,73 @@ export const analyticsRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const userId = ctx.user.id;
+      try {
+        const userId = ctx.user.id;
 
-      // Get user accounts
-      const userAccounts = await db
-        .select()
-        .from(accounts)
-        .where(eq(accounts.userId, userId));
+        // Get user accounts
+        const userAccounts = await db
+          .select()
+          .from(accounts)
+          .where(eq(accounts.userId, userId));
 
-      const accountIds = input.accountId
-        ? [input.accountId]
-        : userAccounts.map((acc) => acc.id);
+        const accountIds = input.accountId
+          ? [input.accountId]
+          : userAccounts.map((acc) => acc.id);
 
-      if (accountIds.length === 0) {
+        if (accountIds.length === 0) {
+          return [];
+        }
+
+        // Get top posts based on sort criteria
+        let orderCol = desc(postAnalytics.engagementRate);
+        if (input.sortBy === "views") {
+          orderCol = desc(postAnalytics.viewsCount);
+        } else if (input.sortBy === "likes") {
+          orderCol = desc(postAnalytics.likesCount);
+        }
+
+        const topPosts = await db
+          .select({
+            postId: postAnalytics.postId,
+            accountId: postAnalytics.accountId,
+            platform: postAnalytics.platform,
+            views: postAnalytics.viewsCount,
+            likes: postAnalytics.likesCount,
+            comments: postAnalytics.commentsCount,
+            shares: postAnalytics.sharesCount,
+            engagementRate: postAnalytics.engagementRate,
+            recordedAt: postAnalytics.recordedAt,
+          })
+          .from(postAnalytics)
+          .where(inArray(postAnalytics.accountId, accountIds))
+          .orderBy(orderCol)
+          .limit(input.limit);
+
+        // Fetch all post content in a single query (avoids N+1 pattern)
+        const postIds = topPosts.map((p) => p.postId).filter((id): id is number => id !== null && id !== undefined);
+        const postContents =
+          postIds.length > 0
+            ? await db
+                .select({ id: scheduledPosts.id, content: scheduledPosts.content })
+                .from(scheduledPosts)
+                .where(inArray(scheduledPosts.id, postIds))
+            : [];
+
+        const contentMap = new Map(postContents.map((p) => [p.id, p.content]));
+
+        return topPosts.map((post) => {
+          const account = userAccounts.find((acc) => acc.id === post.accountId);
+          return {
+            ...post,
+            content: post.postId ? (contentMap.get(post.postId) || "") : "",
+            accountName: account?.username || "Unknown",
+            engagementRate: post.engagementRate / 100,
+          };
+        });
+      } catch (error) {
+        logger.error('[Analytics] getTopPosts error:', error);
         return [];
       }
-
-      // Get top posts based on sort criteria
-      let topPosts;
-      if (input.sortBy === "views") {
-        topPosts = await db
-          .select({
-            postId: postAnalytics.postId,
-            accountId: postAnalytics.accountId,
-            platform: postAnalytics.platform,
-            views: postAnalytics.viewsCount,
-            likes: postAnalytics.likesCount,
-            comments: postAnalytics.commentsCount,
-            shares: postAnalytics.sharesCount,
-            engagementRate: postAnalytics.engagementRate,
-            recordedAt: postAnalytics.recordedAt,
-          })
-          .from(postAnalytics)
-          .where(inArray(postAnalytics.accountId, accountIds))
-          .orderBy(desc(postAnalytics.viewsCount))
-          .limit(input.limit);
-      } else if (input.sortBy === "likes") {
-        topPosts = await db
-          .select({
-            postId: postAnalytics.postId,
-            accountId: postAnalytics.accountId,
-            platform: postAnalytics.platform,
-            views: postAnalytics.viewsCount,
-            likes: postAnalytics.likesCount,
-            comments: postAnalytics.commentsCount,
-            shares: postAnalytics.sharesCount,
-            engagementRate: postAnalytics.engagementRate,
-            recordedAt: postAnalytics.recordedAt,
-          })
-          .from(postAnalytics)
-          .where(inArray(postAnalytics.accountId, accountIds))
-          .orderBy(desc(postAnalytics.likesCount))
-          .limit(input.limit);
-      } else {
-        topPosts = await db
-          .select({
-            postId: postAnalytics.postId,
-            accountId: postAnalytics.accountId,
-            platform: postAnalytics.platform,
-            views: postAnalytics.viewsCount,
-            likes: postAnalytics.likesCount,
-            comments: postAnalytics.commentsCount,
-            shares: postAnalytics.sharesCount,
-            engagementRate: postAnalytics.engagementRate,
-            recordedAt: postAnalytics.recordedAt,
-          })
-          .from(postAnalytics)
-          .where(inArray(postAnalytics.accountId, accountIds))
-          .orderBy(desc(postAnalytics.engagementRate))
-          .limit(input.limit);
-      }
-
-      // Fetch all post content in a single query (avoids N+1 pattern)
-      const postIds = topPosts.map((p) => p.postId).filter(Boolean);
-      const postContents =
-        postIds.length > 0
-          ? await db
-              .select({ id: scheduledPosts.id, content: scheduledPosts.content })
-              .from(scheduledPosts)
-              .where(inArray(scheduledPosts.id, postIds))
-          : [];
-
-      const contentMap = new Map(postContents.map((p) => [p.id, p.content]));
-
-      const postsWithContent = topPosts.map((post) => {
-        const account = userAccounts.find((acc) => acc.id === post.accountId);
-        return {
-          ...post,
-          content: contentMap.get(post.postId) || "",
-          accountName: account?.username || "Unknown",
-          engagementRate: post.engagementRate / 100,
-        };
-      });
-
-      return postsWithContent;
     }),
 
   /**
@@ -324,31 +314,39 @@ export const analyticsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Calculate engagement rate
-      const totalEngagements = input.likes + input.comments + input.shares;
-      const engagementRate =
-        input.impressions > 0
-          ? Math.round((totalEngagements / input.impressions) * 10000) // Store as percentage * 100
-          : 0;
+      try {
+        // Calculate engagement rate
+        const totalEngagements = input.likes + input.comments + input.shares;
+        const engagementRate =
+          input.impressions > 0
+            ? Math.round((totalEngagements / input.impressions) * 10000) // Store as percentage * 100
+            : 0;
 
-      // Insert analytics record
-      await db.insert(postAnalytics).values({
-        postId: input.postId,
-        accountId: input.accountId,
-        platform: input.platform,
-        viewsCount: input.views,
-        likesCount: input.likes,
-        commentsCount: input.comments,
-        sharesCount: input.shares,
-        savesCount: input.saves,
-        clicksCount: input.clicks,
-        engagementRate,
-        reachCount: input.reach,
-        impressionsCount: input.impressions,
-        recordedAt: toMySQLTimestamp(new Date()),
-      });
+        // Insert analytics record
+        await db.insert(postAnalytics).values({
+          postId: input.postId,
+          accountId: input.accountId,
+          platform: input.platform,
+          viewsCount: input.views,
+          likesCount: input.likes,
+          commentsCount: input.comments,
+          sharesCount: input.shares,
+          savesCount: input.saves,
+          clicksCount: input.clicks,
+          engagementRate,
+          reachCount: input.reach,
+          impressionsCount: input.impressions,
+          recordedAt: toMySQLTimestamp(new Date()),
+        });
 
-      return { success: true };
+        return { success: true };
+      } catch (error) {
+        logger.error('[Analytics] recordAnalytics error:', error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'アナリティクスの記録に失敗しました',
+        });
+      }
     }),
 
   /**
@@ -363,61 +361,67 @@ export const analyticsRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const userId = ctx.user.id;
-      const userAccounts = await db
-        .select()
-        .from(accounts)
-        .where(eq(accounts.userId, userId));
+      try {
+        const userId = ctx.user.id;
+        const userAccounts = await db
+          .select()
+          .from(accounts)
+          .where(eq(accounts.userId, userId));
 
-      const accountIds = input.accountId
-        ? [input.accountId]
-        : userAccounts.map((acc) => acc.id);
+        const accountIds = input.accountId
+          ? [input.accountId]
+          : userAccounts.map((acc) => acc.id);
 
-      if (accountIds.length === 0) {
+        if (accountIds.length === 0) {
+          return { cells: [], recommendation: "" };
+        }
+
+        const conditions = [inArray(postAnalytics.accountId, accountIds)];
+        if (input.startDate) {
+          conditions.push(gte(postAnalytics.recordedAt, toMySQLTimestamp(new Date(input.startDate))));
+        }
+        if (input.endDate) {
+          conditions.push(lte(postAnalytics.recordedAt, toMySQLTimestamp(new Date(input.endDate))));
+        }
+
+        // Group by day of week and hour
+        const rows = await db
+          .select({
+            dayOfWeek: sql<number>`DAYOFWEEK(${postAnalytics.recordedAt}) - 1`,
+            hour: sql<number>`HOUR(${postAnalytics.recordedAt})`,
+            avgEngagementRate: sql<number>`AVG(${postAnalytics.engagementRate})`,
+            postCount: sql<number>`COUNT(*)`,
+          })
+          .from(postAnalytics)
+          .where(and(...conditions))
+          .groupBy(
+            sql`DAYOFWEEK(${postAnalytics.recordedAt})`,
+            sql`HOUR(${postAnalytics.recordedAt})`
+          );
+
+        const cells = rows.map((row) => ({
+          dayOfWeek: Number(row.dayOfWeek),
+          hour: Number(row.hour),
+          engagementRate: Number(row.avgEngagementRate || 0) / 100,
+          postCount: Number(row.postCount),
+        }));
+
+        // Find best time slot
+        let recommendation = "";
+        if (cells.length > 0) {
+          const best = cells.reduce(
+            (a, b) => (a.engagementRate > b.engagementRate ? a : b),
+            cells[0]
+          );
+          const dayNames = ["日", "月", "火", "水", "木", "金", "土"];
+          recommendation = `最もエンゲージメントが高い時間帯: ${dayNames[best.dayOfWeek]}曜日 ${best.hour}時`;
+        }
+
+        return { cells, recommendation };
+      } catch (error) {
+        logger.error('[Analytics] getHeatmapData error:', error);
         return { cells: [], recommendation: "" };
       }
-
-      const conditions = [inArray(postAnalytics.accountId, accountIds)];
-      if (input.startDate) {
-        conditions.push(gte(postAnalytics.recordedAt, toMySQLTimestamp(new Date(input.startDate))));
-      }
-      if (input.endDate) {
-        conditions.push(lte(postAnalytics.recordedAt, toMySQLTimestamp(new Date(input.endDate))));
-      }
-
-      // Group by day of week and hour
-      const rows = await db
-        .select({
-          dayOfWeek: sql<number>`DAYOFWEEK(${postAnalytics.recordedAt}) - 1`,
-          hour: sql<number>`HOUR(${postAnalytics.recordedAt})`,
-          avgEngagementRate: sql<number>`AVG(${postAnalytics.engagementRate})`,
-          postCount: sql<number>`COUNT(*)`,
-        })
-        .from(postAnalytics)
-        .where(and(...conditions))
-        .groupBy(
-          sql`DAYOFWEEK(${postAnalytics.recordedAt})`,
-          sql`HOUR(${postAnalytics.recordedAt})`
-        );
-
-      const cells = rows.map((row) => ({
-        dayOfWeek: Number(row.dayOfWeek),
-        hour: Number(row.hour),
-        engagementRate: Number(row.avgEngagementRate || 0) / 100,
-        postCount: Number(row.postCount),
-      }));
-
-      // Find best time slot
-      let recommendation = "";
-      if (cells.length > 0) {
-        const best = cells.reduce((a, b) =>
-          a.engagementRate > b.engagementRate ? a : b
-        );
-        const dayNames = ["日", "月", "火", "水", "木", "金", "土"];
-        recommendation = `最もエンゲージメントが高い時間帯: ${dayNames[best.dayOfWeek]}曜日 ${best.hour}時`;
-      }
-
-      return { cells, recommendation };
     }),
 
   /**
@@ -432,11 +436,16 @@ export const analyticsRouter = router({
       })
     )
     .query(async ({ input }) => {
-      return await getTopHashtags({
-        accountId: input.accountId,
-        projectId: input.projectId,
-        limit: input.limit,
-      });
+      try {
+        return await getTopHashtags({
+          accountId: input.accountId,
+          projectId: input.projectId,
+          limit: input.limit,
+        });
+      } catch (error) {
+        logger.error('[Analytics] getHashtagRanking error:', error);
+        return [];
+      }
     }),
 
   /**
@@ -450,29 +459,34 @@ export const analyticsRouter = router({
       })
     )
     .query(async ({ input }) => {
-      // Get usage history from hashtagPerformance
-      const conditions = [eq(hashtagPerformance.hashtag, input.hashtag)];
-      if (input.accountId) {
-        conditions.push(eq(hashtagPerformance.accountId, input.accountId));
+      try {
+        // Get usage history from hashtagPerformance
+        const conditions = [eq(hashtagPerformance.hashtag, input.hashtag)];
+        if (input.accountId) {
+          conditions.push(eq(hashtagPerformance.accountId, input.accountId));
+        }
+
+        const results = await db
+          .select()
+          .from(hashtagPerformance)
+          .where(and(...conditions))
+          .orderBy(desc(hashtagPerformance.updatedAt))
+          .limit(30);
+
+        return results.map((r) => ({
+          hashtag: r.hashtag,
+          usageCount: r.usageCount,
+          avgLikes: r.avgLikes,
+          avgComments: r.avgComments,
+          avgShares: r.avgShares,
+          avgEngagementRate: r.avgEngagementRate,
+          trendScore: r.trendScore,
+          lastUsedAt: r.lastUsedAt,
+        }));
+      } catch (error) {
+        logger.error('[Analytics] getHashtagTrends error:', error);
+        return [];
       }
-
-      const results = await db
-        .select()
-        .from(hashtagPerformance)
-        .where(and(...conditions))
-        .orderBy(desc(hashtagPerformance.updatedAt))
-        .limit(30);
-
-      return results.map((r) => ({
-        hashtag: r.hashtag,
-        usageCount: r.usageCount,
-        avgLikes: r.avgLikes,
-        avgComments: r.avgComments,
-        avgShares: r.avgShares,
-        avgEngagementRate: r.avgEngagementRate,
-        trendScore: r.trendScore,
-        lastUsedAt: r.lastUsedAt,
-      }));
     }),
 
   /**
@@ -486,20 +500,25 @@ export const analyticsRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      // If no accountId provided, use first user account
-      let accountId = input.accountId;
-      if (!accountId) {
-        const userAccounts = await db
-          .select({ id: accounts.id })
-          .from(accounts)
-          .where(eq(accounts.userId, ctx.user.id))
-          .limit(1);
-        accountId = userAccounts[0]?.id;
-      }
-      if (!accountId) {
+      try {
+        // If no accountId provided, use first user account
+        let accountId = input.accountId;
+        if (!accountId) {
+          const userAccounts = await db
+            .select({ id: accounts.id })
+            .from(accounts)
+            .where(eq(accounts.userId, ctx.user.id))
+            .limit(1);
+          accountId = userAccounts[0]?.id;
+        }
+        if (!accountId) {
+          return { ownTopHashtags: [], modelTopHashtags: [], recommended: [] };
+        }
+        return await compareWithModelAccountHashtags(accountId, input.projectId);
+      } catch (error) {
+        logger.error('[Analytics] getModelAccountHashtags error:', error);
         return { ownTopHashtags: [], modelTopHashtags: [], recommended: [] };
       }
-      return await compareWithModelAccountHashtags(accountId, input.projectId);
     }),
 
   /**
@@ -609,108 +628,119 @@ export const analyticsRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const userId = ctx.user.id;
+      try {
+        const userId = ctx.user.id;
 
-      const userAccounts = await db
-        .select()
-        .from(accounts)
-        .where(eq(accounts.userId, userId));
+        const userAccounts = await db
+          .select()
+          .from(accounts)
+          .where(eq(accounts.userId, userId));
 
-      const accountIds = input.accountId
-        ? [input.accountId]
-        : userAccounts.map((acc) => acc.id);
+        const accountIds = input.accountId
+          ? [input.accountId]
+          : userAccounts.map((acc) => acc.id);
 
-      // My stats
-      const myStats = accountIds.length > 0
-        ? await db
-            .select({
-              avgLikes: sql<number>`AVG(${postAnalytics.likesCount})`,
-              avgComments: sql<number>`AVG(${postAnalytics.commentsCount})`,
-              avgEngagementRate: sql<number>`AVG(${postAnalytics.engagementRate})`,
-              postCount: sql<number>`COUNT(*)`,
-            })
-            .from(postAnalytics)
-            .where(inArray(postAnalytics.accountId, accountIds))
-        : [{ avgLikes: 0, avgComments: 0, avgEngagementRate: 0, postCount: 0 }];
+        // My stats
+        const myStats = accountIds.length > 0
+          ? await db
+              .select({
+                avgLikes: sql<number>`AVG(${postAnalytics.likesCount})`,
+                avgComments: sql<number>`AVG(${postAnalytics.commentsCount})`,
+                avgEngagementRate: sql<number>`AVG(${postAnalytics.engagementRate})`,
+                postCount: sql<number>`COUNT(*)`,
+              })
+              .from(postAnalytics)
+              .where(inArray(postAnalytics.accountId, accountIds))
+          : [{ avgLikes: 0, avgComments: 0, avgEngagementRate: 0, postCount: 0 }];
 
-      // Model stats
-      const modelConditions = input.projectId
-        ? [eq(modelAccounts.projectId, input.projectId)]
-        : [];
+        // Model stats
+        const modelConditions = input.projectId
+          ? [eq(modelAccounts.projectId, input.projectId)]
+          : [];
 
-      const models = await db
-        .select()
-        .from(modelAccounts)
-        .where(modelConditions.length > 0 ? and(...modelConditions) : undefined);
+        const models = await db
+          .select()
+          .from(modelAccounts)
+          .where(modelConditions.length > 0 ? and(...modelConditions) : undefined);
 
-      const modelIds = models.map((m) => m.id);
-      const patterns = modelIds.length > 0
-        ? await db
-            .select()
-            .from(modelAccountBehaviorPatterns)
-            .where(inArray(modelAccountBehaviorPatterns.modelAccountId, modelIds))
-        : [];
+        const modelIds = models.map((m) => m.id);
+        const patterns = modelIds.length > 0
+          ? await db
+              .select()
+              .from(modelAccountBehaviorPatterns)
+              .where(inArray(modelAccountBehaviorPatterns.modelAccountId, modelIds))
+          : [];
 
-      const my = myStats[0];
-      const myLikes = Number(my?.avgLikes || 0);
-      const myComments = Number(my?.avgComments || 0);
-      const myEngRate = Number(my?.avgEngagementRate || 0) / 100;
+        const my = myStats[0];
+        const myLikes = Number(my?.avgLikes || 0);
+        const myComments = Number(my?.avgComments || 0);
+        const myEngRate = Number(my?.avgEngagementRate || 0) / 100;
 
-      const modelAvgEngRate = patterns.length > 0
-        ? patterns.reduce((s, p) => s + Number(p.avgEngagementRate || 0), 0) / patterns.length
-        : 0;
+        const modelAvgEngRate = patterns.length > 0
+          ? patterns.reduce((s, p) => s + Number(p.avgEngagementRate || 0), 0) / patterns.length
+          : 0;
 
-      const gaps = [];
+        const gaps = [];
 
-      if (modelAvgEngRate > 0 && myEngRate < modelAvgEngRate) {
-        const gapPct = Math.round(((modelAvgEngRate - myEngRate) / modelAvgEngRate) * 100);
-        gaps.push({
-          metric: "エンゲージメント率",
-          myValue: Math.round(myEngRate * 100) / 100,
-          modelValue: Math.round(modelAvgEngRate * 100) / 100,
-          gapPercentage: gapPct,
-          recommendation: `モデルアカウントのエンゲージメント率は${modelAvgEngRate.toFixed(2)}%。コンテンツの質と投稿タイミングを改善しましょう。`,
-          priority: gapPct > 50 ? "high" : gapPct > 25 ? "medium" : "low",
-        });
+        if (modelAvgEngRate > 0 && myEngRate < modelAvgEngRate) {
+          const gapPct = Math.round(((modelAvgEngRate - myEngRate) / modelAvgEngRate) * 100);
+          let priority: "high" | "medium" | "low" = "low";
+          if (gapPct > 50) {
+            priority = "high";
+          } else if (gapPct > 25) {
+            priority = "medium";
+          }
+          gaps.push({
+            metric: "エンゲージメント率",
+            myValue: Math.round(myEngRate * 100) / 100,
+            modelValue: Math.round(modelAvgEngRate * 100) / 100,
+            gapPercentage: gapPct,
+            recommendation: `モデルアカウントのエンゲージメント率は${modelAvgEngRate.toFixed(2)}%。コンテンツの質と投稿タイミングを改善しましょう。`,
+            priority,
+          });
+        }
+
+        if (myLikes < 10) {
+          gaps.push({
+            metric: "平均いいね数",
+            myValue: Math.round(myLikes),
+            modelValue: 0,
+            gapPercentage: 0,
+            recommendation: `いいね数を増やすため、ビジュアルコンテンツの質を上げましょう。`,
+            priority: "medium" as const,
+          });
+        }
+
+        if (myComments < 5) {
+          gaps.push({
+            metric: "平均コメント数",
+            myValue: Math.round(myComments),
+            modelValue: 0,
+            gapPercentage: 0,
+            recommendation: `質問形式や議論を促す投稿を増やし、コメントを獲得しましょう。`,
+            priority: "medium" as const,
+          });
+        }
+
+        const modelAvgPostsDay = patterns.length > 0
+          ? patterns.reduce((s, p) => s + Number(p.avgPostsPerDay || 0), 0) / patterns.length
+          : 0;
+        if (modelAvgPostsDay > 0) {
+          gaps.push({
+            metric: "投稿頻度",
+            myValue: Number(my?.postCount || 0),
+            modelValue: Math.round(modelAvgPostsDay * 7),
+            gapPercentage: 0,
+            recommendation: `モデルアカウントは1日平均${modelAvgPostsDay.toFixed(1)}回投稿。コンスタントな投稿を心がけましょう。`,
+            priority: "medium" as const,
+          });
+        }
+
+        return { gaps };
+      } catch (error) {
+        logger.error('[Analytics] getGapAnalysis error:', error);
+        return { gaps: [] };
       }
-
-      if (myLikes < 10) {
-        gaps.push({
-          metric: "平均いいね数",
-          myValue: Math.round(myLikes),
-          modelValue: 0,
-          gapPercentage: 0,
-          recommendation: `いいね数を増やすため、ビジュアルコンテンツの質を上げましょう。`,
-          priority: "medium" as const,
-        });
-      }
-
-      if (myComments < 5) {
-        gaps.push({
-          metric: "平均コメント数",
-          myValue: Math.round(myComments),
-          modelValue: 0,
-          gapPercentage: 0,
-          recommendation: `質問形式や議論を促す投稿を増やし、コメントを獲得しましょう。`,
-          priority: "medium" as const,
-        });
-      }
-
-      const modelAvgPostsDay = patterns.length > 0
-        ? patterns.reduce((s, p) => s + Number(p.avgPostsPerDay || 0), 0) / patterns.length
-        : 0;
-      if (modelAvgPostsDay > 0) {
-        gaps.push({
-          metric: "投稿頻度",
-          myValue: Number(my?.postCount || 0),
-          modelValue: Math.round(modelAvgPostsDay * 7),
-          gapPercentage: 0,
-          recommendation: `モデルアカウントは1日平均${modelAvgPostsDay.toFixed(1)}回投稿。コンスタントな投稿を心がけましょう。`,
-          priority: "medium" as const,
-        });
-      }
-
-      return { gaps };
     }),
 
   /**
@@ -726,12 +756,17 @@ export const analyticsRouter = router({
       })
     )
     .query(async ({ input }) => {
-      return await getFunnelData({
-        accountId: input.accountId,
-        projectId: input.projectId,
-        startDate: input.startDate,
-        endDate: input.endDate,
-      });
+      try {
+        return await getFunnelData({
+          accountId: input.accountId,
+          projectId: input.projectId,
+          startDate: input.startDate,
+          endDate: input.endDate,
+        });
+      } catch (error) {
+        logger.error('[Analytics] getFunnelData error:', error);
+        return { stages: [], timeSeries: [] };
+      }
     }),
 
   /**
@@ -746,10 +781,15 @@ export const analyticsRouter = router({
       })
     )
     .query(async ({ input }) => {
-      return await getPostFunnelContribution({
-        accountId: input.accountId,
-        projectId: input.projectId,
-        limit: input.limit,
-      });
+      try {
+        return await getPostFunnelContribution({
+          accountId: input.accountId,
+          projectId: input.projectId,
+          limit: input.limit,
+        });
+      } catch (error) {
+        logger.error('[Analytics] getPostFunnelContribution error:', error);
+        return [];
+      }
     }),
 });

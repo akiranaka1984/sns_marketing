@@ -34,12 +34,15 @@ describe("Weekly Review Feature", () => {
       .insert(weeklyReviews)
       .values({
         userId: testUserId,
-        weekStartDate: weekStart,
-        weekEndDate: weekEnd,
+        weekStartDate: weekStart.toISOString().slice(0, 19).replace("T", " "),
+        weekEndDate: weekEnd.toISOString().slice(0, 19).replace("T", " "),
         totalPosts: 10,
         totalViews: 5000,
         totalLikes: 250,
-        avgEngagement: 5.0,
+        totalComments: 30,
+        totalShares: 20,
+        // avgEngagementRate is stored as integer * 100 for precision (500 = 5.00%)
+        avgEngagementRate: 500,
         insights: JSON.stringify({
           topPerformingContent: "Tutorial posts performed best",
           engagementTrends: "Engagement increased by 20%",
@@ -61,7 +64,8 @@ describe("Weekly Review Feature", () => {
     expect(created).toBeDefined();
     expect(created.totalPosts).toBe(10);
     expect(created.totalViews).toBe(5000);
-    expect(created.avgEngagement).toBe(5.0);
+    // avgEngagementRate is stored * 100; 500 represents 5.00%
+    expect(created.avgEngagementRate).toBe(500);
   });
 
   it("should list weekly reviews", async () => {

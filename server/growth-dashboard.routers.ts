@@ -15,12 +15,8 @@ import {
   contentCalendar,
   trackedTrends,
   campaigns,
-  conversionEvents,
-  projects,
-  agents,
   accounts,
   posts,
-  postAnalytics,
   scheduledPosts,
 } from '../drizzle/schema';
 import { eq, and, gte, desc, sql, count, lte } from 'drizzle-orm';

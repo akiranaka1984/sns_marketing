@@ -19,46 +19,53 @@ export const xApiSettingsRouter = router({
    * Get X API settings for current user
    */
   get: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.user?.id || 1;
-
-    const settings = await db.query.xApiSettings.findFirst({
-      where: eq(xApiSettings.userId, userId),
-    });
-
-    if (!settings) {
-      return {
-        configured: false,
-        apiKey: "",
-        apiSecret: "",
-        bearerToken: "",
-        accessToken: "",
-        accessTokenSecret: "",
-        apiTier: "free" as const,
-        oauthConfigured: false,
-        lastTestedAt: null,
-        testResult: null,
-      };
-    }
-
-    // Decrypt sensitive credential fields before returning to client
-    const decryptedApiKey = settings.apiKey ? decrypt(settings.apiKey) : "";
-    const decryptedApiSecret = settings.apiSecret ? decrypt(settings.apiSecret) : "";
-    const decryptedBearerToken = settings.bearerToken ? decrypt(settings.bearerToken) : "";
-    const decryptedAccessToken = settings.accessToken ? decrypt(settings.accessToken) : "";
-    const decryptedAccessTokenSecret = settings.accessTokenSecret ? decrypt(settings.accessTokenSecret) : "";
-
-    return {
-      configured: !!settings.bearerToken,
-      apiKey: decryptedApiKey,
-      apiSecret: decryptedApiSecret,
-      bearerToken: decryptedBearerToken,
-      accessToken: decryptedAccessToken,
-      accessTokenSecret: decryptedAccessTokenSecret,
-      apiTier: settings.apiTier || "free",
-      oauthConfigured: !!(decryptedApiKey && decryptedApiSecret && decryptedAccessToken && decryptedAccessTokenSecret),
-      lastTestedAt: settings.lastTestedAt,
-      testResult: settings.testResult,
+    const emptyResult = {
+      configured: false,
+      apiKey: "",
+      apiSecret: "",
+      bearerToken: "",
+      accessToken: "",
+      accessTokenSecret: "",
+      apiTier: "free" as const,
+      oauthConfigured: false,
+      lastTestedAt: null,
+      testResult: null,
     };
+
+    try {
+      const userId = ctx.user?.id || 1;
+
+      const settings = await db.query.xApiSettings.findFirst({
+        where: eq(xApiSettings.userId, userId),
+      });
+
+      if (!settings) {
+        return emptyResult;
+      }
+
+      // Decrypt sensitive credential fields before returning to client
+      const decryptedApiKey = settings.apiKey ? decrypt(settings.apiKey) : "";
+      const decryptedApiSecret = settings.apiSecret ? decrypt(settings.apiSecret) : "";
+      const decryptedBearerToken = settings.bearerToken ? decrypt(settings.bearerToken) : "";
+      const decryptedAccessToken = settings.accessToken ? decrypt(settings.accessToken) : "";
+      const decryptedAccessTokenSecret = settings.accessTokenSecret ? decrypt(settings.accessTokenSecret) : "";
+
+      return {
+        configured: !!settings.bearerToken,
+        apiKey: decryptedApiKey,
+        apiSecret: decryptedApiSecret,
+        bearerToken: decryptedBearerToken,
+        accessToken: decryptedAccessToken,
+        accessTokenSecret: decryptedAccessTokenSecret,
+        apiTier: settings.apiTier || "free",
+        oauthConfigured: !!(decryptedApiKey && decryptedApiSecret && decryptedAccessToken && decryptedAccessTokenSecret),
+        lastTestedAt: settings.lastTestedAt,
+        testResult: settings.testResult,
+      };
+    } catch (error) {
+      logger.error('[X API Settings] get error:', error);
+      return emptyResult;
+    }
   }),
 
   /**
@@ -242,23 +249,32 @@ export const xApiSettingsRouter = router({
   getApiUsage: protectedProcedure.query(async () => {
     const currentMonth = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
 
-    // Per-account breakdown for the current month
-    const rows = await db
-      .select({
-        accountId: apiUsageTracking.accountId,
-        tweetCount: apiUsageTracking.tweetCount,
-        lastPostedAt: apiUsageTracking.lastPostedAt,
-      })
-      .from(apiUsageTracking)
-      .where(eq(apiUsageTracking.month, currentMonth));
+    try {
+      // Per-account breakdown for the current month
+      const rows = await db
+        .select({
+          accountId: apiUsageTracking.accountId,
+          tweetCount: apiUsageTracking.tweetCount,
+          lastPostedAt: apiUsageTracking.lastPostedAt,
+        })
+        .from(apiUsageTracking)
+        .where(eq(apiUsageTracking.month, currentMonth));
 
-    const totalTweets = rows.reduce((acc, row) => acc + (row.tweetCount ?? 0), 0);
+      const totalTweets = rows.reduce((acc, row) => acc + (row.tweetCount ?? 0), 0);
 
-    return {
-      month: currentMonth,
-      totalTweets,
-      perAccount: rows,
-    };
+      return {
+        month: currentMonth,
+        totalTweets,
+        perAccount: rows,
+      };
+    } catch (error) {
+      logger.error('[X API Settings] getApiUsage error:', error);
+      return {
+        month: currentMonth,
+        totalTweets: 0,
+        perAccount: [],
+      };
+    }
   }),
 
   /**
@@ -270,24 +286,32 @@ export const xApiSettingsRouter = router({
    *   enterprise: unlimited (represented as null)
    */
   getMonthlyLimit: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.user?.id || 1;
+    try {
+      const userId = ctx.user?.id || 1;
 
-    const settings = await db.query.xApiSettings.findFirst({
-      where: eq(xApiSettings.userId, userId),
-    });
+      const settings = await db.query.xApiSettings.findFirst({
+        where: eq(xApiSettings.userId, userId),
+      });
 
-    const tier = settings?.apiTier ?? 'free';
+      const tier = settings?.apiTier ?? 'free';
 
-    const limits: Record<string, number | null> = {
-      free: 500,
-      basic: 3000,
-      pro: 300000,
-      enterprise: null,
-    };
+      const limits: Record<string, number | null> = {
+        free: 500,
+        basic: 3000,
+        pro: 300000,
+        enterprise: null,
+      };
 
-    return {
-      tier,
-      monthlyLimit: limits[tier] ?? 500,
-    };
+      return {
+        tier,
+        monthlyLimit: limits[tier] ?? 500,
+      };
+    } catch (error) {
+      logger.error('[X API Settings] getMonthlyLimit error:', error);
+      return {
+        tier: 'free',
+        monthlyLimit: 500,
+      };
+    }
   }),
 });
