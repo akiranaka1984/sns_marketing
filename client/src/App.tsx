@@ -10,9 +10,12 @@ import { useAuth } from "./_core/hooks/useAuth";
 import DashboardLayout from "./components/DashboardLayout";
 import { CommandPalette } from "./components/CommandPalette";
 import Login from "./pages/Login";
+import { FeatureFlagDevTools } from "./components/FeatureFlagDevTools";
+import { useFeatureFlag } from "./hooks/useFeatureFlags";
 
 // Lazy-loaded pages for route-based code splitting
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const CommandCenter = lazy(() => import("./pages/v2/CommandCenter"));
 const Accounts = lazy(() => import("./pages/Accounts"));
 const NewAccount = lazy(() => import("./pages/NewAccount"));
 const Strategies = lazy(() => import("./pages/Strategies"));
@@ -48,6 +51,7 @@ const TeamManagement = lazy(() => import("./pages/TeamManagement"));
 
 function Router() {
   const { isAuthenticated, loading, refresh } = useAuth();
+  const newDashboard = useFeatureFlag("new_dashboard");
 
   if (loading) {
     return <LoadingSpinner fullScreen showLabel />;
@@ -57,12 +61,15 @@ function Router() {
     return <Login onSuccess={() => refresh()} />;
   }
 
+  const HomePage = newDashboard ? CommandCenter : Dashboard;
+
   return (
     <DashboardLayout>
       <CommandPalette />
       <Suspense fallback={<LoadingSpinner fullScreen={false} showLabel />}>
         <Switch>
-          <Route path="/" component={Dashboard} />
+          <Route path="/" component={HomePage} />
+          <Route path="/today" component={CommandCenter} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/projects" component={Projects} />
           <Route path="/projects/new" component={NewProject} />
@@ -111,6 +118,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
+          {import.meta.env.DEV && <FeatureFlagDevTools />}
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

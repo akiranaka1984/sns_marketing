@@ -42,17 +42,6 @@ export function Analytics() {
     endDate: dateRange.endDate,
   });
 
-  if (overviewLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-          <p className="mt-4 text-neutral-500 font-bold">{t('common.loading')}</p>
-        </div>
-      </div>
-    );
-  }
-
   const exportData = useMemo(() => {
     if (activeTab === "accounts" && overview?.accountPerformance) {
       return overview.accountPerformance.map((account) => ({
@@ -143,6 +132,18 @@ export function Analytics() {
     };
     return titles[activeTab] || "アナリティクス";
   }, [activeTab]);
+
+  // Early return for loading state AFTER all hooks have been called
+  if (overviewLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+          <p className="mt-4 text-neutral-500 font-bold">{t('common.loading')}</p>
+        </div>
+      </div>
+    );
+  }
 
   const tabLabels: Record<string, string> = {
     accounts: "アカウント別",

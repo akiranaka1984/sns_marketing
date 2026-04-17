@@ -24,10 +24,18 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script
-      defer
-      src="%VITE_ANALYTICS_ENDPOINT%/umami"
-      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
+    <!-- Analytics: only load when both env vars are configured -->
+    <script type="module">
+      const endpoint = "%VITE_ANALYTICS_ENDPOINT%";
+      const websiteId = "%VITE_ANALYTICS_WEBSITE_ID%";
+      if (endpoint && !endpoint.includes("%") && websiteId && !websiteId.includes("%")) {
+        const s = document.createElement("script");
+        s.defer = true;
+        s.src = `${endpoint}/umami`;
+        s.setAttribute("data-website-id", websiteId);
+        document.body.appendChild(s);
+      }
+    </script>
   </body>
 
 </html>

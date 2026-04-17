@@ -136,56 +136,29 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [mobileOpen]);
 
+  // ── 厳選された9項目のみ（24項目→9項目に絞り込み） ──
+  // 旧43ページは統合先ページからタブ/サブナビで到達可能。直リンクも維持。
   const privatePages: NavItem[] = [
-    { icon: Home, label: "ホーム", path: "/" },
+    { icon: Home, label: "今日", path: "/" },
     { icon: Inbox, label: "受信トレイ", path: "/inbox" },
   ];
 
+  // フラットな主要5項目（旧「管理/自動化/分析/監視」の階層を解消）
   const sections: NavSection[] = [
     {
-      title: "管理",
+      title: "",  // 見出しなし
       defaultOpen: true,
       items: [
         { icon: Users, label: "アカウント", path: "/accounts" },
-        { icon: FolderOpen, label: "プラン検討", path: "/projects" },
+        { icon: CheckSquare, label: "コンテンツ", path: "/post-review" },
+        { icon: BarChart3, label: "インサイト", path: "/analytics" },
         { icon: Bot, label: "エージェント", path: "/agents" },
-        { icon: UserPlus, label: "チーム管理", path: "/team" },
-      ],
-    },
-    {
-      title: "自動化",
-      items: [
-        { icon: Zap, label: "自動化設定", path: "/automation" },
-        { icon: CheckSquare, label: "投稿レビュー", path: "/post-review" },
-        { icon: Calendar, label: "スケジュール", path: "/scheduled-posts" },
-        { icon: CalendarDays, label: "カレンダー", path: "/content-calendar" },
-      ],
-    },
-    {
-      title: "分析",
-      items: [
-        { icon: BarChart3, label: "分析", path: "/analytics" },
-        { icon: TrendingUp, label: "週次レビュー", path: "/weekly-review" },
-        { icon: Sparkles, label: "AI最適化", path: "/ai-optimization" },
-        { icon: FlaskConical, label: "A/Bテスト", path: "/ab-testing" },
-        { icon: GraduationCap, label: "モデル", path: "/model-accounts" },
-        { icon: Flame, label: "バズ分析", path: "/buzz-analysis" },
-        { icon: Brain, label: "学習インサイト", path: "/learning-insights" },
-        { icon: Hash, label: "ハッシュタグ", path: "/hashtag-analytics" },
-        { icon: Trophy, label: "競合比較", path: "/competitor-benchmark" },
-      ],
-    },
-    {
-      title: "監視",
-      items: [
-        { icon: AlertTriangle, label: "凍結検知", path: "/freeze-detection" },
-        { icon: MessageCircle, label: "エンゲージメント", path: "/engagement" },
+        { icon: Lightbulb, label: "戦略", path: "/strategies" },
       ],
     },
   ];
 
   const bottomItems: NavItem[] = [
-    { icon: Lightbulb, label: "戦略", path: "/strategies" },
     { icon: FileText, label: "ログ", path: "/logs" },
     { icon: Settings, label: "設定", path: "/settings" },
   ];
@@ -235,6 +208,17 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
   };
 
   const SectionGroup = ({ section }: { section: NavSection }) => {
+    // タイトルが空の場合は見出しなしで直接表示（フラットナビ）
+    if (!section.title) {
+      return (
+        <div className="mt-1 space-y-[2px]">
+          {section.items.map((item) => (
+            <NavItemRow key={item.path} item={item} />
+          ))}
+        </div>
+      );
+    }
+
     const isExpanded = expandedSections[section.title.toLowerCase()] ?? section.defaultOpen ?? false;
 
     return (
@@ -266,6 +250,27 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
       </div>
     );
   };
+
+  // 「詳細機能」セクション（折りたたみデフォルト）— 上級者・ヘビーユーザー向け
+  const advancedItems: NavItem[] = [
+    { icon: FlaskConical, label: "A/Bテスト", path: "/ab-testing" },
+    { icon: Flame, label: "バズ分析", path: "/buzz-analysis" },
+    { icon: Brain, label: "学習インサイト", path: "/learning-insights" },
+    { icon: TrendingUp, label: "週次レビュー", path: "/weekly-review" },
+    { icon: Sparkles, label: "AI最適化", path: "/ai-optimization" },
+    { icon: GraduationCap, label: "モデル", path: "/model-accounts" },
+    { icon: Hash, label: "ハッシュタグ", path: "/hashtag-analytics" },
+    { icon: Trophy, label: "競合比較", path: "/competitor-benchmark" },
+    { icon: Calendar, label: "スケジュール", path: "/scheduled-posts" },
+    { icon: CalendarDays, label: "カレンダー", path: "/content-calendar" },
+    { icon: Zap, label: "自動化設定", path: "/automation" },
+    { icon: FolderOpen, label: "プラン検討", path: "/projects" },
+    { icon: UserPlus, label: "チーム管理", path: "/team" },
+    { icon: AlertTriangle, label: "凍結検知", path: "/freeze-detection" },
+    { icon: MessageCircle, label: "エンゲージメント", path: "/engagement" },
+  ];
+
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   const sidebarContent = (
     <>
@@ -339,9 +344,37 @@ function NeoLayout({ children }: { children: React.ReactNode }) {
           ))}
         </div>
 
-        {sections.map((section) => (
-          <SectionGroup key={section.title} section={section} />
+        {sections.map((section, i) => (
+          <SectionGroup key={section.title || `section-${i}`} section={section} />
         ))}
+
+        {/* ── 詳細機能（折りたたみ、デフォルト閉） ── */}
+        {!(isCollapsed && !isMobile) && (
+          <div className="mt-5">
+            <button
+              onClick={() => setAdvancedOpen(!advancedOpen)}
+              aria-expanded={advancedOpen}
+              className="w-full flex items-center gap-1.5 px-2.5 py-[4px] group"
+            >
+              <ChevronDown
+                className={`w-3 h-3 text-neutral-700 group-hover:text-neutral-500 transition-all duration-200 ${advancedOpen ? '' : '-rotate-90'}`}
+              />
+              <span className="text-[11px] font-medium text-neutral-600 uppercase tracking-widest group-hover:text-neutral-500 transition-colors">
+                詳細機能
+              </span>
+              <span className="ml-auto text-[10px] text-neutral-700 font-mono">
+                {advancedItems.length}
+              </span>
+            </button>
+            {advancedOpen && (
+              <div className="mt-1 space-y-[2px]">
+                {advancedItems.map((item) => (
+                  <NavItemRow key={item.path} item={item} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="my-4 border-t border-white/[0.06]" />
 

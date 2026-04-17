@@ -105,3 +105,11 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+
+# Manus debug artifacts (may contain credentials)
+.manus/
+.playwright-mcp/
+
+# Python bytecode
+__pycache__/
+*.pyc
